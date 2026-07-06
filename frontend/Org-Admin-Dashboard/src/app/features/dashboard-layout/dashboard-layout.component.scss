@@ -1,0 +1,272 @@
+// =============================================================================
+// dashboard-layout.component.scss
+// Styles for the persistent authenticated shell (sidebar + top bar).
+// All values come from _tokens.scss — nothing is hardcoded here.
+// =============================================================================
+
+@import '../../../styles/tokens';
+
+// ── Overall grid ──────────────────────────────────────────────────────────────
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: $color-background;
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: $color-surface-container-low;
+  border-right: 1px solid $color-outline-variant;
+  height: 100vh;
+  overflow-y: auto;
+  // Fixed within the flex layout — no positioning hack needed
+  position: sticky;
+  top: 0;
+
+  &__org {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: $spacing-container-padding $spacing-container-padding $spacing-gutter;
+    border-bottom: 1px solid $color-outline-variant;
+    margin-bottom: $spacing-unit * 2;
+  }
+
+  &__org-name {
+    color: $color-on-surface;
+    font-weight: $fw-bold;
+  }
+
+  &__org-label {
+    color: $color-on-surface-variant;
+  }
+
+  &__nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 8px;
+  }
+
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: $spacing-unit * 4 8px;
+    border-top: 1px solid $color-outline-variant;
+    margin-top: auto;
+  }
+
+  &__nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px $spacing-gutter;
+    border-radius: $rounded;
+    font-family: $font-primary;
+    font-size: $fs-label-md;
+    font-weight: $fw-semibold;
+    line-height: $lh-label-md;
+    letter-spacing: 0.01em;
+    color: $color-on-surface-variant;
+    text-decoration: none;
+    transition: background-color 150ms ease, color 150ms ease;
+    // Transparent left border placeholder — replaced on active state
+    border-left: 2px solid transparent;
+
+    .material-symbols-outlined {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background-color: $color-surface-container-high;
+      color: $color-on-surface;
+    }
+
+    &--active {
+      color: $color-primary;
+      background-color: rgba($color-primary, 0.06);
+      border-left-color: $color-primary;
+      border-radius: 0 $rounded $rounded 0;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// ── Main content column ───────────────────────────────────────────────────────
+.layout__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // prevents flex overflow
+  overflow: hidden;
+}
+
+.layout__content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: $color-surface-container-lowest;
+}
+
+// ── Top Navigation Bar ────────────────────────────────────────────────────────
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  padding: 0 $spacing-container-padding;
+  background-color: $color-surface;
+  border-bottom: 1px solid $color-outline-variant;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-gutter;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: $spacing-unit * 2;
+  }
+
+  &__brand {
+    color: $color-primary;
+    font-weight: $fw-bold;
+    white-space: nowrap;
+  }
+
+  &__search {
+    position: relative;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: $color-outline-variant;
+    pointer-events: none;
+  }
+
+  &__search-input {
+    padding: 6px 12px 6px 34px;
+    font-family: $font-primary;
+    font-size: $fs-body-sm;
+    color: $color-on-surface;
+    background-color: $color-surface-container-lowest;
+    border: 1px solid $color-outline-variant;
+    border-radius: $rounded-full;
+    width: 256px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &::placeholder {
+      color: $color-outline;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px $color-primary-fixed;
+    }
+  }
+
+  &__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-on-surface-variant;
+    padding: 8px;
+    border-radius: $rounded-full;
+    transition: background-color 150ms ease;
+
+    .material-symbols-outlined {
+      font-size: 22px;
+    }
+
+    &:hover {
+      background-color: $color-surface-container-low;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
+  }
+
+  &__divider {
+    width: 1px;
+    height: 24px;
+    background-color: $color-outline-variant;
+    margin: 0 $spacing-unit;
+  }
+
+  &__org-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: $rounded;
+    font-family: $font-primary;
+    font-size: $fs-body-sm;
+    font-weight: $fw-medium;
+    color: $color-on-surface;
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background-color: $color-surface-container-low;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
+  }
+
+  &__chevron {
+    font-size: 16px;
+    color: $color-on-surface-variant;
+  }
+
+  // User avatar wrapper
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: $rounded-full;
+    border: 1px solid $color-outline-variant;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: $spacing-unit;
+    cursor: pointer;
+    background-color: $color-surface-container;
+  }
+
+  &__avatar-icon {
+    font-size: 32px;
+    color: $color-on-surface-variant;
+  }
+}

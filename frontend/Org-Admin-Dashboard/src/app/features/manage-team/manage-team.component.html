@@ -1,0 +1,54 @@
+<section class="manage-team">
+
+  <!-- ── Page Header ─────────────────────────────────────────────────────── -->
+  <div class="manage-team__header">
+    <div class="manage-team__header-text">
+      <h1 class="pd-headline-md manage-team__title">{{ strings.pageTitle }}</h1>
+      <p class="pd-body-md manage-team__subtitle">{{ strings.pageSubtitle }}</p>
+    </div>
+
+    <!-- Add CTA Button based on current tab -->
+    <button
+      *ngIf="activeTab === 'departments'"
+      id="btn-add-department"
+      class="btn-primary"
+      routerLink="/manage-team/add-department"
+      type="button">
+      <span class="material-symbols-outlined icon-sm">add</span>
+      {{ strings.departments.addButton }}
+    </button>
+    <button
+      *ngIf="activeTab === 'officers'"
+      id="btn-add-officer"
+      class="btn-primary"
+      routerLink="/manage-team/add-officer"
+      type="button">
+      <span class="material-symbols-outlined icon-sm">person_add</span>
+      {{ strings.officers.addButton }}
+    </button>
+  </div>
+
+  <!-- ── Tab Strip ──────────────────────────────────────────────────────── -->
+  <div class="manage-team__tabs" role="tablist">
+    <button
+      id="tab-departments"
+      role="tab"
+      [attr.aria-selected]="activeTab === 'departments'"
+      class="manage-team__tab"
+      [class.manage-team__tab--active]="activeTab === 'departments'"
+      (click)="setTab('departments')">
+      {{ strings.tabs.departments }}
+    </button>
+        <button id="tab-officers" role="tab" [attr.aria-selected]="activeTab === 'officers'" class="manage-team__tab"
+          [class.manage-team__tab--active]="activeTab === 'officers'" (click)="setTab('officers')">
+          {{ strings.tabs.officers }}
+        </button>
+  </div>
+
+  <!-- ── Tab Content Subcomponents ───────────────────────────────────────── -->
+  <div class="manage-team__content">
+    <app-manage-departments *ngIf="activeTab === 'departments'"></app-manage-departments>
+    <app-manage-officers *ngIf="activeTab === 'officers'"></app-manage-officers>
+  </div>
+
+</section>

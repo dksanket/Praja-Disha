@@ -1,0 +1,161 @@
+<main class="login-page">
+  <!-- Subtle grid background (aria-hidden so screen readers skip it) -->
+  <div class="login-page__bg-grid" aria-hidden="true">
+    <svg width="100%" height="100%">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)"/>
+    </svg>
+  </div>
+
+  <!-- Decorative blurred blobs -->
+  <div class="login-page__blob login-page__blob--top-right" aria-hidden="true"></div>
+  <div class="login-page__blob login-page__blob--bottom-left" aria-hidden="true"></div>
+
+  <!-- Centred login card -->
+  <div class="login-page__content">
+    <div class="login-card" role="region" aria-label="Login">
+
+      <!-- Logo & heading -->
+      <div class="login-card__header">
+        <div class="login-card__logo">
+          <img src="assets/logo/logo.png" [alt]="strings.brandName" class="login-card__logo-img"/>
+        </div>
+        <h1 class="pd-headline-md login-card__title">{{ strings.pageTitle }}</h1>
+      </div>
+
+      <!-- Auth methods -->
+      <div class="login-card__body">
+
+        <!-- Google SSO -->
+        <button
+          type="button"
+          id="btn-google-login"
+          class="btn-google"
+          (click)="onGoogleLogin()"
+          (mousedown)="pressButton($event)"
+          (mouseup)="releaseButton($event)"
+          (mouseleave)="releaseButton($event)">
+          <!-- Google coloured logo SVG -->
+          <svg class="btn-google__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span>{{ strings.googleBtn }}</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="divider" aria-hidden="true">
+          <div class="divider__line"></div>
+          <span class="divider__label pd-label-sm">{{ strings.divider }}</span>
+          <div class="divider__line"></div>
+        </div>
+
+        <!-- Credential form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+          <!-- Auth method toggle -->
+          <div class="auth-toggle" role="radiogroup" aria-label="Authentication method">
+            <label class="auth-toggle__option">
+              <input
+                type="radio"
+                name="auth_method"
+                value="phone"
+                [checked]="authMethod === 'phone'"
+                (change)="setAuthMethod('phone')"
+                class="auth-toggle__radio"/>
+              <span class="pd-label-md auth-toggle__label">{{ strings.radioPhone }}</span>
+            </label>
+            <label class="auth-toggle__option">
+              <input
+                type="radio"
+                name="auth_method"
+                value="email"
+                [checked]="authMethod === 'email'"
+                (change)="setAuthMethod('email')"
+                class="auth-toggle__radio"/>
+              <span class="pd-label-md auth-toggle__label">{{ strings.radioEmail }}</span>
+            </label>
+          </div>
+
+          <!-- Input row — phone mode shows country-code dropdown + number field -->
+          <div class="input-row">
+            <div *ngIf="authMethod === 'phone'" class="select-wrapper">
+              <select
+                id="sel-country-code"
+                formControlName="countryCode"
+                class="pd-input pd-input--select"
+                aria-label="Country code">
+                <option>+91</option>
+                <option>+1</option>
+                <option>+44</option>
+              </select>
+              <span class="material-symbols-outlined select-wrapper__chevron" aria-hidden="true">expand_more</span>
+            </div>
+
+            <input
+              id="inp-identifier"
+              [type]="authMethod === 'phone' ? 'tel' : 'email'"
+              [placeholder]="authMethod === 'phone' ? strings.phonePlaceholder : strings.emailPlaceholder"
+              formControlName="identifier"
+              class="pd-input pd-input--identifier"
+              [attr.inputmode]="authMethod === 'phone' ? 'numeric' : 'email'"
+              autocomplete="off"/>
+          </div>
+
+          <!-- Submit -->
+          <button
+            id="btn-send-otp"
+            type="submit"
+            class="btn-primary"
+            (mousedown)="pressButton($event)"
+            (mouseup)="releaseButton($event)"
+            (mouseleave)="releaseButton($event)">
+            {{ strings.sendOtp }}
+          </button>
+
+          <!-- Terms -->
+          <div class="terms">
+            <input
+              id="chk-terms"
+              type="checkbox"
+              formControlName="terms"
+              class="terms__checkbox"/>
+            <label for="chk-terms" class="pd-body-sm terms__text">
+              {{ strings.termsPrefix }}
+              <a href="#" class="terms__link">{{ strings.termsLink }}</a>
+              {{ strings.termsSuffix }}
+            </label>
+          </div>
+
+        </form>
+      </div><!-- /.login-card__body -->
+
+    </div><!-- /.login-card -->
+
+    <!-- Below-card link -->
+    <p class="pd-body-sm below-card-link">
+      {{ strings.noAccount }}
+      <a href="#" class="below-card-link__anchor pd-title-md">{{ strings.contactAdmin }}</a>
+    </p>
+  </div><!-- /.login-page__content -->
+
+  <!-- Footer -->
+  <footer class="login-footer">
+    <span class="pd-label-sm login-footer__copy">{{ strings.footerCopy }}</span>
+    <nav class="login-footer__nav" aria-label="Footer links">
+      <a href="#" class="pd-label-sm login-footer__link">{{ strings.helpCenter }}</a>
+      <a href="#" class="pd-label-sm login-footer__link">{{ strings.privacyPolicy }}</a>
+      <a href="#" class="pd-label-sm login-footer__link">{{ strings.termsOfService }}</a>
+    </nav>
+    <div class="login-footer__secure">
+      <span class="material-symbols-outlined login-footer__secure-icon" aria-hidden="true">verified_user</span>
+      <span class="pd-label-sm">{{ strings.secureEnv }}</span>
+    </div>
+  </footer>
+</main>

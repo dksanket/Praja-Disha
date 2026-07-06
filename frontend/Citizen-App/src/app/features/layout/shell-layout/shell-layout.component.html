@@ -1,0 +1,111 @@
+<!-- Top App Bar -->
+<header class="bg-white/85 backdrop-blur-md sticky top-0 z-40 w-full border-b border-outline-variant/30 transition-all">
+  <div class="flex justify-between items-center px-6 md:px-margin-desktop py-3 w-full max-w-max-width-content mx-auto h-16">
+    <!-- Brand Logo -->
+    <div class="flex items-center gap-2 cursor-pointer" (click)="navigateTo('track')">
+      <span class="material-symbols-outlined text-primary text-2xl font-bold">account_balance</span>
+      <span class="font-headline-md text-xl font-bold text-primary">{{ strings.brandName }}</span>
+    </div>
+
+    <!-- Desktop Navigation Links -->
+    <nav class="hidden md:flex items-center gap-8">
+      <a 
+        class="font-label-lg text-sm transition-colors cursor-pointer" 
+        [class.text-primary]="isReportActive"
+        [class.font-bold]="isReportActive"
+        [class.text-on-surface-variant]="!isReportActive"
+        [class.hover:text-primary]="!isReportActive"
+        (click)="navigateTo('report')">
+        {{ strings.nav.report }}
+      </a>
+      <a 
+        class="font-label-lg text-sm transition-colors cursor-pointer" 
+        [class.text-primary]="isTrackActive"
+        [class.font-bold]="isTrackActive"
+        [class.text-on-surface-variant]="!isTrackActive"
+        [class.hover:text-primary]="!isTrackActive"
+        (click)="navigateTo('track')">
+        {{ strings.nav.track }}
+      </a>
+      <a 
+        class="font-label-lg text-sm transition-colors cursor-pointer" 
+        [class.text-primary]="isWalletActive"
+        [class.font-bold]="isWalletActive"
+        [class.text-on-surface-variant]="!isWalletActive"
+        [class.hover:text-primary]="!isWalletActive"
+        (click)="navigateTo('wallet')">
+        {{ strings.nav.wallet }}
+      </a>
+    </nav>
+
+    <!-- Avatar / Profile -->
+    <div class="flex items-center gap-3">
+      <span class="hidden md:block font-label-lg text-sm text-on-surface-variant cursor-pointer hover:text-primary" (click)="navigateTo('profile')">Profile</span>
+      <div 
+        class="w-10 h-10 rounded-full bg-primary-container overflow-hidden border border-outline-variant cursor-pointer hover:scale-105 transition-transform"
+        (click)="navigateTo('profile')">
+        <img class="w-full h-full object-cover" [src]="avatarUrl" alt="User Profile">
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Router Outlet Container -->
+<div class="w-full">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white border-t border-outline-variant/30 shadow-md md:hidden h-20">
+  <!-- Report Tab -->
+  <a 
+    class="flex flex-col items-center justify-center p-2 rounded-xl transition-all cursor-pointer w-[72px]"
+    [ngClass]="isReportActive ? 'text-primary bg-primary/5' : 'text-secondary'"
+    (click)="navigateTo('report')">
+    <span 
+      class="material-symbols-outlined text-2xl transition-transform active:scale-90"
+      [class.icon-filled]="isReportActive">
+      campaign
+    </span>
+    <span class="font-label-md text-[10px] mt-0.5" [class.font-bold]="isReportActive">{{ strings.nav.report }}</span>
+  </a>
+
+  <!-- Track Tab -->
+  <a 
+    class="flex flex-col items-center justify-center p-2 rounded-xl transition-all cursor-pointer w-[72px]"
+    [ngClass]="isTrackActive ? 'text-primary bg-primary/5' : 'text-secondary'"
+    (click)="navigateTo('track')">
+    <span 
+      class="material-symbols-outlined text-2xl transition-transform active:scale-90"
+      [class.icon-filled]="isTrackActive">
+      analytics
+    </span>
+    <span class="font-label-md text-[10px] mt-0.5" [class.font-bold]="isTrackActive">{{ strings.nav.track }}</span>
+  </a>
+
+  <!-- Wallet Tab -->
+  <a 
+    class="flex flex-col items-center justify-center p-2 rounded-xl transition-all cursor-pointer w-[72px]"
+    [ngClass]="isWalletActive ? 'text-primary bg-primary/5' : 'text-secondary'"
+    (click)="navigateTo('wallet')">
+    <span 
+      class="material-symbols-outlined text-2xl transition-transform active:scale-90"
+      [class.icon-filled]="isWalletActive">
+      account_balance_wallet
+    </span>
+    <span class="font-label-md text-[10px] mt-0.5" [class.font-bold]="isWalletActive">{{ strings.nav.wallet }}</span>
+  </a>
+
+  <!-- Profile Tab -->
+  <a 
+    class="flex flex-col items-center justify-center p-2 rounded-xl transition-all cursor-pointer w-[72px]"
+    [ngClass]="isProfileActive ? 'text-primary bg-primary/5' : 'text-secondary'"
+    (click)="navigateTo('profile')">
+    <span 
+      class="material-symbols-outlined text-2xl transition-transform active:scale-90"
+      [class.icon-filled]="isProfileActive">
+      person
+    </span>
+    <span class="font-label-md text-[10px] mt-0.5" [class.font-bold]="isProfileActive">{{ strings.nav.profile }}</span>
+  </a>
+</nav>

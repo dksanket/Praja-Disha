@@ -1,0 +1,134 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { CitizenService, Ticket } from '../../../core/services/citizen.service';
+import { TRACK_STRINGS } from './track.strings';
+
+interface DisplayTicket extends Ticket {
+  isStep1Active: boolean;
+  isStep2Active: boolean;
+  isStep3Active: boolean;
+  isStep4Active: boolean;
+  
+  step1Class: string;
+  step2Class: string;
+  step3Class: string;
+  step4Class: string;
+  
+  line1Class: string;
+  line2Class: string;
+  line3Class: string;
+}
+
+@Component({
+  selector: 'app-track',
+  templateUrl: './track.component.html',
+  styleUrls: ['./track.component.scss']
+})
+export class TrackComponent implements OnInit, OnDestroy {
+  strings = TRACK_STRINGS['en'];
+  
+  displayTickets: DisplayTicket[] = [];
+  
+  private subscription = new Subscription();
+
+  constructor(
+    private readonly router: Router,
+    private readonly citizenService: CitizenService
+  ) {}
+
+  ngOnInit(): void {
+    this.subscription.add(
+      this.citizenService.tickets$.subscribe({
+        next: (tickets) => {
+          this.displayTickets = tickets.map(t => this.mapToDisplayTicket(t));
+        }
+      })
+    );
+    
+    this.subscription.add(
+      this.citizenService.currentUser$.subscribe({
+        next: (profile) => {
+          if (profile) {
+            const lang = profile.language || 'en';
+            this.strings = TRACK_STRINGS[lang] || TRACK_STRINGS['en'];
+          }
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  // Pre-calculate all stepper visual states
+  private mapToDisplayTicket(ticket: Ticket): DisplayTicket {
+    const status = ticket.status;
+    
+    // Check points
+    const step1 = true; // Always submitted
+    const step2 = status === 'AI-Assigned' || status === 'In Progress' || status === 'Resolved';
+    const step3 = status === 'In Progress' || status === 'Resolved';
+    const step4 = status === 'Resolved';
+
+    // Tailwind styles mapping
+    const activeClass = 'bg-primary text-on-primary ring-4 ring-primary-container/20';
+    const doneClass = 'bg-primary-container text-on-primary-container';
+    const pendingClass = 'bg-surface-container-high text-on-surface-variant';
+
+    let s1 = doneClass;
+    let s2 = pendingClass;
+    let s3 = pendingClass;
+    let s4 = pendingClass;
+
+    let l1 = 'bg-outline-variant';
+    let l2 = 'bg-outline-variant';
+    let l3 = 'bg-outline-variant';
+
+    if (status === 'Submitted') {
+      s1 = activeClass;
+    } else if (status === 'AI-Assigned') {
+      s1 = doneClass;
+      s2 = activeClass;
+      l1 = 'bg-primary-container';
+    } else if (status === 'In Progress') {
+      s1 = doneClass;
+      s2 = doneClass;
+      s3 = activeClass;
+      l1 = 'bg-primary-container';
+      l2 = 'bg-primary-container';
+    } else if (status === 'Resolved') {
+      s1 = doneClass;
+      s2 = doneClass;
+      s3 = doneClass;
+      s4 = doneClass;
+      l1 = 'bg-primary-container';
+      l2 = 'bg-primary-container';
+      l3 = 'bg-primary-container';
+    }
+
+    return {
+      ...ticket,
+      isStep1Active: step1,
+      isStep2Active: step2,
+      isStep3Active: step3,
+      isStep4Active: step4,
+      step1Class: s1,
+      step2Class: s2,
+      step3Class: s3,
+      step4Class: s4,
+      line1Class: l1,
+      line2Class: l2,
+      line3Class: l3
+    };
+  }
+
+  viewDetails(id: string): void {
+    this.router.navigate([`/app/track/${id}`]);
+  }
+
+  goToReport(): void {
+    this.router.navigate(['/app/report']);
+  }
+}

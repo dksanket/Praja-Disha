@@ -1,0 +1,406 @@
+// =============================================================================
+// manage-team.component.scss
+// Scoped styles for the parent Team Management shell page.
+// All values are derived from tokens.scss — no hardcoded fonts/colors.
+// =============================================================================
+
+@import '../../../styles/tokens';
+
+// ── Page shell ───────────────────────────────────────────────────────────────
+.manage-team {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-gutter;
+  padding: $spacing-container-padding;
+  min-height: 100%;
+  background-color: $color-surface-container-lowest;
+}
+
+// ── Page header ──────────────────────────────────────────────────────────────
+.manage-team__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid $color-outline-variant;
+  padding-bottom: $spacing-gutter;
+}
+
+.manage-team__title {
+  color: $color-on-surface;
+  margin-bottom: 4px;
+}
+
+.manage-team__subtitle {
+  color: $color-on-surface-variant;
+}
+
+// ── Tab strip ────────────────────────────────────────────────────────────────
+.manage-team__tabs {
+  display: flex;
+  gap: 2rem;
+  padding: 0 $spacing-unit * 2;
+  border-bottom: 1px solid $color-outline-variant;
+  margin-top: -$spacing-unit; // compensate for the header's bottom margin
+}
+
+.manage-team__tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $fs-label-md;
+  font-weight: $fw-semibold;
+  line-height: $lh-label-md;
+  letter-spacing: 0.01em;
+  padding-bottom: 12px;
+  color: $color-on-surface-variant;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    color: $color-on-surface;
+  }
+
+  &--active {
+    color: $color-primary;
+    border-bottom-color: $color-primary;
+  }
+}
+
+// ── Primary Action Button (Add Department / Add Officer) ─────────────────────
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: $color-primary;
+  color: $color-on-primary;
+  border: none;
+  border-radius: $rounded-md;
+  font-family: $font-primary;
+  font-size: $fs-label-md;
+  font-weight: $fw-semibold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-primary-container;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+.icon-sm {
+  font-size: 16px !important;
+}
+
+.manage-team__content {
+  margin-top: $spacing-gutter;
+}
+
+// ── PrimeNG Table & Paginator Overrides ────────────────────────────────────────
+::ng-deep {
+  // Hide accessible screen-reader helper elements
+  .p-hidden-accessible {
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+  }
+
+  .p-datatable {
+    .p-datatable-wrapper {
+      overflow-x: hidden !important; // Prevent horizontal scrollbar
+    }
+
+    .p-datatable-thead > tr > th {
+      padding: 10px 12px !important; // More compact header padding
+    }
+
+    // Sort icon styling
+    .p-sortable-column-icon {
+      width: 12px !important;
+      height: 12px !important;
+      font-size: 10px !important;
+      color: $color-outline !important;
+      margin-left: 2px !important;
+    }
+
+    // Column filter button styling - remove default box and styling
+    .p-column-filter-menu-button {
+      width: 28px !important;
+      height: 28px !important;
+      color: $color-outline !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: $rounded-full !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-left: 4px !important;
+      transition: background-color 150ms ease, color 150ms ease !important;
+      
+      &:hover {
+        background-color: $color-surface-container-low !important;
+        color: $color-primary !important;
+      }
+      
+      &.p-column-filter-menu-button-active {
+        background-color: rgba($color-primary, 0.08) !important;
+        color: $color-primary !important;
+      }
+    }
+  }
+
+  // Dropdown Component Overrides
+  .p-dropdown {
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative !important;
+    background: $color-surface-container-lowest !important;
+    border: 1px solid $color-outline-variant !important;
+    border-radius: $rounded !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    
+    // Fix inner label double border/background inheriting from global inputtext
+    .p-dropdown-label.p-inputtext {
+      border: none !important;
+      background: transparent !important;
+      padding: 6px 10px !important;
+      box-shadow: none !important;
+      font-size: $fs-body-sm !important;
+      color: $color-on-surface !important;
+      width: 100% !important;
+    }
+    
+    .p-dropdown-trigger {
+      width: 28px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: $color-outline !important;
+    }
+    
+    &:not(.p-disabled).p-focus {
+      border-color: $color-primary !important;
+      box-shadow: 0 0 0 2px $color-primary-fixed !important;
+    }
+  }
+
+  // Column filter overlay dialog styling
+  .p-column-filter-overlay {
+    background: $color-surface-container-lowest !important;
+    border: 1px solid $color-outline-variant !important;
+    border-radius: $rounded-lg !important;
+    box-shadow: $elevation-2-shadow !important;
+    font-family: $font-primary !important;
+    padding: 14px !important;
+    min-width: 240px !important;
+    margin-top: 4px !important;
+
+    // Stack constraints and inputs vertically
+    .p-column-filter-operator {
+      margin-bottom: 10px !important;
+      border-bottom: 1px solid $color-outline-variant !important;
+      padding-bottom: 10px !important;
+      width: 100% !important;
+    }
+
+    .p-column-filter-constraint {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      margin-bottom: 12px !important;
+      width: 100% !important;
+    }
+
+    .p-column-filter-matchmode-dropdown {
+      width: 100% !important;
+    }
+
+    .p-column-filter-value {
+      width: 100% !important;
+    }
+
+    // Input fields inside filter dialog
+    .p-inputtext {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      background: $color-surface-container-lowest !important;
+      border: 1px solid $color-outline-variant !important;
+      border-radius: $rounded !important;
+      padding: 6px 10px !important;
+      font-size: $fs-body-sm !important;
+      color: $color-on-surface !important;
+      
+      &:focus {
+        border-color: $color-primary !important;
+        box-shadow: 0 0 0 2px $color-primary-fixed !important;
+        outline: none !important;
+      }
+    }
+
+    // Add rule button style (clean link text style)
+    .p-column-filter-add-button {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: $color-primary !important;
+      padding: 0 !important;
+      margin-top: 8px !important;
+      justify-content: flex-start !important;
+      width: auto !important;
+      
+      &:hover {
+        background: transparent !important;
+        color: $color-primary-container !important;
+        text-decoration: underline !important;
+      }
+      
+      .p-button-label {
+        font-size: $fs-body-sm !important;
+        font-weight: $fw-semibold !important;
+        color: $color-primary !important;
+      }
+      
+      .p-button-icon {
+        font-size: 14px !important;
+        color: $color-primary !important;
+        margin-right: 4px !important;
+      }
+    }
+
+    // Filter action buttons (Clear, Apply)
+    .p-column-filter-buttonbar {
+      display: flex !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+      margin-top: 12px !important;
+      padding-top: 10px !important;
+      border-top: 1px solid $color-outline-variant !important;
+      
+      .p-button {
+        padding: 6px 12px !important;
+        font-size: $fs-label-sm !important;
+        font-weight: $fw-semibold !important;
+        border-radius: $rounded !important;
+        
+        &.p-button-outlined {
+          border: 1px solid $color-outline-variant !important;
+          color: $color-on-surface-variant !important;
+          background: transparent !important;
+          
+          &:hover {
+            background-color: $color-surface-container-low !important;
+            border-color: $color-outline !important;
+          }
+        }
+        
+        &:not(.p-button-outlined) {
+          background-color: $color-primary !important;
+          border-color: $color-primary !important;
+          color: $color-on-primary !important;
+          
+          &:hover {
+            background-color: $color-primary-container !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Paginator structure
+  .p-paginator {
+    background-color: $color-surface-container-lowest !important;
+    border-top: 1px solid $color-outline-variant !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    
+    // Hide double arrows
+    .p-paginator-first,
+    .p-paginator-last {
+      display: none !important;
+    }
+
+    .p-current-page-report {
+      font-family: $font-primary !important;
+      font-size: $fs-body-sm !important;
+      color: $color-on-surface-variant !important;
+      margin-right: auto !important;
+    }
+
+    // Page link elements styling
+    .p-paginator-pages {
+      display: flex !important;
+      gap: 4px !important;
+    }
+
+    .p-paginator-page,
+    .p-paginator-prev,
+    .p-paginator-next {
+      min-width: 24px !important;
+      height: 24px !important;
+      border-radius: $rounded !important;
+      border: none !important;
+      font-family: $font-primary !important;
+      font-size: $fs-body-sm !important;
+      color: $color-on-surface !important;
+      background: transparent !important;
+      transition: background-color 150ms ease !important;
+
+      &:hover:not(.p-disabled):not(.p-highlight) {
+        background-color: $color-surface-container-low !important;
+      }
+
+      &.p-highlight {
+        background-color: $color-primary-container !important;
+        color: $color-on-primary-container !important;
+        font-weight: $fw-semibold !important;
+      }
+    }
+  }
+
+  // Dropdown panel popup styling
+  .p-dropdown-panel {
+    background: $color-surface-container-lowest !important;
+    border: 1px solid $color-outline-variant !important;
+    border-radius: $rounded-md !important;
+    box-shadow: $elevation-2-shadow !important;
+    font-family: $font-primary !important;
+    
+    .p-dropdown-items {
+      padding: 4px 0 !important;
+    }
+    
+    .p-dropdown-item {
+      padding: 6px 12px !important;
+      font-size: $fs-body-sm !important;
+      color: $color-on-surface !important;
+      
+      &:hover {
+        background-color: $color-surface-container-low !important;
+      }
+      
+      &.p-highlight {
+        background-color: $color-primary-container !important;
+        color: $color-on-primary-container !important;
+      }
+    }
+  }
+}
+

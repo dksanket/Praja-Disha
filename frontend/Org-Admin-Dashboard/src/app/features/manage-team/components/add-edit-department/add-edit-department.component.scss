@@ -1,0 +1,980 @@
+// =============================================================================
+// add-edit-department.component.scss
+// Styles for the Add/Edit Department view.
+// Uses design tokens from _tokens.scss. NEVER hardcode colors or fonts.
+// =============================================================================
+
+@import '../../../../../styles/tokens';
+
+// ── Layout Grid ──────────────────────────────────────────────────────────────
+.add-edit-dept-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-gutter * 2;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-container-padding 0;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+// ── Left Column: Form Canvas ─────────────────────────────────────────────────
+.form-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-gutter * 1.5;
+  width: 100%;
+  max-width: 800px;
+}
+
+// ── Breadcrumb and Header ────────────────────────────────────────────────────
+.breadcrumb-container {
+  display: flex;
+  margin-bottom: $spacing-unit * 2;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-primary;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  font-weight: $fw-medium;
+  padding: 4px 8px;
+  border-radius: $rounded;
+  transition: color 150ms ease, background-color 150ms ease;
+
+  &:hover {
+    color: $color-primary-container;
+    background-color: $color-surface-container-low;
+  }
+
+  span {
+    font-size: 18px;
+  }
+}
+
+.page-title-block {
+  margin-bottom: $spacing-unit * 4;
+}
+
+.page-title {
+  color: $color-on-surface;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: $color-on-surface-variant;
+  margin-top: $spacing-unit * 2;
+}
+
+// ── Error Banner ─────────────────────────────────────────────────────────────
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: $color-error-container;
+  border: 1px solid rgba($color-error, 0.2);
+  border-radius: $rounded;
+  padding: 12px 16px;
+  margin-bottom: $spacing-unit * 2;
+
+  &__icon {
+    color: $color-error;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    color: $color-on-error-container;
+    margin: 0;
+  }
+}
+
+// ── Form Cards (Surfaces) ────────────────────────────────────────────────────
+.form-card {
+  background-color: $elevation-1-bg;
+  border: 1px solid $elevation-1-border;
+  border-radius: $rounded-lg;
+  padding: $spacing-gutter * 1.5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 0;
+
+  &__legend {
+    color: $color-on-surface;
+    font-weight: $fw-semibold;
+    border-bottom: 1px solid $color-outline-variant;
+    width: 100%;
+    padding-bottom: 8px;
+    margin-bottom: $spacing-gutter;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid $color-outline-variant;
+    padding-bottom: 8px;
+    margin-bottom: $spacing-gutter;
+
+    .form-card__legend {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      width: auto;
+    }
+  }
+}
+
+// ── Form Controls & Inputs ───────────────────────────────────────────────────
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-gutter;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-unit * 1.5;
+}
+
+.form-label {
+  color: $color-on-surface-variant;
+  font-weight: $fw-medium;
+
+  .required-star {
+    color: $color-error;
+  }
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  background-color: $color-surface;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 8px 12px;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  color: $color-on-surface;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &::placeholder {
+    color: $color-outline;
+    opacity: 0.8;
+  }
+
+  &:focus {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px $color-primary-fixed-dim;
+  }
+
+  &:disabled {
+    background-color: $color-surface-container-low;
+    color: $color-outline;
+    cursor: not-allowed;
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.form-static-text {
+  width: 100%;
+  background-color: $color-surface-container-low;
+  border: 1px dashed $color-outline-variant;
+  border-radius: $rounded;
+  padding: 8px 12px;
+  font-family: $font-mono;
+  font-size: $fs-body-md;
+  color: $color-outline;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+// Select tag styling wrapper
+.select-wrapper {
+  position: relative;
+  width: 100%;
+
+  .select-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $color-outline;
+    font-size: 20px;
+    pointer-events: none;
+  }
+
+  .form-select {
+    padding-left: 40px;
+    padding-right: 40px;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .select-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $color-outline;
+    font-size: 20px;
+    pointer-events: none;
+  }
+}
+
+// Autocomplete and search containers
+.search-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+
+  .search-field-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $color-outline;
+    font-size: 20px;
+    pointer-events: none;
+  }
+
+  .pl-10 {
+    padding-left: 40px;
+  }
+}
+
+.autocomplete-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline;
+  border-radius: $rounded;
+  box-shadow: $elevation-2-shadow;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container-low;
+  }
+
+  .item-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: $color-secondary-container;
+    color: $color-on-secondary-container;
+    border-radius: $rounded-full;
+    font-size: 11px;
+    font-weight: $fw-bold;
+  }
+
+  .item-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .item-name {
+    color: $color-on-surface;
+    font-weight: $fw-medium;
+  }
+
+  .item-username {
+    color: $color-outline;
+  }
+}
+
+// Active chips
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.head-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: $color-primary-fixed;
+  color: $color-on-primary-fixed;
+  border-radius: $rounded-full;
+  padding: 4px 12px;
+
+  .chip-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: $color-surface-container-highest;
+    border-radius: $rounded-full;
+    overflow: hidden;
+  }
+
+  .chip-avatar-initials {
+    font-size: 8px;
+    font-weight: $fw-bold;
+    color: $color-on-surface-variant;
+  }
+
+  .chip-name {
+    font-weight: $fw-medium;
+  }
+
+  .chip-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: $color-on-primary-fixed-variant;
+    transition: color 150ms ease;
+
+    &:hover {
+      color: $color-error;
+    }
+
+    span {
+      font-size: 14px;
+    }
+  }
+}
+
+// ── Geographic configuration drawing ─────────────────────────────────────────
+.sub-section {
+  padding: $spacing-gutter 0;
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+
+  &-title {
+    color: $color-on-surface;
+    font-weight: $fw-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $spacing-unit * 3;
+    opacity: 0.8;
+  }
+
+  &-desc {
+    color: $color-on-surface-variant;
+    margin-top: -$spacing-unit;
+    margin-bottom: $spacing-gutter;
+    opacity: 0.9;
+  }
+}
+
+.border-t {
+  border-top: 1px solid $color-outline-variant;
+}
+
+.map-draw-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: $color-surface-container-low;
+  border: 1px dashed $color-outline-variant;
+  border-radius: $rounded-lg;
+  padding: $spacing-gutter * 1.5;
+
+  .map-draw-icon {
+    font-size: 32px;
+    color: $color-outline;
+    margin-bottom: 8px;
+  }
+
+  .map-draw-text {
+    color: $color-on-surface-variant;
+    margin-bottom: 16px;
+  }
+}
+
+// ── Assigned Officers Section ────────────────────────────────────────────────
+.btn-text-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-primary;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  font-weight: $fw-medium;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: $rounded;
+  transition: color 150ms ease, background-color 150ms ease;
+
+  &:hover {
+    color: $color-primary-container;
+    background-color: $color-surface-container-low;
+  }
+
+  span {
+    font-size: 18px;
+  }
+}
+
+.assign-search-panel {
+  background-color: $color-surface;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 12px;
+}
+
+.assign-results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: $rounded;
+  border: 1px solid $color-outline-variant;
+}
+
+.assign-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background-color: $color-surface-container-lowest;
+  cursor: pointer;
+  border-bottom: 1px solid $color-surface-container-low;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container-low;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .item-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: $color-primary-fixed;
+    color: $color-on-primary-fixed;
+    border-radius: $rounded-full;
+    font-size: 9px;
+    font-weight: $fw-bold;
+  }
+
+  .item-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .item-name {
+    color: $color-on-surface;
+    font-weight: $fw-medium;
+  }
+
+  .item-id {
+    color: $color-outline;
+  }
+
+  .add-icon-right {
+    color: $color-primary;
+    font-size: 20px;
+  }
+}
+
+.officers-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.officer-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: $color-surface;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 10px 12px;
+  position: relative;
+  transition: box-shadow 150ms ease;
+
+  &:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .btn-remove-officer {
+      opacity: 1;
+    }
+  }
+
+  .card-avatar-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: $color-secondary-container;
+    color: $color-on-secondary-container;
+    border-radius: $rounded-full;
+    font-size: 10px;
+    font-weight: $fw-bold;
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .card-name {
+    color: $color-on-surface;
+    font-weight: $fw-medium;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-meta {
+    color: $color-outline;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.btn-remove-officer {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-outline;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: $rounded;
+  opacity: 0.8;
+  transition: opacity 150ms ease, color 150ms ease, background-color 150ms ease;
+
+  &:hover {
+    color: $color-error;
+    background-color: $color-error-container;
+    opacity: 1;
+  }
+
+  span {
+    font-size: 18px;
+  }
+}
+
+.empty-state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: $color-surface-container-low;
+  border: 1px dashed $color-outline-variant;
+  border-radius: $rounded;
+  padding: $spacing-gutter;
+
+  .empty-state-icon {
+    font-size: 32px;
+    color: $color-outline;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+
+  .empty-state-text {
+    color: $color-on-surface-variant;
+    margin: 0;
+  }
+}
+
+// ── Footer action buttons ────────────────────────────────────────────────────
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: $spacing-gutter;
+  border-top: 1px solid $color-outline-variant;
+  padding-top: $spacing-gutter * 1.5;
+}
+
+// Custom Buttons
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: $color-primary;
+  color: $color-on-primary;
+  border: none;
+  border-radius: $rounded;
+  padding: 8px 20px;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  font-weight: $fw-medium;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-primary-container;
+  }
+
+  &:disabled {
+    background-color: $color-outline-variant;
+    color: $color-outline;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: $color-surface-container-lowest;
+  color: $color-on-surface-variant;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 8px 20px;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  font-weight: $fw-medium;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container-low;
+  }
+}
+
+// ── Right Column: Sidebar ────────────────────────────────────────────────────
+.sidebar-column {
+  width: 100%;
+}
+
+.sticky-sidebar {
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-gutter;
+  background-color: $elevation-1-bg;
+  border: 1px solid $elevation-1-border;
+  border-radius: $rounded-lg;
+  padding: $spacing-gutter * 1.5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $color-on-surface;
+  margin: 0 0 12px 0;
+  font-weight: $fw-semibold;
+
+  &-icon {
+    color: $color-primary;
+    font-size: 20px;
+  }
+}
+
+.tree-container {
+  background-color: $color-surface;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 16px;
+}
+
+.tree-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tree-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $color-on-surface-variant;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  position: relative;
+
+  .tree-node-icon {
+    font-size: 18px;
+    color: $color-outline;
+  }
+
+  // Children connector visual lines
+  &:not(:first-child) {
+    padding-left: 20px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: -16px;
+      bottom: 8px;
+      width: 1px;
+      background-color: $color-outline-variant;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 8px;
+      width: 8px;
+      height: 1px;
+      background-color: $color-outline-variant;
+    }
+  }
+
+  &--current {
+    color: $color-primary;
+    font-weight: $fw-semibold;
+
+    .tree-node-icon {
+      color: $color-primary;
+    }
+
+    &::after {
+      background-color: $color-primary !important;
+    }
+
+    // Active vertical bar
+    &::before {
+      border-left-color: $color-primary;
+    }
+
+    .tree-node-name {
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: -32px;
+        top: 2px;
+        width: 2px;
+        height: 16px;
+        background-color: $color-primary;
+      }
+    }
+  }
+}
+
+.tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: $color-surface-container-low;
+  border-left: 3px solid $color-primary;
+  border-radius: $rounded;
+  padding: 12px;
+
+  .tip-card-icon {
+    color: $color-primary;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+
+  .tip-card-text {
+    color: $color-on-surface-variant;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// ── Modal Overlay & Card ─────────────────────────────────────────────────────
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba($color-inverse-surface, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-card {
+  background-color: $elevation-1-bg;
+  border: 1px solid $elevation-1-border;
+  border-radius: $rounded-lg;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-bottom: 1px solid $color-outline-variant;
+
+  .modal-title {
+    color: $color-on-surface;
+    margin: 0;
+  }
+
+  .modal-subtitle {
+    color: $color-on-surface-variant;
+    margin-top: 4px;
+  }
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-outline;
+  padding: 4px;
+  border-radius: $rounded;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease, background-color 150ms ease;
+
+  &:hover {
+    color: $color-on-surface;
+    background-color: $color-surface-container-low;
+  }
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.google-map-canvas {
+  width: 100%;
+  height: 320px;
+  background-color: $color-surface-container-low;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-lg;
+  overflow: hidden;
+}
+
+.modal-error-banner {
+  margin: 0 20px;
+  padding: 10px 14px;
+  background-color: $color-error-container;
+  border: 1px solid rgba($color-error, 0.3);
+  border-radius: $rounded-md;
+  color: $color-on-error-container;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.coordinates-logger {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .logger-title {
+    color: $color-on-surface-variant;
+  }
+
+  .logger-box {
+    background-color: $color-surface;
+    border: 1px solid $color-outline-variant;
+    border-radius: $rounded;
+    padding: 8px 12px;
+    max-height: 80px;
+    overflow-y: auto;
+    font-size: $fs-mono-sm;
+    color: $color-secondary;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-top: 1px solid $color-outline-variant;
+}
+
+// ── Spacing Utilities ────────────────────────────────────────────────────────
+.mt-gutter {
+  margin-top: $spacing-gutter;
+}
+
+.mt-2 {
+  margin-top: $spacing-unit * 2;
+}
+
+.mt-3 {
+  margin-top: $spacing-unit * 3;
+}
+
+.mb-4 {
+  margin-bottom: $spacing-unit * 4;
+}

@@ -1,0 +1,322 @@
+<div class="details-canvas" *ngIf="task">
+  <!-- Back Button -->
+  <div class="back-navigation">
+    <button (click)="goBack()" class="back-link" id="btn-back-dashboard">
+      <span class="material-symbols-outlined">arrow_back</span>
+      <span>{{ strings.backBtn }}</span>
+    </button>
+  </div>
+
+  <!-- Header Card -->
+  <div class="header-card">
+    <div class="header-main">
+      <div>
+        <h1 class="pd-display-lg header-title">{{ task.title }}</h1>
+        <div class="badge-row">
+          <!-- Priority Badge -->
+          <span 
+            class="pd-badge"
+            [class.pd-badge--p0]="task.priority === 'P0'"
+            [class.pd-badge--p1]="task.priority === 'P1'"
+            [class.pd-badge--p2]="task.priority === 'P2'">
+            <span class="pd-badge__pulse" *ngIf="task.priority === 'P0'"></span>
+            {{ task.priority }} Critical
+          </span>
+          <!-- Status Badge -->
+          <span class="status-tag status-tag--active">
+            <span class="status-tag__pulse"></span>
+            Active
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Meta Info Line -->
+    <div class="meta-row">
+      <div class="meta-item">
+        <span class="meta-label">{{ strings.metaLabels.id }}</span>
+        <span class="meta-value pd-mono-sm">#{{ task.id }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">{{ strings.metaLabels.groupId }}</span>
+        <span class="meta-value pd-mono-sm">{{ task.groupId }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">{{ strings.metaLabels.parentTask }}</span>
+        <span class="meta-value pd-mono-sm">{{ task.parentTaskId ? '#' + task.parentTaskId : 'None' }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">{{ strings.metaLabels.orgId }}</span>
+        <span class="meta-value pd-mono-sm">{{ task.orgId }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">{{ strings.metaLabels.created }}</span>
+        <span class="meta-value">{{ task.createdAt }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspace Grid -->
+  <div class="workspace-grid">
+    <!-- Left Column: Context -->
+    <div class="context-column">
+      <!-- Details Card -->
+      <div class="card card--left-accent">
+        <div class="reporter-info">
+          <span class="material-symbols-outlined">person</span>
+          <span>
+            {{ strings.metaLabels.reportedBy }} 
+            <strong class="reporter-name">{{ task.reportedBy }}</strong> 
+            ({{ task.reporterType }})
+          </span>
+        </div>
+
+        <!-- Description & Audio Section -->
+        <div class="section-block">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">record_voice_over</span>
+            <span>{{ strings.metaLabels.descAndAudio }}</span>
+          </h3>
+          <div class="description-bubble">
+            "{{ task.description }}"
+          </div>
+
+          <!-- Audio Player -->
+          <div class="audio-player" *ngIf="task.voiceUrl">
+            <button 
+              type="button" 
+              class="audio-play-btn"
+              [ariaLabel]="isAudioPlaying ? 'Pause audio' : 'Play audio'"
+              (click)="toggleAudio()">
+              <span class="material-symbols-outlined">{{ isAudioPlaying ? 'pause' : 'play_arrow' }}</span>
+            </button>
+            <div class="audio-progress-bar">
+              <div class="audio-progress-fill" [style.width.%]="audioPercent"></div>
+            </div>
+            <span class="audio-timer pd-mono-sm">{{ formattedAudioTime }} / {{ task.voiceDuration }}</span>
+          </div>
+        </div>
+
+        <!-- Metadata Grid -->
+        <div class="section-block border-top">
+          <h3 class="section-title">{{ strings.metaLabels.metadataHeader }}</h3>
+          <div class="metadata-grid">
+            <div class="metadata-cell">
+              <div class="cell-label">{{ strings.metaLabels.category }}</div>
+              <div class="cell-value">{{ task.category }}</div>
+            </div>
+            <div class="metadata-cell">
+              <div class="cell-label">{{ strings.metaLabels.language }}</div>
+              <div class="cell-value">{{ task.language }}</div>
+            </div>
+            <div class="metadata-cell col-span-2">
+              <div class="cell-label">{{ strings.metaLabels.location }}</div>
+              <div class="cell-value location-value">
+                <span>{{ task.location.address }}</span>
+                <span class="pd-mono-sm geo-coordinates">{{ task.location.lat }}, {{ task.location.lng }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo Snapshot Grid -->
+        <div class="snapshots-grid border-top">
+          <div class="snapshot-card">
+            <div class="snapshot-img-container">
+              <img [src]="task.imageUrl" [alt]="strings.snapshots.incident" class="snapshot-img" />
+            </div>
+            <div class="snapshot-label">{{ strings.snapshots.incident }}</div>
+          </div>
+          <div class="snapshot-card">
+            <div class="snapshot-img-container">
+              <img [src]="task.mapUrl" [alt]="strings.snapshots.mapping" class="snapshot-img" />
+            </div>
+            <div class="snapshot-label">{{ strings.snapshots.mapping }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Delegation Workspace -->
+    <div class="delegation-column">
+      <!-- Sub-Assignment Tree Card -->
+      <div class="card tree-card">
+        <h2 class="pd-title-md card-title">{{ strings.rightPanel.treeTitle }}</h2>
+        <div class="tree-container">
+          <div class="tree-scroller">
+            <div class="tree-root">
+              <div *ngFor="let node of task.subTasks; let i = index" class="tree-node-wrapper">
+                
+                <!-- Tree branch connector line (rendered for nested child items) -->
+                <div class="tree-line" *ngIf="node.parentId"></div>
+                
+                <!-- Node item content -->
+                <div class="tree-node">
+                  <div class="node-details">
+                    <div class="node-title">{{ node.title }}</div>
+                    <div class="node-subtitle">
+                      <span>{{ node.role }}</span>
+                      <span *ngIf="node.department" class="node-dept-sep"> &bull; </span>
+                      <span *ngIf="node.department" class="node-dept">{{ node.department }}</span>
+                    </div>
+                  </div>
+                  <div class="node-actions">
+                    <span class="node-status" [class]="node.statusClass">{{ node.status }}</span>
+                    <span class="node-time pd-mono-sm" *ngIf="node.timestamp">{{ node.timestamp }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Communication workspace: Tabs -->
+      <div class="card communications-card">
+        <div class="tabs-header">
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.tab-btn--active]="activeTab === 'comments'"
+            (click)="setActiveTab('comments')">
+            {{ strings.rightPanel.tabs.comments }}
+          </button>
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.tab-btn--active]="activeTab === 'notes'"
+            (click)="setActiveTab('notes')">
+            {{ strings.rightPanel.tabs.notes }}
+          </button>
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.tab-btn--active]="activeTab === 'activity'"
+            (click)="setActiveTab('activity')">
+            {{ strings.rightPanel.tabs.activity }}
+          </button>
+        </div>
+
+        <div class="tab-body">
+          <!-- Comments Tab -->
+          <div *ngIf="activeTab === 'comments'" class="tab-content flex-col">
+            <!-- Comments List -->
+            <div class="messages-list">
+              <div 
+                *ngFor="let comment of task.comments" 
+                class="message-bubble-wrapper"
+                [class.message-bubble-wrapper--self]="comment.isSelf">
+                
+                <div class="avatar-circle" [class.avatar-circle--self]="comment.isSelf">
+                  {{ comment.initials }}
+                </div>
+                
+                <div class="message-bubble" [class.message-bubble--self]="comment.isSelf">
+                  <div class="message-meta">
+                    <span class="message-user">{{ comment.userName }}</span>
+                    <span class="message-time pd-mono-sm">{{ comment.timestamp }}</span>
+                  </div>
+                  <p class="message-text">{{ comment.text }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form -->
+            <div class="message-input-form">
+              <textarea 
+                [(ngModel)]="newCommentText" 
+                [placeholder]="strings.rightPanel.commentsForm.placeholder"
+                class="message-textarea"
+                id="comment-textarea"
+                rows="2">
+              </textarea>
+              <button 
+                type="button" 
+                (click)="submitComment()"
+                [disabled]="!newCommentText.trim()"
+                class="pd-btn pd-btn--primary send-btn"
+                id="btn-send-comment">
+                <span class="material-symbols-outlined">send</span>
+                <span>{{ strings.rightPanel.commentsForm.btnText }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Internal Notes Tab -->
+          <div *ngIf="activeTab === 'notes'" class="tab-content flex-col">
+            <!-- Notes List -->
+            <div class="messages-list">
+              <div *ngFor="let note of task.notes" class="message-bubble-wrapper message-bubble-wrapper--note">
+                <div class="avatar-circle avatar-circle--note">
+                  <span class="material-symbols-outlined">sticky_note_2</span>
+                </div>
+                <div class="message-bubble message-bubble--note">
+                  <div class="message-meta">
+                    <span class="message-user">{{ note.userName }} (Officer)</span>
+                    <span class="message-time pd-mono-sm">{{ note.timestamp }}</span>
+                  </div>
+                  <p class="message-text">{{ note.text }}</p>
+                </div>
+              </div>
+              <div *ngIf="task.notes.length === 0" class="empty-state-notice">
+                No internal notes have been added to this task yet.
+              </div>
+            </div>
+
+            <!-- Form -->
+            <div class="message-input-form">
+              <textarea 
+                [(ngModel)]="newNoteText" 
+                [placeholder]="strings.rightPanel.notesForm.placeholder"
+                class="message-textarea message-textarea--note"
+                id="note-textarea"
+                rows="2">
+              </textarea>
+              <button 
+                type="button" 
+                (click)="submitNote()"
+                [disabled]="!newNoteText.trim()"
+                class="pd-btn pd-btn--secondary send-btn"
+                id="btn-save-note">
+                <span class="material-symbols-outlined">assignment_turned_in</span>
+                <span>{{ strings.rightPanel.notesForm.btnText }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Activity Log Tab -->
+          <div *ngIf="activeTab === 'activity'" class="tab-content">
+            <div class="activity-table-wrapper">
+              <table class="activity-table">
+                <thead>
+                  <tr>
+                    <th class="activity-table__th pd-label-sm">{{ strings.rightPanel.activityHeaders.action }}</th>
+                    <th class="activity-table__th pd-label-sm">{{ strings.rightPanel.activityHeaders.user }}</th>
+                    <th class="activity-table__th pd-label-sm">{{ strings.rightPanel.activityHeaders.remarks }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let activity of task.activities" class="activity-table__tr">
+                    <td class="activity-table__td">
+                      <div class="activity-action-cell">
+                        <span class="activity-action-badge">{{ activity.action }}</span>
+                        <span class="activity-time pd-mono-sm block mt-dense">{{ activity.timestamp }}</span>
+                      </div>
+                    </td>
+                    <td class="activity-table__td pd-mono-sm text-secondary">{{ activity.performedBy }}</td>
+                    <td class="activity-table__td">{{ activity.remarks }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="!task">
+  <span class="material-symbols-outlined loading-spinner">sync</span>
+  <p>Loading task details...</p>
+</div>

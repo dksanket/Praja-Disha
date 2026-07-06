@@ -1,0 +1,134 @@
+[
+  {
+    "id": "DPT-001",
+    "name": "Office of the Director",
+    "parentDepartmentId": null,
+    "parentDepartmentName": null,
+    "headOfficerId": "OFF-001",
+    "headOfficerName": "Dr. Robert Chen",
+    "headOfficerAvatarUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuC10sKAN89PGjDKwYauYitGOEAKl_prLSwag1Ludqs-XJ19Zh8oYl-vsp7WT2yMijENwk_ZuQ34JhHzNnglULUj8W3KFspVid1X5EusuTlMxN0W9q7GuLJ4OYL2RXYmUlQCvUqCFDHvxMS-N_1GxOekRb1rTEV_Ze8q2To_Bew-UNiUqM6hUtxGqvUiNi2RA3xTm9NApx0GDucROhkCl8qldERoyE4baDekbEBckDB_LhsIqpppr4FDK99oWQSCL4Hq-Z9U-NKMqh0",
+    "officerCount": 12,
+    "depth": 0
+  },
+  {
+    "id": "DPT-002",
+    "name": "Operations Division",
+    "parentDepartmentId": "DPT-001",
+    "parentDepartmentName": "Office of the Director",
+    "headOfficerId": "OFF-002",
+    "headOfficerName": "Sarah Jenkins",
+    "headOfficerAvatarUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCp0121mztte4lD5_sKJseiIQhadkfmY75dQzhBL-3Zhs9eyt3Aw65MRqjFOR6-mck-ctTNuQsS5ZYV161373zfWAZw05XLA6KjRSJRTT11KjajYrvPB2Kg3jrmVguNWfNQFFUyuDKpgN2jAsJIuOKl-ibaVdDKxpcrfjiBRZxwOe_FF31SnDgjsXNkFvY3npdC9XebusNKuB_VerWx5pgrC52D2tyaIeDM706RucOEJKEb_9y9UhCZLTrajVVseZzHJgqx7b9v6ao",
+    "officerCount": 45,
+    "depth": 1
+  },
+  {
+    "id": "DPT-003",
+    "name": "Strategic Intelligence",
+    "parentDepartmentId": null,
+    "parentDepartmentName": null,
+    "headOfficerId": "OFF-003",
+    "headOfficerName": "Marcus Vance",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 28,
+    "depth": 0
+  },
+  {
+    "id": "DPT-004",
+    "name": "Data Analytics Sub-Unit",
+    "parentDepartmentId": "DPT-003",
+    "parentDepartmentName": "Strategic Intelligence",
+    "headOfficerId": null,
+    "headOfficerName": null,
+    "headOfficerAvatarUrl": null,
+    "officerCount": 8,
+    "depth": 1
+  },
+  {
+    "id": "DPT-005",
+    "name": "Cyber Operations",
+    "parentDepartmentId": null,
+    "parentDepartmentName": null,
+    "headOfficerId": "OFF-005",
+    "headOfficerName": "Lt. Col. Diana Mercer",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 31,
+    "depth": 0
+  },
+  {
+    "id": "DPT-006",
+    "name": "Network Defense Unit",
+    "parentDepartmentId": "DPT-005",
+    "parentDepartmentName": "Cyber Operations",
+    "headOfficerId": "OFF-006",
+    "headOfficerName": "Raj Patel",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 14,
+    "depth": 1
+  },
+  {
+    "id": "DPT-007",
+    "name": "Policy & Compliance",
+    "parentDepartmentId": null,
+    "parentDepartmentName": null,
+    "headOfficerId": "OFF-007",
+    "headOfficerName": "Amara Osei",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 9,
+    "depth": 0
+  },
+  {
+    "id": "DPT-008",
+    "name": "Regulatory Affairs",
+    "parentDepartmentId": "DPT-007",
+    "parentDepartmentName": "Policy & Compliance",
+    "headOfficerId": null,
+    "headOfficerName": null,
+    "headOfficerAvatarUrl": null,
+    "officerCount": 5,
+    "depth": 1
+  },
+  {
+    "id": "DPT-009",
+    "name": "Field Operations",
+    "parentDepartmentId": null,
+    "parentDepartmentName": null,
+    "headOfficerId": "OFF-009",
+    "headOfficerName": "Victor Santos",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 62,
+    "depth": 0
+  },
+  {
+    "id": "DPT-010",
+    "name": "Northern District Task Force",
+    "parentDepartmentId": "DPT-009",
+    "parentDepartmentName": "Field Operations",
+    "headOfficerId": "OFF-010",
+    "headOfficerName": "Maya Krishnan",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 18,
+    "depth": 1
+  },
+  {
+    "id": "DPT-011",
+    "name": "Southern District Task Force",
+    "parentDepartmentId": "DPT-009",
+    "parentDepartmentName": "Field Operations",
+    "headOfficerId": null,
+    "headOfficerName": null,
+    "headOfficerAvatarUrl": null,
+    "officerCount": 22,
+    "depth": 1
+  },
+  {
+    "id": "DPT-012",
+    "name": "Human Resources",
+    "parentDepartmentId": null,
+    "parentDepartmentName": null,
+    "headOfficerId": "OFF-012",
+    "headOfficerName": "Dr. Priya Nair",
+    "headOfficerAvatarUrl": null,
+    "officerCount": 11,
+    "depth": 0
+  }
+]

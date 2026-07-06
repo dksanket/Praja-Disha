@@ -1,0 +1,126 @@
+// =============================================================================
+// _tokens.scss — Design tokens derived from DESIGN.md
+// All colors, typography, spacing, elevation, and shape values live here.
+// Other SCSS files import this partial; NEVER hardcode values elsewhere.
+// =============================================================================
+
+// ── Color tokens ──────────────────────────────────────────────────────────────
+// Material-style surface scale
+$color-surface:                   #faf8ff;
+$color-surface-dim:               #d2d9f4;
+$color-surface-bright:            #faf8ff;
+$color-surface-container-lowest:  #ffffff;
+$color-surface-container-low:     #f2f3ff;
+$color-surface-container:         #eaedff;
+$color-surface-container-high:    #e2e7ff;
+$color-surface-container-highest: #dae2fd;
+$color-on-surface:                #131b2e;
+$color-on-surface-variant:        #434655;
+$color-inverse-surface:           #283044;
+$color-inverse-on-surface:        #eef0ff;
+$color-outline:                   #737686;
+$color-outline-variant:           #c3c6d7;
+$color-surface-tint:              #0053db;
+
+// Primary — brand blue used for actions & active states only
+$color-primary:                   #004ac6;
+$color-on-primary:                #ffffff;
+$color-primary-container:         #2563eb;
+$color-on-primary-container:      #eeefff;
+$color-inverse-primary:           #b4c5ff;
+$color-primary-fixed:             #dbe1ff;
+$color-primary-fixed-dim:         #b4c5ff;
+$color-on-primary-fixed:          #00174b;
+$color-on-primary-fixed-variant:  #003ea8;
+
+// Secondary — slate metadata / non-critical UI
+$color-secondary:                 #505f76;
+$color-on-secondary:              #ffffff;
+$color-secondary-container:       #d0e1fb;
+$color-on-secondary-container:    #54647a;
+$color-secondary-fixed:           #d3e4fe;
+$color-secondary-fixed-dim:       #b7c8e1;
+$color-on-secondary-fixed:        #0b1c30;
+$color-on-secondary-fixed-variant:#38485d;
+
+// Tertiary — amber/review accents
+$color-tertiary:                  #784b00;
+$color-on-tertiary:               #ffffff;
+$color-tertiary-container:        #996100;
+$color-on-tertiary-container:     #ffeedd;
+$color-tertiary-fixed:            #ffddb8;
+$color-tertiary-fixed-dim:        #ffb95f;
+$color-on-tertiary-fixed:         #2a1700;
+$color-on-tertiary-fixed-variant: #653e00;
+
+// Semantic — error / critical
+$color-error:                     #ba1a1a;
+$color-on-error:                  #ffffff;
+$color-error-container:           #ffdad6;
+$color-on-error-container:        #93000a;
+
+// Background
+$color-background:                #faf8ff;
+$color-on-background:             #131b2e;
+$color-surface-variant:           #dae2fd;
+
+// ── Typography scale ──────────────────────────────────────────────────────────
+$font-primary:   'Inter', system-ui, sans-serif;
+$font-mono:      'JetBrains Mono', 'Courier New', monospace;
+
+// Font sizes
+$fs-display-lg:  36px;
+$fs-headline-md: 24px;
+$fs-headline-sm: 20px;
+$fs-title-md:    16px;
+$fs-body-md:     14px;
+$fs-body-sm:     13px;
+$fs-label-md:    12px;
+$fs-label-sm:    11px;
+$fs-mono-sm:     12px;
+
+// Line heights
+$lh-display-lg:  44px;
+$lh-headline-md: 32px;
+$lh-headline-sm: 28px;
+$lh-title-md:    24px;
+$lh-body-md:     20px;
+$lh-body-sm:     18px;
+$lh-label-md:    16px;
+$lh-label-sm:    14px;
+$lh-mono-sm:     16px;
+
+// Font weights
+$fw-regular: 400;
+$fw-medium:  500;
+$fw-semibold: 600;
+$fw-bold:    700;
+
+// ── Spacing (8pt grid — unit = 4px) ──────────────────────────────────────────
+$spacing-unit:             4px;
+$spacing-container-padding: 24px;
+$spacing-gutter:            16px;
+$spacing-row-dense:         32px;
+$spacing-row-standard:      48px;
+
+// ── Border radius (shape language) ───────────────────────────────────────────
+$rounded-sm:   0.125rem;  // 2px
+$rounded:      0.25rem;   // 4px  — buttons, inputs, cards
+$rounded-md:   0.375rem;  // 6px  — badges
+$rounded-lg:   0.5rem;
+$rounded-xl:   0.75rem;
+$rounded-full: 9999px;
+
+// ── Elevation — tonal layering + low-contrast outlines ───────────────────────
+// Level 0: background
+$elevation-0-bg: $color-surface-container-low;
+// Level 1: cards/surfaces
+$elevation-1-bg:     $color-surface-container-lowest;
+$elevation-1-border: $color-outline-variant;
+// Level 2: popovers/dropdowns
+$elevation-2-bg:     $color-surface-container-lowest;
+$elevation-2-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$elevation-2-border: $color-outline;
+
+// Active/drag tint
+$elevation-active-tint: rgba($color-primary, 0.06);

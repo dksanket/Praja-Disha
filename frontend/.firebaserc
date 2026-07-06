@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "praja-disha"
+  },
+  "targets": {
+    "praja-disha": {
+      "hosting": {
+        "citizen": [
+          "praja-disha"
+        ],
+        "admin": [
+          "praja-disha-admin-console"
+        ]
+      }
+    }
+  }
+}

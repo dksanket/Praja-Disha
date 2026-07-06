@@ -1,0 +1,193 @@
+[
+  {
+    "id": "TSK-4921",
+    "title": "Severe Drainage Collapse",
+    "priority": "P0",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "BWSSB (Water & Sewage)"
+      },
+      {
+        "type": "dept",
+        "label": "Engineering Dept"
+      },
+      {
+        "type": "dept",
+        "label": "Traffic Police Dept"
+      },
+      {
+        "type": "dept",
+        "label": "Field Operations Dept"
+      }
+    ],
+    "dueDate": "Today, 14:30",
+    "dueDateCritical": true,
+    "status": "Active",
+    "statusType": "ai-pending",
+    "indicatorColorClass": "indicator-water"
+  },
+  {
+    "id": "TSK-8921",
+    "title": "Optimize Water Distribution - Sector 4",
+    "priority": "P0",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Water Supply Dept"
+      },
+      {
+        "type": "dept",
+        "label": "Engineering Dept"
+      }
+    ],
+    "dueDate": "Today, 14:00",
+    "dueDateCritical": true,
+    "status": "AI-Assigned: Review Pending",
+    "statusType": "ai-pending",
+    "indicatorColorClass": "indicator-water"
+  },
+  {
+    "id": "TSK-8914",
+    "title": "Annual Budget Review Preparation",
+    "priority": "P2",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Finance Dept"
+      }
+    ],
+    "dueDate": "Oct 24, 2026",
+    "dueDateCritical": false,
+    "status": "In Progress",
+    "statusType": "in-progress"
+  },
+  {
+    "id": "TSK-8901",
+    "title": "Public Consultation Notice Draft",
+    "priority": "P1",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Policy & Compliance"
+      }
+    ],
+    "dueDate": "Oct 25, 2026",
+    "dueDateCritical": false,
+    "status": "Drafting",
+    "statusType": "drafting"
+  },
+  {
+    "id": "TSK-8922",
+    "title": "Pothole Repair & Road Patching - Ward 8",
+    "priority": "P0",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Engineering Dept"
+      }
+    ],
+    "dueDate": "Today, 18:00",
+    "dueDateCritical": true,
+    "status": "AI-Assigned: Review Pending",
+    "statusType": "ai-pending"
+  },
+  {
+    "id": "TSK-8923",
+    "title": "Review Urban Traffic Congestion Data",
+    "priority": "P1",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Engineering Dept"
+      },
+      {
+        "type": "dept",
+        "label": "Traffic Police Dept"
+      }
+    ],
+    "dueDate": "Oct 12, 2026",
+    "dueDateCritical": false,
+    "status": "In Progress",
+    "statusType": "in-progress"
+  },
+  {
+    "id": "TSK-8924",
+    "title": "Establish Emergency Response Guidelines",
+    "priority": "P0",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Operations Division"
+      }
+    ],
+    "dueDate": "Oct 05, 2026",
+    "dueDateCritical": false,
+    "status": "Drafting",
+    "statusType": "drafting"
+  },
+  {
+    "id": "TSK-8925",
+    "title": "Prepare Smart City Energy Analytics",
+    "priority": "P2",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Finance Dept"
+      }
+    ],
+    "dueDate": "Completed",
+    "dueDateCritical": false,
+    "status": "Completed",
+    "statusType": "completed"
+  },
+  {
+    "id": "TSK-8926",
+    "title": "Validate Waste Disposal Policy Draft",
+    "priority": "P1",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Water Supply Dept"
+      }
+    ],
+    "dueDate": "Tomorrow, 10:00",
+    "dueDateCritical": true,
+    "status": "AI-Assigned: Review Pending",
+    "statusType": "ai-pending"
+  },
+  {
+    "id": "TSK-8927",
+    "title": "Design New Public Park Layout",
+    "priority": "P2",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Field Operations"
+      }
+    ],
+    "dueDate": "Oct 20, 2026",
+    "dueDateCritical": false,
+    "status": "In Progress",
+    "statusType": "in-progress"
+  },
+  {
+    "id": "TSK-8928",
+    "title": "Assess Water Logging Vulnerability",
+    "priority": "P0",
+    "assignments": [
+      {
+        "type": "dept",
+        "label": "Water Supply Dept"
+      },
+      {
+        "type": "dept",
+        "label": "Engineering Dept"
+      }
+    ],
+    "dueDate": "Completed",
+    "dueDateCritical": false,
+    "status": "Completed",
+    "statusType": "completed"
+  }
+]

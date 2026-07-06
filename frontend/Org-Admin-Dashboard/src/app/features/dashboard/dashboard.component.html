@@ -1,0 +1,256 @@
+<div class="dashboard-canvas">
+  <div class="dashboard-container">
+
+    <!-- ── Page Header ─────────────────────────────────────────────────── -->
+    <div class="dashboard-header">
+      <div>
+        <h2 class="pd-display-lg dashboard-header__title">{{ strings.pageTitle }}</h2>
+        <p class="pd-body-md dashboard-header__subtitle">{{ strings.pageSubtitle }}</p>
+      </div>
+      <div class="dashboard-header__actions">
+        <button
+          type="button"
+          class="pd-btn pd-btn--secondary"
+          id="btn-export-report">
+          <span class="material-symbols-outlined">download</span>
+          {{ strings.actions.exportReport }}
+        </button>
+        <button
+          type="button"
+          class="pd-btn pd-btn--primary"
+          id="btn-new-task">
+          <span class="material-symbols-outlined">add</span>
+          {{ strings.actions.newTask }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Bento Grid Quick Filters ────────────────────────────────────── -->
+    <div class="dashboard-bento" role="region" aria-label="Quick metrics filter">
+      
+      <!-- Card 1: Awaiting AI Review -->
+      <div
+        class="bento-card bento-card--primary"
+        [class.bento-card--active]="selectedFilter === 'ai-pending'"
+        (click)="setCategoryFilter('ai-pending')"
+        role="button"
+        tabindex="0"
+        id="card-filter-ai">
+        <div class="bento-card__indicator"></div>
+        <div class="bento-card__header">
+          <span class="pd-label-md bento-card__title">{{ strings.stats.awaitingAiTitle }}</span>
+          <span class="material-symbols-outlined bento-card__icon bento-card__icon--primary">smart_toy</span>
+        </div>
+        <div class="bento-card__body">
+          <span class="pd-display-lg bento-card__value">{{ stats.awaitingAiReviewCount }}</span>
+          <span class="pd-label-sm bento-card__trend bento-card__trend--primary">{{ strings.stats.awaitingAiSubtitle }}</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Due Today / Overdue -->
+      <div
+        class="bento-card bento-card--error"
+        [class.bento-card--active]="selectedFilter === 'due-today'"
+        (click)="setCategoryFilter('due-today')"
+        role="button"
+        tabindex="0"
+        id="card-filter-overdue">
+        <div class="bento-card__indicator"></div>
+        <div class="bento-card__header">
+          <span class="pd-label-md bento-card__title">{{ strings.stats.dueTodayTitle }}</span>
+          <span class="material-symbols-outlined bento-card__icon bento-card__icon--error">warning</span>
+        </div>
+        <div class="bento-card__body">
+          <span class="pd-display-lg bento-card__value">{{ stats.dueTodayCount }}</span>
+          <span class="pd-label-sm bento-card__trend bento-card__trend--error">{{ strings.stats.dueTodaySubtitle }}</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Department Workload (resets filters) -->
+      <div
+        class="bento-card bento-card--secondary"
+        [class.bento-card--active]="selectedFilter === 'all'"
+        (click)="setCategoryFilter('all')"
+        role="button"
+        tabindex="0"
+        id="card-filter-workload">
+        <div class="bento-card__header">
+          <span class="pd-label-md bento-card__title">{{ strings.stats.myDeptTitle }}</span>
+          <span class="material-symbols-outlined bento-card__icon bento-card__icon--secondary">folder_shared</span>
+        </div>
+        <div class="bento-card__body">
+          <span class="pd-display-lg bento-card__value">{{ stats.myDeptCount }}</span>
+          <span class="pd-label-sm bento-card__trend bento-card__trend--secondary">{{ strings.stats.myDeptSubtitle }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Central Triage Task Table ────────────────────────────────────── -->
+    <div class="triage-section">
+      <div class="triage-header">
+        <h3 class="pd-title-md triage-header__title">{{ strings.triageTable.title }}</h3>
+        
+        <div class="triage-header__search-container">
+          <span class="material-symbols-outlined triage-header__search-icon">search</span>
+          <input
+            type="text"
+            class="triage-header__search-input"
+            [placeholder]="strings.triageTable.searchPlaceholder"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+            aria-label="Search triage tasks"
+            id="triage-search-input" />
+        </div>
+      </div>
+
+      <div class="triage-table-wrapper">
+        <table class="triage-table">
+          <thead>
+            <tr>
+              <th class="pd-label-sm triage-table__th text-mono">{{ strings.triageTable.headers.taskId }}</th>
+              <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.titleContext }}</th>
+              <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.priority }}</th>
+              <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.assignment }}</th>
+              <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.dueDate }}</th>
+              <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.status }}</th>
+              <th class="triage-table__th triage-table__th--actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Task Rows -->
+            <tr
+              *ngFor="let task of paginatedTasks; let odd = odd"
+              class="triage-table__tr"
+              [class.triage-table__tr--odd]="odd">
+              
+              <td class="triage-table__td text-mono text-secondary">{{ task.id }}</td>
+              
+              <td class="triage-table__td">
+                <div class="triage-table__context">
+                  <div
+                    class="triage-table__accent-line"
+                    [class.triage-table__accent-line--water]="task.indicatorColorClass === 'indicator-water'">
+                  </div>
+                  <a [routerLink]="['/task-details', task.id]" class="pd-label-md triage-table__title triage-table__title--link">{{ task.title }}</a>
+                </div>
+              </td>
+              
+              <td class="triage-table__td">
+                <!-- Priority Badges -->
+                <span
+                  *ngIf="task.priority === 'P0'"
+                  class="pd-badge pd-badge--p0">
+                  <span class="pd-badge__pulse"></span>
+                  P0
+                </span>
+                <span
+                  *ngIf="task.priority === 'P1'"
+                  class="pd-badge pd-badge--p1">
+                  P1
+                </span>
+                <span
+                  *ngIf="task.priority === 'P2'"
+                  class="pd-badge pd-badge--p2">
+                  P2
+                </span>
+              </td>
+              
+              <td class="triage-table__td">
+                <!-- Assignment List -->
+                <div class="triage-table__assignments">
+                  <ng-container *ngFor="let assign of task.assignments">
+                    
+                    <span
+                      *ngIf="assign.type === 'icon' || assign.type === 'dept'"
+                      class="triage-table__assignment-dept-tag">
+                      {{ assign.label }}
+                    </span>
+                    
+                  </ng-container>
+                </div>
+              </td>
+              
+              <td
+                class="triage-table__td"
+                [class.triage-table__td--critical]="task.dueDateCritical">
+                {{ task.dueDate }}
+              </td>
+              
+              <td class="triage-table__td">
+                <!-- Semantic Status Badges -->
+                <span
+                  class="status-tag"
+                  [class.status-tag--pending]="task.statusType === 'ai-pending'"
+                  [class.status-tag--progress]="task.statusType === 'in-progress'"
+                  [class.status-tag--draft]="task.statusType === 'drafting'"
+                  [class.status-tag--completed]="task.statusType === 'completed'">
+                  <span *ngIf="task.statusType === 'ai-pending'" class="material-symbols-outlined">pending</span>
+                  {{ task.status }}
+                </span>
+              </td>
+              
+              <td class="triage-table__td triage-table__td--actions">
+                <button
+                  type="button"
+                  class="triage-table__action-btn"
+                  aria-label="Actions dropdown">
+                  <span class="material-symbols-outlined">more_vert</span>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="paginatedTasks.length === 0">
+              <td colspan="7" class="triage-table__empty-state pd-body-md text-secondary">
+                {{ strings.triageTable.emptyState }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Pagination Footer ── -->
+      <div class="triage-footer">
+        <span class="pd-body-sm text-secondary">
+          {{ strings.triageTable.pagination.showingLabelPrefix }}
+          {{ startIndex }}
+          {{ strings.triageTable.pagination.showingLabelMiddle }}
+          {{ endIndex }}
+          {{ strings.triageTable.pagination.showingLabelOf }}
+          {{ totalItems }}
+          {{ strings.triageTable.pagination.showingLabelSuffix }}
+        </span>
+        <div class="triage-pagination-actions">
+          <button
+            type="button"
+            class="triage-pagination-btn"
+            [disabled]="!hasPreviousPage"
+            (click)="prevPage()"
+            aria-label="Previous page">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <button
+            type="button"
+            class="triage-pagination-btn"
+            [disabled]="!hasNextPage"
+            (click)="nextPage()"
+            aria-label="Next page">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────── -->
+  <footer class="dashboard-footer">
+    <span class="pd-label-md dashboard-footer__brand">{{ strings.footer.brandCopy }}</span>
+    <div class="dashboard-footer__links">
+      <a href="#" class="pd-label-sm dashboard-footer__link">{{ strings.footer.statusLabel }}</a>
+      <a href="#" class="pd-label-sm dashboard-footer__link">{{ strings.footer.versionLabel }}</a>
+    </div>
+  </footer>
+</div>

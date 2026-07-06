@@ -1,0 +1,122 @@
+<div class="layout">
+
+  <!-- ── Sidebar ───────────────────────────────────────────────────────── -->
+  <nav class="sidebar" aria-label="Main navigation">
+
+    <!-- Org identity block -->
+    <div class="sidebar__org">
+      <span class="sidebar__org-name pd-title-md">{{ strings.orgName }}</span>
+      <span class="sidebar__org-label pd-label-md">{{ strings.orgLabel }}</span>
+    </div>
+
+    <!-- Primary navigation -->
+    <div class="sidebar__nav" role="list">
+      <a
+        id="nav-dashboard"
+        routerLink="/dashboard"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        role="listitem">
+        <span class="material-symbols-outlined">dashboard</span>
+        {{ strings.nav.dashboard }}
+      </a>
+
+      <a
+        id="nav-ai-chat"
+        routerLink="/ai-chat"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        role="listitem">
+        <span class="material-symbols-outlined">smart_toy</span>
+        {{ strings.nav.aiChat }}
+      </a>
+
+      <a
+        id="nav-manage-team"
+        routerLink="/manage-team"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        role="listitem">
+        <span class="material-symbols-outlined">group</span>
+        {{ strings.nav.manageTeam }}
+      </a>
+    </div>
+
+    <!-- Bottom utility links -->
+    <div class="sidebar__bottom" role="list">
+      <a
+        id="nav-support"
+        routerLink="/support"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        role="listitem">
+        <span class="material-symbols-outlined">help</span>
+        {{ strings.bottomNav.support }}
+      </a>
+
+      <a
+        id="nav-logs"
+        routerLink="/logs"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        role="listitem">
+        <span class="material-symbols-outlined">history</span>
+        {{ strings.bottomNav.logs }}
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Main content column ───────────────────────────────────────────── -->
+  <div class="layout__main">
+
+    <!-- Top navigation bar -->
+    <header class="topbar" role="banner">
+      <div class="topbar__left">
+        <span class="topbar__brand pd-headline-sm">{{ strings.brand }}</span>
+
+        <div class="topbar__search">
+          <span class="material-symbols-outlined topbar__search-icon">search</span>
+          <input
+            id="topbar-search"
+            type="text"
+            class="topbar__search-input"
+            [placeholder]="strings.searchPlaceholder"
+            aria-label="Global search" />
+        </div>
+      </div>
+
+      <div class="topbar__right">
+        <button id="btn-notifications" class="topbar__icon-btn" type="button" aria-label="Notifications">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+
+        <button id="btn-settings" class="topbar__icon-btn" type="button" aria-label="Settings">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
+
+        <!-- Visual divider -->
+        <div class="topbar__divider" aria-hidden="true"></div>
+
+        <button id="btn-org-switcher" class="topbar__org-btn" type="button">
+          <span>{{ strings.orgSwitcher }}</span>
+          <span class="material-symbols-outlined topbar__chevron">expand_more</span>
+        </button>
+
+        <!-- User avatar — placeholder; replaced by AuthService user in a later sprint -->
+        <div
+          id="user-avatar"
+          class="topbar__avatar"
+          role="img"
+          aria-label="User profile">
+          <span class="material-symbols-outlined topbar__avatar-icon">account_circle</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Feature content projected here -->
+    <main class="layout__content" role="main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+</div>

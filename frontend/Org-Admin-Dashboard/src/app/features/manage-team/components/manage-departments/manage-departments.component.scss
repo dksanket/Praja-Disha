@@ -1,0 +1,309 @@
+// =============================================================================
+// manage-departments.component.scss
+// Scoped styles for the Manage Departments sub-component.
+// =============================================================================
+
+@import '../../../../../styles/tokens';
+
+// ── Toolbar ──────────────────────────────────────────────────────────────────
+.manage-team__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-gutter;
+  margin-bottom: $spacing-gutter;
+}
+
+.manage-team__toolbar-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+// ── Search field ─────────────────────────────────────────────────────────────
+.search-field {
+  position: relative;
+  width: 320px;
+
+  &__icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: $color-outline-variant;
+    pointer-events: none;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    font-family: $font-primary;
+    font-size: $fs-body-sm;
+    line-height: $lh-body-sm;
+    color: $color-on-surface;
+    background-color: $color-surface;
+    border: 1px solid $color-outline-variant;
+    border-radius: $rounded;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &::placeholder {
+      color: $color-outline;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px $color-primary-fixed;
+    }
+  }
+}
+
+// ── Button styles ─────────────────────────────────────────────────────────────
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: $color-surface;
+  color: $color-on-surface-variant;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  font-weight: $fw-regular;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container-low;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+.icon-sm {
+  font-size: 16px !important;
+}
+
+// ── Department table wrapper ──────────────────────────────────────────────────
+.dept-table-wrap {
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-lg;
+  background-color: $color-surface;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+// ── Table Head ────────────────────────────────────────────────────────────────
+.dept-table__head-row {
+  background-color: $color-surface-container-low;
+  border-bottom: 1px solid $color-outline-variant;
+}
+
+.dept-table__th {
+  padding: 12px 16px;
+  font-family: $font-primary;
+  font-size: $fs-label-sm;
+  font-weight: $fw-medium;
+  line-height: $lh-label-sm;
+  letter-spacing: 0.02em;
+  color: $color-on-surface-variant;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &--id      { width: 10%; }
+  &--name    { width: 32%; }
+  &--parent  { width: 20%; }
+  &--head    { width: 23%; }
+  &--officers { width: 10%; text-align: right; }
+  &--actions { width: 5%; text-align: center; }
+}
+
+.table-header-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+
+  &--right {
+    justify-content: flex-end;
+  }
+}
+
+// ── Table Body Rows ───────────────────────────────────────────────────────────
+.dept-table__row {
+  border-bottom: 1px solid $color-outline-variant;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: rgba($color-surface-container-low, 0.5);
+
+    .row-action-btn {
+      opacity: 1;
+    }
+  }
+
+  &--child {
+    background-color: $color-surface;
+  }
+}
+
+// ── Table Data Cells ──────────────────────────────────────────────────────────
+.dept-table__td {
+  padding: 12px 16px;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  line-height: $lh-body-sm;
+  color: $color-on-surface;
+  vertical-align: middle;
+
+  &--id {
+    font-family: $font-mono;
+    font-size: $fs-mono-sm;
+    color: $color-on-surface-variant;
+  }
+
+  &--name {
+    font-weight: $fw-medium;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &--indented {
+    padding-left: 32px;
+    position: relative;
+  }
+
+  &--parent { color: $color-on-surface-variant; }
+
+  &--officers {
+    text-align: right;
+    font-weight: $fw-medium;
+  }
+
+  &--actions { text-align: center; }
+}
+
+.dept-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: $rounded-full;
+  background-color: $color-primary;
+  flex-shrink: 0;
+}
+
+.dept-tree-line {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 12px;
+  height: 16px;
+  margin-top: -8px;
+  border-top: 1px solid $color-outline-variant;
+  border-left: 1px solid $color-outline-variant;
+  border-top-left-radius: 2px;
+}
+
+.dept-table__dept-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dept-table__parent-link {
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.dept-table__none-label {
+  color: $color-on-surface-variant;
+  font-style: italic;
+}
+
+// ── Officer cell ──────────────────────────────────────────────────────────────
+.officer-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &__avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: $rounded-full;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  &__initials {
+    width: 24px;
+    height: 24px;
+    border-radius: $rounded-full;
+    background-color: $color-tertiary-container;
+    color: $color-on-tertiary-container;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: $fw-bold;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    color: $color-on-surface;
+    white-space: nowrap;
+  }
+}
+
+// ── Vacant badge ──────────────────────────────────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: $rounded-md;
+  font-family: $font-primary;
+  font-size: $fs-label-sm;
+  font-weight: $fw-medium;
+  line-height: $lh-label-sm;
+
+  &--vacant {
+    background-color: $color-surface-variant;
+    color: $color-on-surface-variant;
+    font-style: italic;
+  }
+}
+
+// ── Row action button ─────────────────────────────────────────────────────────
+.row-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-outline-variant;
+  opacity: 0;
+  padding: 4px;
+  border-radius: $rounded;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease, opacity 150ms ease;
+
+  &:hover {
+    color: $color-primary;
+  }
+
+  &:focus-visible {
+    opacity: 1;
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}

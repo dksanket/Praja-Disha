@@ -1,0 +1,113 @@
+<main class="pt-8 pb-32 px-6 md:px-margin-desktop max-w-max-width-content mx-auto w-full">
+  <!-- Page Title -->
+  <div class="mb-8">
+    <h1 class="font-headline-lg text-2xl font-bold text-on-background md:text-3xl">{{ strings.title }}</h1>
+    <p class="font-body-md text-sm text-on-surface-variant mt-1">{{ strings.subtitle }}</p>
+  </div>
+
+  <!-- Empty State if no tickets -->
+  <div *ngIf="displayTickets.length === 0" class="text-center py-16 bg-white rounded-xl border border-outline-variant/60 shadow-sm p-8">
+    <span class="material-symbols-outlined text-outline text-5xl mb-4">campaign</span>
+    <p class="font-body-md text-sm text-secondary">{{ strings.emptyState }}</p>
+  </div>
+
+  <!-- Ticket Cards List Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6" *ngIf="displayTickets.length > 0">
+    <!-- Ticket Card Loop -->
+    <div 
+      *ngFor="let ticket of displayTickets" 
+      class="bg-white rounded-xl p-6 border border-outline-variant/60 shadow-sm hover:shadow-md transition-all group duration-300">
+      
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="font-headline-md text-lg font-bold text-on-surface group-hover:text-primary transition-colors duration-200">{{ ticket.title }}</h3>
+          <div class="mt-1.5 inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/60 text-on-secondary-container font-label-md text-xs font-semibold">
+            {{ ticket.category }}
+          </div>
+        </div>
+        <span class="text-on-surface-variant font-label-md text-xs font-bold bg-surface-container-low px-2 py-1 rounded">ID: {{ ticket.id }}</span>
+      </div>
+
+      <!-- Stepper -->
+      <div class="mt-6">
+        <div class="flex items-center justify-between w-full relative mb-2">
+          <!-- Step 1: Submitted -->
+          <div class="flex flex-col items-center z-10">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300" [ngClass]="ticket.step1Class">
+              <span class="material-symbols-outlined text-sm font-bold">check</span>
+            </div>
+          </div>
+          <div class="step-line h-[2px] flex-grow mx-1 transition-all duration-500" [ngClass]="ticket.line1Class"></div>
+
+          <!-- Step 2: AI-Assigned -->
+          <div class="flex flex-col items-center z-10">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300" [ngClass]="ticket.step2Class">
+              <span class="material-symbols-outlined text-sm font-bold">auto_awesome</span>
+            </div>
+          </div>
+          <div class="step-line h-[2px] flex-grow mx-1 transition-all duration-500" [ngClass]="ticket.line2Class"></div>
+
+          <!-- Step 3: In Progress -->
+          <div class="flex flex-col items-center z-10">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300" [ngClass]="ticket.step3Class">
+              <span class="material-symbols-outlined text-sm font-bold" [class.animate-spin]="ticket.status === 'In Progress'">engineering</span>
+            </div>
+          </div>
+          <div class="step-line h-[2px] flex-grow mx-1 transition-all duration-500" [ngClass]="ticket.line3Class"></div>
+
+          <!-- Step 4: Resolved -->
+          <div class="flex flex-col items-center z-10">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300" [ngClass]="ticket.step4Class">
+              <span class="material-symbols-outlined text-sm font-bold">flag</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between w-full px-1">
+          <span class="font-label-md text-[10px] font-bold" [class.text-primary]="ticket.status !== 'Submitted'" [class.text-secondary]="ticket.status === 'Submitted'">Submitted</span>
+          <span class="font-label-md text-[10px] font-bold" [class.text-primary]="ticket.isStep2Active" [class.text-secondary]="!ticket.isStep2Active">AI-Assigned</span>
+          <span class="font-label-md text-[10px] font-bold" [class.text-primary]="ticket.isStep3Active" [class.text-secondary]="!ticket.isStep3Active">In Progress</span>
+          <span class="font-label-md text-[10px] font-bold" [class.text-primary]="ticket.isStep4Active" [class.text-secondary]="!ticket.isStep4Active">Resolved</span>
+        </div>
+      </div>
+
+      <!-- Footer action -->
+      <div class="mt-6 pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+        <p class="font-body-md text-on-surface-variant text-xs italic">
+          {{ strings.lastUpdateLabel }} {{ ticket.lastUpdate }}
+        </p>
+        <button 
+          class="text-primary font-label-lg text-sm font-semibold flex items-center gap-1 hover:underline"
+          (click)="viewDetails(ticket.id)">
+          {{ strings.viewDetailsBtn }} 
+          <span class="material-symbols-outlined text-sm font-bold">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bento-Style Info Card -->
+    <div class="bg-primary text-on-primary rounded-xl p-6 flex flex-col justify-between shadow-lg overflow-hidden relative min-h-[220px]">
+      <div class="relative z-10">
+        <h3 class="font-headline-md text-xl font-bold mb-3">{{ strings.infoCardTitle }}</h3>
+        <p class="font-body-md text-sm opacity-90 leading-relaxed">{{ strings.infoCardDesc }}</p>
+      </div>
+      <div class="relative z-10 mt-6">
+        <button class="bg-white text-primary px-5 py-2.5 rounded-xl font-label-lg text-sm font-semibold hover:bg-primary-fixed transition-all shadow-sm active:scale-95 duration-150">
+          {{ strings.infoCardBtn }}
+        </button>
+      </div>
+      <!-- Abstract BG decoration -->
+      <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+      <div class="absolute -left-8 -top-8 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Floating Action Button (FAB) -->
+<div class="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-40">
+  <button 
+    class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+    (click)="goToReport()">
+    <span class="material-symbols-outlined text-3xl font-semibold">add</span>
+  </button>
+</div>

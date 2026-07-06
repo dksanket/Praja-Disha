@@ -1,0 +1,670 @@
+// =============================================================================
+// add-edit-officer.component.scss
+// Styles for the Add/Edit Officer view.
+// Uses design tokens from _tokens.scss. NEVER hardcode colors or fonts.
+// =============================================================================
+
+@import '../../../../../styles/tokens';
+
+// ── Layout Grid ──────────────────────────────────────────────────────────────
+.add-edit-officer-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-gutter * 2;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-container-padding 0;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+// ── Left Column: Form Canvas ─────────────────────────────────────────────────
+.form-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-gutter * 1.5;
+  width: 100%;
+  max-width: 800px;
+}
+
+// ── Breadcrumb and Header ────────────────────────────────────────────────────
+.breadcrumb-container {
+  display: flex;
+  margin-bottom: $spacing-unit * 2;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-primary;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  font-weight: $fw-medium;
+  padding: 4px 8px;
+  border-radius: $rounded;
+  transition: color 150ms ease, background-color 150ms ease;
+
+  &:hover {
+    color: $color-primary-container;
+    background-color: $color-surface-container-low;
+  }
+
+  span {
+    font-size: 18px;
+  }
+}
+
+.page-title-block {
+  margin-bottom: $spacing-unit * 4;
+}
+
+.page-title {
+  color: $color-on-surface;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: $color-on-surface-variant;
+  margin-top: $spacing-unit * 2;
+}
+
+// ── Error Banner ─────────────────────────────────────────────────────────────
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: $color-error-container;
+  border: 1px solid rgba($color-error, 0.2);
+  border-radius: $rounded;
+  padding: 12px 16px;
+  margin-bottom: $spacing-unit * 2;
+
+  &__icon {
+    color: $color-error;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    color: $color-on-error-container;
+    margin: 0;
+  }
+}
+
+// ── Form Cards & Fieldsets ───────────────────────────────────────────────────
+.form-card {
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-xl;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+
+  &__legend {
+    padding: 0 4px;
+    margin-bottom: $spacing-gutter;
+    color: $color-on-surface;
+    font-weight: $fw-semibold;
+    border: none;
+  }
+}
+
+.form-row-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-gutter;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-unit * 1.5;
+}
+
+.form-label {
+  color: $color-on-surface-variant;
+  font-weight: $fw-medium;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required-star {
+  color: $color-error;
+}
+
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  background-color: $color-surface-container-lowest;
+  color: $color-on-surface;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
+  }
+
+  &:disabled {
+    background-color: $color-surface-container-low;
+    color: $color-outline;
+    cursor: not-allowed;
+  }
+}
+
+.font-mono {
+  font-family: $font-mono;
+  font-size: $fs-mono-sm;
+}
+
+.mt-gutter {
+  margin-top: $spacing-gutter;
+}
+
+.pt-3 {
+  padding-top: 12px;
+}
+
+.border-t-dashed {
+  border-top: 1px dashed $color-outline-variant;
+}
+
+// ── Phone Input Group ────────────────────────────────────────────────────────
+.phone-input-group {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
+  }
+}
+
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background-color: $color-surface-container-low;
+  color: $color-on-surface-variant;
+  font-family: $font-primary;
+  font-size: $fs-body-sm;
+  border-right: 1px solid $color-outline-variant;
+  font-weight: $fw-medium;
+  user-select: none;
+}
+
+.phone-input {
+  border: none;
+  border-radius: 0;
+  flex-grow: 1;
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+// ── Toggle Switch ────────────────────────────────────────────────────────────
+.status-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $color-outline-variant;
+  transition: 200ms;
+  border-radius: 24px;
+
+  &:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 200ms;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+input:checked + .toggle-slider {
+  background-color: $color-primary;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  color: $color-on-surface;
+}
+
+.status-help-text {
+  color: $color-outline;
+}
+
+// ── Department & Manager Assignments ─────────────────────────────────────────
+.section-desc {
+  color: $color-on-surface-variant;
+  margin: 0;
+}
+
+.chips-container {
+  min-height: 52px;
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips-row-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dept-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: $color-secondary-container;
+  color: $color-on-secondary-container;
+  border: 1px solid rgba($color-outline, 0.15);
+  border-radius: $rounded-md;
+}
+
+.chip-close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $color-on-secondary-container;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: $color-error;
+  }
+
+  span {
+    font-size: 14px;
+  }
+}
+
+.empty-chips-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: $color-surface-container-low;
+  border: 1px dashed $color-outline-variant;
+  border-radius: $rounded;
+}
+
+.empty-chips-text {
+  color: $color-outline;
+  font-style: italic;
+}
+
+// Search & Autocomplete
+.search-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-field-icon {
+  position: absolute;
+  left: 12px;
+  color: $color-outline;
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.pl-10 {
+  padding-left: 40px !important;
+}
+
+.autocomplete-overlay {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: $elevation-2-bg;
+  border: 1px solid $elevation-2-border;
+  border-radius: $rounded;
+  box-shadow: $elevation-2-shadow;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 100;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container-high;
+  }
+
+  .item-icon {
+    color: $color-primary;
+    font-size: 20px;
+  }
+
+  .item-avatar-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: $color-secondary-container;
+    color: $color-on-secondary-container;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $fs-label-md;
+    font-weight: $fw-bold;
+    font-family: $font-primary;
+  }
+
+  .item-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .item-name {
+    color: $color-on-surface;
+    font-weight: $fw-medium;
+  }
+
+  .item-id, .item-username {
+    color: $color-outline;
+  }
+
+  .add-icon-right {
+    color: $color-outline;
+    font-size: 18px;
+    margin-left: auto;
+    transition: color 150ms ease, transform 150ms;
+  }
+
+  &:hover .add-icon-right {
+    color: $color-primary;
+    transform: scale(1.1);
+  }
+}
+
+// Manager Card Chips
+.manager-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background-color: $color-surface-container-low;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-lg;
+  transition: background-color 150ms ease;
+
+  .chip-avatar-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: $color-primary-fixed;
+    color: $color-on-primary-fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $fs-label-md;
+    font-weight: $fw-bold;
+  }
+
+  .chip-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .chip-name {
+    color: $color-on-surface;
+  }
+
+  .chip-meta {
+    color: $color-outline;
+  }
+
+  .chip-remove-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $color-on-surface-variant;
+    border-radius: 50%;
+    transition: color 150ms ease, background-color 150ms ease;
+
+    &:hover {
+      color: $color-error;
+      background-color: rgba($color-error, 0.08);
+    }
+  }
+}
+
+// ── Footer Action Buttons ────────────────────────────────────────────────────
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: $spacing-gutter;
+  border-top: 1px solid $color-outline-variant;
+  padding-top: $spacing-gutter * 1.5;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: $color-primary;
+  color: $color-on-primary;
+  border: none;
+  border-radius: $rounded;
+  padding: 8px 20px;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  font-weight: $fw-medium;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-primary-container;
+  }
+
+  &:disabled {
+    background-color: $color-outline-variant;
+    color: $color-outline;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: $color-surface-container-lowest;
+  color: $color-on-surface-variant;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 8px 20px;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  font-weight: $fw-medium;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container-low;
+  }
+}
+
+// ── Right Column: Sidebar ────────────────────────────────────────────────────
+.sidebar-column {
+  width: 100%;
+
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: $spacing-container-padding;
+  }
+}
+
+.sticky-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-gutter;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $color-on-surface;
+  margin: 0;
+  font-weight: $fw-semibold;
+
+  &-icon {
+    color: $color-secondary;
+    font-size: 22px;
+  }
+}
+
+// Profile attributes card
+.preview-card {
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-xl;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.preview-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.preview-icon {
+  color: $color-outline;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-label {
+  color: $color-outline;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 10px;
+}
+
+.preview-value {
+  color: $color-on-surface;
+  font-weight: $fw-medium;
+  word-break: break-all;
+}
+
+// Tip Card
+.tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background-color: $color-surface-container-low;
+  border-left: 3px solid $color-primary;
+  border-radius: 0 $rounded-lg $rounded-lg 0;
+
+  &-icon {
+    color: $color-primary;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &-text {
+    color: $color-on-surface-variant;
+    margin: 0;
+    line-height: 1.4;
+  }
+}

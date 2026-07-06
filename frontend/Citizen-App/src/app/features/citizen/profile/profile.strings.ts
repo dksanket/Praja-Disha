@@ -1,0 +1,160 @@
+const en = {
+  title: 'User Profile',
+  subtitle: 'Preferences',
+  badgeText: 'Silver Citizen',
+  langSectionTitle: 'Language Selection',
+  langSectionDesc: 'Choose your preferred language for the application interface and communications.',
+  notificationsOption: 'Notification Preferences',
+  detailsOption: 'Personal Details',
+  securityOption: 'Security & Password',
+  logoutBtn: 'Log Out',
+  brandName: 'Praja Disha'
+};
+
+export const PROFILE_STRINGS: Record<string, typeof en> = {
+  en,
+  hi: {
+    title: 'उपयोगकर्ता प्रोफ़ाइल',
+    subtitle: 'प्राथमिकताएं',
+    badgeText: 'सिल्वर नागरिक',
+    langSectionTitle: 'भाषा चयन',
+    langSectionDesc: 'एप्लिकेशन इंटरफ़ेस और संचार के लिए अपनी पसंदीदा भाषा चुनें।',
+    notificationsOption: 'अधिसूचना प्राथमिकताएं',
+    detailsOption: 'व्यक्तिगत विवरण',
+    securityOption: 'सुरक्षा और पासवर्ड',
+    logoutBtn: 'लॉग आउट',
+    brandName: 'प्रजा दिशा'
+  },
+  kn: {
+    title: 'ಬಳಕೆದಾರರ ಪ್ರೊಫೈಲ್',
+    subtitle: 'ಆದ್ಯತೆಗಳು',
+    badgeText: 'ಸಿಲ್ವರ್ ನಾಗರಿಕ',
+    langSectionTitle: 'ಭಾಷೆ ಆಯ್ಕೆ',
+    langSectionDesc: 'ಅಪ್ಲಿಕೇಶನ್ ಇಂಟರ್ಫೇಸ್ ಮತ್ತು ಸಂವಹನಗಳಿಗಾಗಿ ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯನ್ನು ಆರಿಸಿ.',
+    notificationsOption: 'ಅಧಿಸೂಚನೆ ಆದ್ಯತೆಗಳು',
+    detailsOption: 'ವೈಯಕ್ತಿಕ ವಿವರಗಳು',
+    securityOption: 'ಭದ್ರತೆ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್',
+    logoutBtn: 'ಲಾಗ್ ಔಟ್',
+    brandName: 'ಪ್ರಜಾ ದಿಶಾ'
+  },
+  bn: {
+    title: 'ব্যবহারকারী প্রোফাইল',
+    subtitle: 'পছন্দসমূহ',
+    badgeText: 'রৌপ্য নাগরিক',
+    langSectionTitle: 'ভাষা নির্বাচন',
+    langSectionDesc: 'অ্যাপ্লিকেশন ইন্টারফেস এবং যোগাযোগের জন্য আপনার পছন্দের ভাষা চয়ন করুন।',
+    notificationsOption: 'বিজ্ঞপ্তি পছন্দসমূহ',
+    detailsOption: 'ব্যক্তিগত বিবরণ',
+    securityOption: 'নিরাপত্তা ও পাসওয়ার্ড',
+    logoutBtn: 'লগ আউট',
+    brandName: 'প্রজা দিশা'
+  },
+  ta: {
+    title: 'பயனர் சுயவிவரம்',
+    subtitle: 'விருப்பத்தேர்வுகள்',
+    badgeText: 'வெள்ளி குடிமகன்',
+    langSectionTitle: 'மொழி தேர்வு',
+    langSectionDesc: 'பயன்பாட்டு இடைமுகம் மற்றும் தகவல்தொடர்புகளுக்கு உங்களுக்கு விருப்பமான மொழியைத் தேர்ந்தெடுக்கவும்.',
+    notificationsOption: 'அறிவிப்பு விருப்பத்தேர்வுகள்',
+    detailsOption: 'தனிப்பட்ட விவரங்கள்',
+    securityOption: 'பாதுகாப்பு & கடவுச்சொல்',
+    logoutBtn: 'வெளியேறு',
+    brandName: 'பிரஜா திஷா'
+  },
+  te: {
+    title: 'యూజర్ ప్రొఫైల్',
+    subtitle: 'ప్రాధాన్యతలు',
+    badgeText: 'సిల్వర్ పౌరుడు',
+    langSectionTitle: 'భాష ఎంపిక',
+    langSectionDesc: 'అప్లికేషన్ ఇంటర్‌ఫేస్ మరియు కమ్యూనికేషన్స్ కోసం మీ ప్రాధాన్య భాషను ఎంచుకోండి.',
+    notificationsOption: 'నోటిఫికేషన్ ప్రాధాন্যతలు',
+    detailsOption: 'వ్యక్తిగత వివరాలు',
+    securityOption: 'భద్రత & పాస్‌వర్డ్',
+    logoutBtn: 'లాగ్ అవుట్',
+    brandName: 'ప్రజా దిశ'
+  },
+  mr: {
+    title: 'वापरकर्ता प्रोफाइल',
+    subtitle: 'प्राधान्ये',
+    badgeText: 'सिल्व्हर नागरिक',
+    langSectionTitle: 'भाषा निवड',
+    langSectionDesc: 'ॲप्लिकेशन इंटरफेस आणि संवादासाठी आपली पसंतीची भाषा निवडा.',
+    notificationsOption: 'सूचना प्राधान्ये',
+    detailsOption: 'वैयक्तिक तपशील',
+    securityOption: 'सुरक्षा आणि पासवर्ड',
+    logoutBtn: 'लॉग आउट',
+    brandName: 'प्रजा दिशा'
+  },
+  ur: {
+    title: 'صارف کا پروفائل',
+    subtitle: 'ترجیحات',
+    badgeText: 'سلور شہری',
+    langSectionTitle: 'زبان کا انتخاب',
+    langSectionDesc: 'ایپلی کیشن انٹرفیس اور مواصلات کے لیے اپنی پسندیدہ زبان منتخب کریں۔',
+    notificationsOption: 'اطلاع کی ترجیحات',
+    detailsOption: 'ذاتی معلومات',
+    securityOption: 'سیکیورٹی اور پاس ورڈ',
+    logoutBtn: 'لاگ آؤٹ',
+    brandName: 'प्रजा दिशा'
+  },
+  gu: {
+    title: 'વપરાશકર્તા પ્રોફાઇલ',
+    subtitle: 'પસંદગીઓ',
+    badgeText: 'સિલ્વર નાગરિક',
+    langSectionTitle: 'ભાષા પસંદગી',
+    langSectionDesc: 'એપ્લિકેશન ઇન્ટરફેસ અને સંચાર માટે તમારી પસંદગીની ભાષા પસંદ કરો.',
+    notificationsOption: 'સૂચના પસંદગીઓ',
+    detailsOption: 'વ્યક્તિગત વિગતો',
+    securityOption: 'સુરક્ષા અને પાસવર્ડ',
+    logoutBtn: 'લોગ આઉટ',
+    brandName: 'પ્રજા દિશા'
+  },
+  ml: {
+    title: 'ഉപയോക്തൃ പ്രൊഫൈൽ',
+    subtitle: 'ക്രമീകരണങ്ങൾ',
+    badgeText: 'സിൽവർ സിറ്റിസൺ',
+    langSectionTitle: 'ഭാഷ തിരഞ്ഞെടുക്കൽ',
+    langSectionDesc: 'ആപ്ലിക്കേഷൻ ഇന്റർഫേസിനും ആശയവിനിമയത്തിനുമായി നിങ്ങളുടെ ഇഷ്ടഭാഷ തിരഞ്ഞെടുക്കുക.',
+    notificationsOption: 'നോട്ടിഫിക്കേഷൻ ക്രമീകരണങ്ങൾ',
+    detailsOption: 'വ്യക്തിഗത വിവരങ്ങൾ',
+    securityOption: 'സുരക്ഷയും പാസ്‌വേഡും',
+    logoutBtn: 'ലോഗ് ഔട്ട്',
+    brandName: 'പ്രജാ ദിശ'
+  },
+  pa: {
+    title: 'ਉਪਭੋਗਤਾ ਪ੍ਰੋਫਾਈਲ',
+    subtitle: 'ਤਰਜੀਹਾਂ',
+    badgeText: 'ਸਿਲਵਰ ਨਾਗਰਿਕ',
+    langSectionTitle: 'ਭਾਸ਼ਾ ਦੀ ਚੋਣ',
+    langSectionDesc: 'ਐਪਲੀਕੇਸ਼ਨ ਇੰਟਰਫੇਸ ਅਤੇ ਸੰਚਾਰ ਲਈ ਆਪਣੀ ਪਸੰਦੀਦਾ ਭਾਸ਼ਾ ਚੁਣੋ।',
+    notificationsOption: 'ਨੋਟੀਫਿਕੇਸ਼ਨ ਤਰਜੀਹਾਂ',
+    detailsOption: 'ਨਿੱਜੀ ਵੇਰਵੇ',
+    securityOption: 'ਸੁਰੱਖਿਆ ਅਤੇ ਪਾਸਵਰਡ',
+    logoutBtn: 'ਲੌਗ ਆਊਟ',
+    brandName: 'ਪ੍ਰਜਾ ਦਿਸ਼ਾ'
+  },
+  or: {
+    title: 'ଉପଭୋକ୍ତା ପ୍ରୋଫାଇଲ୍',
+    subtitle: 'ପସନ୍ଦସମୂହ',
+    badgeText: 'ସିଲଭର ନାଗରିକ',
+    langSectionTitle: 'ଭାଷା ଚୟନ',
+    langSectionDesc: 'ଆପ୍ଲିକେସନ୍ ଇଣ୍ଟରଫେସ୍ ଏବଂ ଯୋଗାଯୋଗ ପାଇଁ ଆପଣଙ୍କର ପସନ୍ଦର ଭାଷା ବାଛନ୍ତୁ।',
+    notificationsOption: 'ବିଜ୍ଞପ୍ତି ପସନ୍ଦସମୂହ',
+    detailsOption: 'ବ୍ୟକ୍ତିଗତ ବିବରଣୀ',
+    securityOption: 'ସୁରକ୍ଷା ଏବଂ ପାସୱାର୍ଡ',
+    logoutBtn: 'ଲଗ୍ ଆଉଟ୍',
+    brandName: 'ପ୍ରଜା ଦିଶା'
+  },
+  as: {
+    title: 'ব্যৱহাৰকাৰীৰ প্ৰফাইল',
+    subtitle: 'পছন্দসমূহ',
+    badgeText: 'ছিলভাৰ নাগৰিক',
+    langSectionTitle: 'ভাষা বাছনি',
+    langSectionDesc: 'এপ্লিকেচনৰ মাধ্যম আৰু যোগাযোগৰ বাবে আপোনাৰ পছন্দৰ ভাষা বাছনি কৰক।',
+    notificationsOption: 'জাননীৰ পছন্দসমূহ',
+    detailsOption: 'ব্যক্তিগত তথ্য',
+    securityOption: 'সুৰক্ষা আৰু পাছৱৰ্ড',
+    logoutBtn: 'লগ আউট',
+    brandName: 'প্ৰজা দিশা'
+  }
+};

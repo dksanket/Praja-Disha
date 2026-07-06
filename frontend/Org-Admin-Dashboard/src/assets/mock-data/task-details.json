@@ -1,0 +1,195 @@
+{
+  "TSK-4921": {
+    "id": "TSK-4921",
+    "title": "Severe Drainage Collapse",
+    "priority": "P0",
+    "groupId": "G-782",
+    "parentTaskId": "TSK-4900",
+    "orgId": "ORG-BWSSB",
+    "createdAt": "Oct 24, 2026 14:30 IST",
+    "reportedBy": "Ramesh K.",
+    "reporterType": "Citizen",
+    "description": "The main storm water drain on 80 Feet Road has completely collapsed after yesterday's heavy rain. Water is backing up into nearby shops and the road is caving in. Need immediate help before an accident happens.",
+    "voiceUrl": "assets/audio/drainage_collapse.mp3",
+    "voiceDuration": "0:42",
+    "category": "Infrastructure / Drainage",
+    "language": "Kannada (Translated)",
+    "location": {
+      "address": "80 Feet Road, Ward 42, Bengaluru North",
+      "lat": "13.0124° N",
+      "lng": "77.5431° E"
+    },
+    "imageUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBg0ILinaoHUST1gzmjbg3DicaBTDW0RxRsTva5aeFO-aVGAfl-yQHTlxnKrCHUwcrmypjdhvA0XFDvRXlZVZ8KE1gg4zUtRvznIOqJ7mfVl74gfVcWp6CaY-eqy4fLjqcDx1WfAuql1bF08DYQD3MefXxrh8H6scylxhfDoFYvzshDFk7PepJ4Zz9lxvUQvDgoXvR8XAWstnsmwY-92yY47XAYf7sUtJu3Mu88fax8zECN8PJLTXWsClM-hdgZwNfV3UHC-_TzkYU",
+    "mapUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBftfd0fD5bkIjlgGJPd8xvMqIc2so9g_CG7hXtEty5seUntRKkyCs0ksESaL_iyc6ZHJ6A-s0Th1V0cxiMBMPDneeFh5MLgU_TLC2zj3ZBnfpLrbMzKlPwgq-uQwY-C5zKd5SBnKiHn21JWUkHQLr7yx5yfBZsOHK4qBYnv8jKxJf9IQyjoGNDZem1KbTk4ssnJoAhSOcRvm3L9SJ9JqcEu6Cv0ozrQtU52R2xQi01T8IsmgpsXhoNwwRKkkczdquAwX1pjPozNME",
+    "subTasks": [
+      {
+        "id": "SUB-001",
+        "title": "Severe Drainage Collapse",
+        "role": "Root Task",
+        "department": "BWSSB (Water & Sewage)",
+        "icon": "account_tree",
+        "status": "ACTIVE",
+        "statusClass": "bg-primary-container text-on-primary-container",
+        "assignee": "",
+        "timestamp": ""
+      },
+      {
+        "id": "SUB-002",
+        "parentId": "SUB-001",
+        "title": "Site Inspection",
+        "role": "Officer: Suresh M. (DEPT-ENG)",
+        "department": "Engineering Dept",
+        "icon": "engineering",
+        "status": "IN_PROGRESS",
+        "statusClass": "bg-secondary-container text-on-secondary-container",
+        "assignee": "Suresh M.",
+        "timestamp": "Oct 24, 15:10"
+      },
+      {
+        "id": "SUB-003",
+        "parentId": "SUB-001",
+        "title": "Traffic Diversion",
+        "role": "Officer: Inspector Rao (DEPT-TRF)",
+        "department": "Traffic Police Dept",
+        "icon": "traffic",
+        "status": "PENDING",
+        "statusClass": "bg-surface-container-high text-on-surface-variant",
+        "assignee": "Inspector Rao",
+        "timestamp": "Oct 24, 15:30"
+      },
+      {
+        "id": "SUB-004",
+        "parentId": "SUB-001",
+        "title": "Barricade Setup",
+        "role": "Officer: Field Team A",
+        "department": "Field Operations Dept",
+        "icon": "construction",
+        "status": "NOT_STARTED",
+        "statusClass": "bg-surface-variant text-on-surface-variant",
+        "assignee": "Field Team A",
+        "timestamp": "Oct 24, 15:45"
+      },
+      {
+        "id": "SUB-005",
+        "parentId": "SUB-001",
+        "title": "Signage Placement",
+        "role": "Officer: Field Team A",
+        "department": "Field Operations Dept",
+        "icon": "warning",
+        "status": "NOT_STARTED",
+        "statusClass": "bg-surface-variant text-on-surface-variant",
+        "assignee": "Field Team A",
+        "timestamp": "Oct 24, 15:50"
+      }
+    ],
+    "comments": [
+      {
+        "userName": "Suresh M. (Officer)",
+        "initials": "SM",
+        "timestamp": "15:10",
+        "text": "Reached site. The damage is worse than reported. We need heavy machinery.",
+        "isSelf": false
+      },
+      {
+        "userName": "Ramesh K. (Citizen)",
+        "initials": "RK",
+        "timestamp": "14:35",
+        "text": "Please hurry, the water is entering my shop now.",
+        "isSelf": true
+      }
+    ],
+    "notes": [
+      {
+        "userName": "Suresh M.",
+        "timestamp": "15:12",
+        "text": "Initiating escalation to BWSSB Central Office for drainage backhoe loader dispatch."
+      }
+    ],
+    "activities": [
+      {
+        "timestamp": "Oct 24, 14:30",
+        "action": "AI_ASSIGNED",
+        "performedBy": "system_ai",
+        "remarks": "Ticket initialized and auto-routed to Water & Engineering department."
+      },
+      {
+        "timestamp": "Oct 24, 15:10",
+        "action": "STATUS_CHANGED",
+        "performedBy": "suresh_m",
+        "remarks": "Changed assignment status to IN_PROGRESS."
+      }
+    ]
+  },
+  "TSK-8921": {
+    "id": "TSK-8921",
+    "title": "Optimize Water Distribution - Sector 4",
+    "priority": "P0",
+    "groupId": "G-102",
+    "parentTaskId": "TSK-8900",
+    "orgId": "ORG-BWSSB",
+    "createdAt": "Oct 24, 2026 09:15 IST",
+    "reportedBy": "Ananya S.",
+    "reporterType": "Citizen",
+    "description": "Water pressure in Sector 4 is extremely low since this morning. Several apartments are not receiving water at all. Please inspect the main pipeline valves.",
+    "voiceUrl": "assets/audio/water_pressure.mp3",
+    "voiceDuration": "0:30",
+    "category": "Water Supply / Distribution",
+    "language": "English",
+    "location": {
+      "address": "Sector 4, HSR Layout, Bengaluru South",
+      "lat": "12.9124° N",
+      "lng": "77.6431° E"
+    },
+    "imageUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBg0ILinaoHUST1gzmjbg3DicaBTDW0RxRsTva5aeFO-aVGAfl-yQHTlxnKrCHUwcrmypjdhvA0XFDvRXlZVZ8KE1gg4zUtRvznIOqJ7mfVl74gfVcWp6CaY-eqy4fLjqcDx1WfAuql1bF08DYQD3MefXxrh8H6scylxhfDoFYvzshDFk7PepJ4Zz9lxvUQvDgoXvR8XAWstnsmwY-92yY47XAYf7sUtJu3Mu88fax8zECN8PJLTXWsClM-hdgZwNfV3UHC-_TzkYU",
+    "mapUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBftfd0fD5bkIjlgGJPd8xvMqIc2so9g_CG7hXtEty5seUntRKkyCs0ksESaL_iyc6ZHJ6A-s0Th1V0cxiMBMPDneeFh5MLgU_TLC2zj3ZBnfpLrbMzKlPwgq-uQwY-C5zKd5SBnKiHn21JWUkHQLr7yx5yfBZsOHK4qBYnv8jKxJf9IQyjoGNDZem1KbTk4ssnJoAhSOcRvm3L9SJ9JqcEu6Cv0ozrQtU52R2xQi01T8IsmgpsXhoNwwRKkkczdquAwX1pjPozNME",
+    "subTasks": [
+      {
+        "id": "SUB-101",
+        "title": "Optimize Water Distribution - Sector 4",
+        "role": "Root Task",
+        "department": "Water Supply Dept",
+        "icon": "account_tree",
+        "status": "ACTIVE",
+        "statusClass": "bg-primary-container text-on-primary-container",
+        "assignee": "",
+        "timestamp": ""
+      },
+      {
+        "id": "SUB-102",
+        "parentId": "SUB-101",
+        "title": "Valve Pressure Test",
+        "role": "Officer: Suresh M. (DEPT-ENG)",
+        "department": "Engineering Dept",
+        "icon": "engineering",
+        "status": "IN_PROGRESS",
+        "statusClass": "bg-secondary-container text-on-secondary-container",
+        "assignee": "Suresh M.",
+        "timestamp": "Oct 24, 10:00"
+      }
+    ],
+    "comments": [
+      {
+        "userName": "Suresh M. (Officer)",
+        "initials": "SM",
+        "timestamp": "10:15",
+        "text": "Pressure gauge at Junction B shows normal flow. Checking local sector control valves now.",
+        "isSelf": false
+      }
+    ],
+    "notes": [
+      {
+        "userName": "Suresh M.",
+        "timestamp": "10:20",
+        "text": "Checking if illegal booster pumps are active in the layout."
+      }
+    ],
+    "activities": [
+      {
+        "timestamp": "Oct 24, 09:15",
+        "action": "AI_ASSIGNED",
+        "performedBy": "system_ai",
+        "remarks": "Assigned to Water Dept for optimizing flow controls."
+      }
+    ]
+  }
+}

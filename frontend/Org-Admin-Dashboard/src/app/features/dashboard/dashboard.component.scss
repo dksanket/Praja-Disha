@@ -1,0 +1,605 @@
+@import '../../../styles/tokens';
+
+// ── Dashboard Canvas & Container ──────────────────────────────────────────────
+.dashboard-canvas {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background-color: $color-background;
+}
+
+.dashboard-container {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: $spacing-container-padding;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-container-padding;
+}
+
+// ── Page Header ──────────────────────────────────────────────────────────────
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid $color-outline-variant;
+  padding-bottom: $spacing-gutter;
+
+  &__title {
+    color: $color-on-surface;
+    font-weight: $fw-bold;
+    margin: 0;
+  }
+
+  &__subtitle {
+    color: $color-on-surface-variant;
+    margin: $spacing-unit 0 0 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-unit * 2;
+  }
+}
+
+// ── Reusable Component-level Buttons ─────────────────────────────────────────
+.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px $spacing-gutter;
+  font-family: $font-primary;
+  font-size: $fs-label-md;
+  font-weight: $fw-semibold;
+  border-radius: $rounded;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+  line-height: 1;
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  &--primary {
+    background-color: $color-primary;
+    color: $color-on-primary;
+    border: 1px solid $color-primary;
+
+    &:hover {
+      background-color: $color-on-primary-fixed-variant;
+      border-color: $color-on-primary-fixed-variant;
+    }
+  }
+
+  &--secondary {
+    background-color: $color-surface-container-lowest;
+    color: $color-on-surface;
+    border: 1px solid $color-outline-variant;
+
+    &:hover {
+      background-color: $color-surface-container-low;
+    }
+  }
+}
+
+// ── Bento Grid ────────────────────────────────────────────────────────────────
+.dashboard-bento {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: $spacing-gutter;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// ── Bento Cards ──────────────────────────────────────────────────────────────
+.bento-card {
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-lg;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 128px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+
+  &__indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  &__title {
+    color: $color-on-surface-variant;
+  }
+
+  &__icon {
+    font-size: 20px;
+
+    &--primary {
+      color: $color-primary;
+    }
+
+    &--error {
+      color: $color-error;
+    }
+
+    &--secondary {
+      color: $color-secondary;
+    }
+  }
+
+  &__body {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  &__value {
+    color: $color-on-surface;
+    font-weight: $fw-bold;
+  }
+
+  &__trend {
+    font-weight: $fw-medium;
+
+    &--primary {
+      color: $color-primary;
+    }
+
+    &--error {
+      color: $color-error;
+      font-weight: $fw-semibold;
+    }
+
+    &--secondary {
+      color: $color-on-surface-variant;
+    }
+  }
+
+  // Hover & Active States
+  &:hover {
+    background-color: $color-surface-container-low;
+  }
+
+  &--primary {
+    .bento-card__indicator {
+      background-color: $color-primary;
+    }
+    &:hover {
+      border-color: rgba($color-primary, 0.5);
+    }
+  }
+
+  &--error {
+    background-color: $color-error-container;
+    border-color: rgba($color-error, 0.15);
+
+    .bento-card__indicator {
+      background-color: $color-error;
+    }
+    .bento-card__title,
+    .bento-card__value,
+    .bento-card__trend {
+      color: $color-on-error-container;
+    }
+    &:hover {
+      border-color: rgba($color-error, 0.4);
+      background-color: rgba($color-error, 0.12);
+    }
+  }
+
+  &--secondary {
+    &:hover {
+      border-color: $color-secondary;
+    }
+  }
+
+  &--active {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 1px $color-primary;
+  }
+}
+
+// ── Central Triage Section ───────────────────────────────────────────────────
+.triage-section {
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-lg;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.triage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-gutter 20px;
+  border-bottom: 1px solid $color-outline-variant;
+
+  &__title {
+    color: $color-on-surface;
+    margin: 0;
+  }
+
+  &__search-container {
+    position: relative;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: $color-on-surface-variant;
+    pointer-events: none;
+  }
+
+  &__search-input {
+    padding: 6px 12px 6px 36px;
+    font-family: $font-primary;
+    font-size: $fs-body-sm;
+    color: $color-on-surface;
+    background-color: $color-surface-container;
+    border: 1px solid $color-outline-variant;
+    border-radius: $rounded;
+    width: 256px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &::placeholder {
+      color: $color-outline;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px $color-primary-fixed;
+    }
+  }
+}
+
+// ── Triage Table ─────────────────────────────────────────────────────────────
+.triage-table-wrapper {
+  overflow-x: auto;
+}
+
+.triage-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  &__th {
+    padding: 12px $spacing-gutter;
+    color: $color-on-surface-variant;
+    background-color: rgba($color-surface-container, 0.5);
+    border-bottom: 1px solid $color-outline-variant;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__tr {
+    border-bottom: 1px solid $color-outline-variant;
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background-color: $color-surface-container-low;
+    }
+
+    &--odd {
+      background-color: rgba($color-surface-container, 0.15);
+    }
+  }
+
+  &__td {
+    padding: 12px $spacing-gutter;
+    font-family: $font-primary;
+    font-size: $fs-body-sm;
+    color: $color-on-surface;
+    vertical-align: middle;
+
+    &--critical {
+      color: $color-error;
+      font-weight: $fw-medium;
+    }
+
+    &--actions {
+      text-align: right;
+      width: 40px;
+    }
+  }
+
+  &__context {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__accent-line {
+    width: 4px;
+    height: 16px;
+    border-radius: $rounded-full;
+    background-color: $color-outline-variant;
+
+    &--water {
+      background-color: $color-tertiary-fixed-dim;
+    }
+  }
+
+  &__title {
+    color: $color-on-surface;
+    text-decoration: none;
+
+    &--link {
+      cursor: pointer;
+      transition: color 150ms ease;
+
+      &:hover {
+        color: $color-primary;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__assignments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+
+  &__avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: $rounded-full;
+    object-cover: cover;
+  }
+
+  &__assignment-dept-tag {
+    font-family: $font-primary;
+    font-size: $fs-label-sm;
+    font-weight: $fw-semibold;
+    color: $color-primary;
+    background-color: $color-primary-fixed;
+    padding: 2px 8px;
+    border-radius: $rounded;
+    white-space: nowrap;
+    display: inline-block;
+    border: none;
+  }
+
+  &__action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-on-surface-variant;
+    padding: 4px;
+    border-radius: $rounded-full;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 150ms ease, color 150ms ease;
+
+    .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    &:hover {
+      background-color: $color-surface-container;
+      color: $color-primary;
+    }
+  }
+
+  &__empty-state {
+    text-align: center;
+    padding: 40px $spacing-gutter;
+  }
+}
+
+// ── Reusable Semantic Badges ─────────────────────────────────────────────────
+.pd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: $rounded;
+  font-family: $font-primary;
+  font-size: $fs-label-sm;
+  font-weight: $fw-semibold;
+  border: 1px solid transparent;
+
+  &__pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: $rounded-full;
+    background-color: currentColor;
+    margin-right: 6px;
+    animation: badge-pulse 1.5s infinite ease-in-out;
+  }
+
+  &--p0 {
+    background-color: rgba($color-error, 0.08);
+    color: $color-error;
+    border-color: rgba($color-error, 0.15);
+  }
+
+  &--p1 {
+    background-color: rgba($color-primary-container, 0.08);
+    color: $color-primary-container;
+    border-color: rgba($color-primary-container, 0.15);
+  }
+
+  &--p2 {
+    background-color: $color-surface-container-highest;
+    color: $color-on-surface-variant;
+    border-color: $color-outline-variant;
+  }
+}
+
+@keyframes badge-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+}
+
+// ── Semantic Status Badges ───────────────────────────────────────────────────
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: $rounded-full;
+  font-family: $font-primary;
+  font-size: $fs-label-sm;
+  font-weight: $fw-medium;
+  border: 1px solid transparent;
+  line-height: 1;
+
+  .material-symbols-outlined {
+    font-size: 14px;
+  }
+
+  &--pending {
+    background-color: rgba($color-tertiary-container, 0.12);
+    color: $color-tertiary-container;
+    border-color: rgba($color-tertiary-container, 0.2);
+    animation: status-pulse 2s infinite ease-in-out;
+  }
+
+  &--progress {
+    background-color: $color-surface-container-high;
+    color: $color-on-surface-variant;
+    border-color: $color-outline-variant;
+  }
+
+  &--draft {
+    background-color: $color-surface-container-high;
+    color: $color-on-surface-variant;
+    border-color: $color-outline-variant;
+  }
+
+  &--completed {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: rgb(21, 128, 61);
+    border-color: rgba(34, 197, 94, 0.2);
+  }
+}
+
+@keyframes status-pulse {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+// ── Triage Table Pagination Footer ───────────────────────────────────────────
+.triage-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid $color-outline-variant;
+  background-color: rgba($color-surface-container, 0.3);
+}
+
+.triage-pagination-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.triage-pagination-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-on-surface-variant;
+  padding: 4px;
+  border-radius: $rounded-full;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: $color-surface-container;
+    color: $color-on-surface;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ── Dashboard Footer ─────────────────────────────────────────────────────────
+.dashboard-footer {
+  margin-top: auto;
+  padding: $spacing-unit * 3 $spacing-container-padding;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $color-outline-variant;
+  background-color: $color-surface-container-lowest;
+
+  &__brand {
+    color: $color-on-surface;
+    font-weight: $fw-bold;
+  }
+
+  &__links {
+    display: flex;
+    gap: $spacing-gutter;
+  }
+
+  &__link {
+    color: $color-secondary;
+    text-decoration: none;
+    transition: opacity 150ms ease, color 150ms ease;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+}
+
+// ── Fonts & General Utilities ────────────────────────────────────────────────
+.text-mono {
+  font-family: $font-mono !important;
+  font-size: $fs-mono-sm !important;
+}
+
+.text-secondary {
+  color: $color-on-surface-variant !important;
+}

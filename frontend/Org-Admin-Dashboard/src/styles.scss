@@ -1,0 +1,307 @@
+// =============================================================================
+// styles.scss — Global stylesheet for Praja Disha
+// Imports token partial and establishes baseline CSS custom properties,
+// resets, typography utilities, and PrimeNG theme overrides.
+// =============================================================================
+
+@import 'styles/tokens';
+
+
+// ── CSS Custom Properties (tokens exposed to templates & JS) ──────────────────
+:root {
+  // Surfaces
+  --pd-surface:                   #{$color-surface};
+  --pd-surface-dim:               #{$color-surface-dim};
+  --pd-surface-bright:            #{$color-surface-bright};
+  --pd-surface-container-lowest:  #{$color-surface-container-lowest};
+  --pd-surface-container-low:     #{$color-surface-container-low};
+  --pd-surface-container:         #{$color-surface-container};
+  --pd-surface-container-high:    #{$color-surface-container-high};
+  --pd-surface-container-highest: #{$color-surface-container-highest};
+
+  // On-surface text
+  --pd-on-surface:         #{$color-on-surface};
+  --pd-on-surface-variant: #{$color-on-surface-variant};
+
+  // Inverse
+  --pd-inverse-surface:     #{$color-inverse-surface};
+  --pd-inverse-on-surface:  #{$color-inverse-on-surface};
+
+  // Outlines
+  --pd-outline:         #{$color-outline};
+  --pd-outline-variant: #{$color-outline-variant};
+
+  // Primary
+  --pd-primary:               #{$color-primary};
+  --pd-on-primary:            #{$color-on-primary};
+  --pd-primary-container:     #{$color-primary-container};
+  --pd-on-primary-container:  #{$color-on-primary-container};
+  --pd-inverse-primary:       #{$color-inverse-primary};
+
+  // Secondary
+  --pd-secondary:              #{$color-secondary};
+  --pd-on-secondary:           #{$color-on-secondary};
+  --pd-secondary-container:    #{$color-secondary-container};
+  --pd-on-secondary-container: #{$color-on-secondary-container};
+
+  // Tertiary / amber review
+  --pd-tertiary:              #{$color-tertiary};
+  --pd-on-tertiary:           #{$color-on-tertiary};
+  --pd-tertiary-container:    #{$color-tertiary-container};
+  --pd-on-tertiary-container: #{$color-on-tertiary-container};
+
+  // Error / critical
+  --pd-error:              #{$color-error};
+  --pd-on-error:           #{$color-on-error};
+  --pd-error-container:    #{$color-error-container};
+  --pd-on-error-container: #{$color-on-error-container};
+
+  // Background
+  --pd-background:    #{$color-background};
+  --pd-on-background: #{$color-on-background};
+
+  // Typography
+  --pd-font-primary: #{$font-primary};
+  --pd-font-mono:    #{$font-mono};
+
+  // Spacing
+  --pd-space-unit:   #{$spacing-unit};
+  --pd-space-pad:    #{$spacing-container-padding};
+  --pd-space-gutter: #{$spacing-gutter};
+
+  // Radius
+  --pd-radius:      #{$rounded};
+  --pd-radius-sm:   #{$rounded-sm};
+  --pd-radius-md:   #{$rounded-md};
+  --pd-radius-lg:   #{$rounded-lg};
+  --pd-radius-xl:   #{$rounded-xl};
+  --pd-radius-full: #{$rounded-full};
+
+  // Elevation shadows
+  --pd-shadow-2: #{$elevation-2-shadow};
+}
+
+// ── CSS Reset & Baseline ──────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--pd-background);
+  color: var(--pd-on-surface);
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-md;
+  line-height: $lh-body-md;
+  font-weight: $fw-regular;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ── Typography utility classes ────────────────────────────────────────────────
+.pd-display-lg {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-display-lg;
+  font-weight: $fw-bold;
+  line-height: $lh-display-lg;
+  letter-spacing: -0.02em;
+}
+
+.pd-headline-md {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-headline-md;
+  font-weight: $fw-semibold;
+  line-height: $lh-headline-md;
+  letter-spacing: -0.01em;
+}
+
+.pd-headline-sm {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-headline-sm;
+  font-weight: $fw-semibold;
+  line-height: $lh-headline-sm;
+}
+
+.pd-title-md {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-title-md;
+  font-weight: $fw-semibold;
+  line-height: $lh-title-md;
+}
+
+.pd-body-md {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-md;
+  font-weight: $fw-regular;
+  line-height: $lh-body-md;
+}
+
+.pd-body-sm {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-sm;
+  font-weight: $fw-regular;
+  line-height: $lh-body-sm;
+}
+
+.pd-label-md {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-label-md;
+  font-weight: $fw-semibold;
+  line-height: $lh-label-md;
+  letter-spacing: 0.01em;
+}
+
+.pd-label-sm {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-label-sm;
+  font-weight: $fw-medium;
+  line-height: $lh-label-sm;
+  letter-spacing: 0.02em;
+}
+
+// Monospaced — for IDs, timestamps, technical logs
+.pd-mono-sm {
+  font-family: var(--pd-font-mono);
+  font-size: $fs-mono-sm;
+  font-weight: $fw-regular;
+  line-height: $lh-mono-sm;
+}
+
+// ── Elevation utility classes ─────────────────────────────────────────────────
+// Level 1 — card / surface
+.pd-elevation-1 {
+  background-color: var(--pd-surface-container-lowest);
+  border: 1px solid var(--pd-outline-variant);
+  border-radius: var(--pd-radius);
+}
+
+// Level 2 — popover / dropdown
+.pd-elevation-2 {
+  background-color: var(--pd-surface-container-lowest);
+  border: 1px solid var(--pd-outline);
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow-2);
+}
+
+// AI insight card — left accent border in primary color
+.pd-ai-card {
+  border-left: 3px solid var(--pd-primary);
+}
+
+// Active drag / hover tint
+.pd-active-tint {
+  background-color: #{$elevation-active-tint};
+}
+
+// ── Focus ring — accessibility ────────────────────────────────────────────────
+:focus-visible {
+  outline: 2px solid var(--pd-primary);
+  outline-offset: 2px;
+}
+
+// ── PrimeNG overrides — align to design tokens ───────────────────────────────
+// Override PrimeNG's default primary to match brand blue
+.p-button.p-button-primary,
+.p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-danger):not(.p-button-help) {
+  background: var(--pd-primary);
+  border-color: var(--pd-primary);
+  border-radius: var(--pd-radius);
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-md;
+  font-weight: $fw-semibold;
+
+  &:enabled:hover {
+    background: var(--pd-primary-container);
+    border-color: var(--pd-primary-container);
+  }
+
+  &:enabled:focus {
+    box-shadow: 0 0 0 2px var(--pd-primary-fixed);
+  }
+}
+
+// Secondary ghost-style button
+.p-button.p-button-outlined {
+  border-color: var(--pd-outline-variant);
+  color: var(--pd-on-surface);
+  border-radius: var(--pd-radius);
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-md;
+
+  &:enabled:hover {
+    background: var(--pd-surface-container);
+    border-color: var(--pd-outline);
+  }
+}
+
+// Input fields
+.p-inputtext {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-md;
+  border-color: var(--pd-outline-variant);
+  border-radius: var(--pd-radius);
+  padding: 8px 12px;
+
+  &:enabled:focus {
+    border-color: var(--pd-primary);
+    box-shadow: 0 0 0 3px var(--pd-primary-fixed);
+    outline: none;
+  }
+}
+
+// Table — alternating stripes, sticky headers
+.p-datatable {
+  font-family: var(--pd-font-primary);
+  font-size: $fs-body-sm; // Dense table content uses body-sm per design spec
+
+  .p-datatable-thead > tr > th {
+    font-size: $fs-label-md;
+    font-weight: $fw-semibold;
+    background: var(--pd-surface-container-low);
+    border-bottom: 2px solid var(--pd-outline-variant);
+    color: var(--pd-on-surface-variant);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .p-datatable-tbody > tr:nth-child(even) {
+    background: var(--pd-surface-container-lowest);
+  }
+
+  .p-datatable-tbody > tr:nth-child(odd) {
+    background: var(--pd-surface-container-low);
+  }
+}
+
+// Badge / status pill
+.p-badge {
+  border-radius: var(--pd-radius-md); // 6px per design spec
+  font-family: var(--pd-font-primary);
+  font-size: $fs-label-sm;
+  font-weight: $fw-semibold;
+}
+
+// ── Material Symbols Outlined — global icon font baseline ─────────────────────
+// Applies consistent variation settings wherever the icon font is used
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+  user-select: none;
+}

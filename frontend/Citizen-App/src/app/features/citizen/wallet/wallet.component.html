@@ -1,0 +1,159 @@
+<main class="max-w-max-width-content mx-auto px-6 md:px-margin-desktop pt-8 pb-32 space-y-6">
+  <!-- Header Section -->
+  <section class="flex flex-col gap-1">
+    <h2 class="font-headline-lg text-2xl font-bold text-on-surface md:text-3xl">{{ strings.title }}</h2>
+    <p class="font-body-md text-sm text-on-surface-variant">{{ strings.subtitle }}</p>
+  </section>
+
+  <!-- Bento Grid Layout -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+    <!-- Hero Reward Card (Bento Large) -->
+    <div class="md:col-span-8 bg-white border border-outline-variant/60 rounded-xl p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full transition-transform group-hover:scale-110 duration-500"></div>
+      
+      <div class="relative z-10" *ngIf="profile">
+        <span class="font-label-lg text-xs font-semibold uppercase tracking-wider text-primary">{{ strings.balanceLabel }}</span>
+        <div class="flex items-baseline gap-1 mt-2">
+          <span class="font-display-lg text-5xl font-extrabold text-on-surface">{{ profile.points }}</span>
+          <span class="font-headline-md text-xl font-bold text-primary">{{ strings.ptsLabel }}</span>
+        </div>
+      </div>
+      
+      <div class="mt-8 flex flex-wrap gap-4 relative z-10">
+        <div class="flex items-center gap-2 bg-surface-container-low px-4 py-2.5 rounded-xl border border-outline-variant/60">
+          <span class="material-symbols-outlined text-primary text-xl">trending_up</span>
+          <div>
+            <p class="font-label-md text-[10px] text-on-surface-variant font-bold">{{ strings.monthLabel }}</p>
+            <p class="font-label-lg text-xs font-bold text-on-surface">+320 pts</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2 bg-surface-container-low px-4 py-2.5 rounded-xl border border-outline-variant/60" *ngIf="profile">
+          <span class="material-symbols-outlined text-primary text-xl">redeem</span>
+          <div>
+            <p class="font-label-md text-[10px] text-on-surface-variant font-bold">{{ strings.tierLabel }}</p>
+            <p class="font-label-lg text-xs font-bold text-on-surface">{{ profile.tier }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Redemption QR Ticket (Bento Sidebar) -->
+    <div class="md:col-span-4 qr-gradient rounded-xl p-6 flex flex-col items-center justify-center text-white text-center shadow-lg transform transition-transform hover:scale-[1.01]">
+      <ng-container *ngIf="activePasses.length > 0">
+        <div class="bg-white p-4 rounded-xl shadow-inner mb-4">
+          <!-- QR Placeholder -->
+          <div class="w-32 h-32 bg-slate-100 flex items-center justify-center border-2 border-dashed border-slate-300">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant">qr_code_2</span>
+          </div>
+        </div>
+        <h3 class="font-headline-md text-lg font-bold">{{ activePasses[0].title }}</h3>
+        <p class="font-body-md text-xs opacity-90 mt-1">{{ strings.qrSubtitle }}</p>
+        <div class="mt-4 w-full border-t border-white/20 pt-4 flex justify-between px-2 text-xs">
+          <div class="text-left">
+            <p class="text-[9px] uppercase font-bold tracking-widest opacity-70">{{ strings.expiresLabel }}</p>
+            <p class="font-label-lg font-semibold">{{ activePasses[0].expiresAt }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[9px] uppercase font-bold tracking-widest opacity-70">{{ strings.fareTypeLabel }}</p>
+            <p class="font-label-lg font-semibold">{{ activePasses[0].fareType }}</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="activePasses.length === 0">
+        <span class="material-symbols-outlined text-5xl mb-3">confirmation_number</span>
+        <h3 class="font-headline-md text-base font-bold mb-2">No Active Passes</h3>
+        <p class="font-body-md text-xs opacity-80 leading-relaxed px-4">
+          Redeem your points for a transit pass in the store below to use public transport.
+        </p>
+      </ng-container>
+    </div>
+
+    <!-- Points Store Section -->
+    <div class="md:col-span-12 bg-white border border-outline-variant/60 rounded-xl p-6 shadow-sm">
+      <h3 class="font-headline-md text-lg font-bold text-on-surface mb-4">{{ strings.storeTitle }}</h3>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Pass Option 1 -->
+        <div class="p-4 border border-outline-variant/60 rounded-xl flex justify-between items-center bg-surface-container-low/30 hover:bg-surface-container-low transition-all">
+          <div class="space-y-1">
+            <h4 class="font-label-lg text-sm font-bold text-on-surface">{{ strings.pass200Title }}</h4>
+            <p class="font-body-md text-xs text-on-surface-variant">{{ strings.pass200Desc }}</p>
+          </div>
+          <button 
+            (click)="redeem(200, strings.pass200Title)"
+            class="bg-primary text-on-primary font-label-lg text-xs font-semibold px-4 py-2 rounded-lg hover:bg-primary-container transition-all active:scale-95 duration-150 shadow-sm">
+            Redeem
+          </button>
+        </div>
+
+        <!-- Pass Option 2 -->
+        <div class="p-4 border border-outline-variant/60 rounded-xl flex justify-between items-center bg-surface-container-low/30 hover:bg-surface-container-low transition-all">
+          <div class="space-y-1">
+            <h4 class="font-label-lg text-sm font-bold text-on-surface">{{ strings.pass500Title }}</h4>
+            <p class="font-body-md text-xs text-on-surface-variant">{{ strings.pass500Desc }}</p>
+          </div>
+          <button 
+            (click)="redeem(500, strings.pass500Title)"
+            class="bg-primary text-on-primary font-label-lg text-xs font-semibold px-4 py-2 rounded-lg hover:bg-primary-container transition-all active:scale-95 duration-150 shadow-sm">
+            Redeem
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="md:col-span-12 bg-white border border-outline-variant/60 rounded-xl p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-headline-md text-lg font-bold text-on-surface">{{ strings.reportsTitle }}</h3>
+        <button class="text-primary font-label-lg text-xs font-semibold hover:underline">
+          {{ strings.viewAllBtn }}
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Activity List Loop -->
+        <div 
+          *ngFor="let act of activities" 
+          class="flex items-center justify-between p-3 hover:bg-surface-container-low rounded-xl border border-transparent hover:border-outline-variant/50 transition-colors">
+          
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center"
+                 [ngClass]="act.points > 0 ? 'bg-primary/10 text-primary' : 'bg-secondary-container/50 text-secondary'">
+              <span class="material-symbols-outlined">{{ act.points > 0 ? 'campaign' : 'receipt_long' }}</span>
+            </div>
+            <div>
+              <p class="font-label-lg text-sm font-semibold text-on-surface">{{ act.title }}</p>
+              <p class="font-label-md text-xs text-on-surface-variant font-medium">{{ act.source }} • {{ act.date }}</p>
+            </div>
+          </div>
+          <span 
+            class="font-headline-md text-lg font-bold"
+            [ngClass]="act.points > 0 ? 'text-primary' : 'text-error'">
+            {{ act.points > 0 ? '+' : '' }}{{ act.points }} {{ strings.ptsLabel }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informational "How it works" -->
+    <div class="md:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+      <div class="p-4 bg-secondary-container/20 rounded-xl border border-outline-variant/30 flex flex-col items-center text-center">
+        <span class="material-symbols-outlined text-secondary text-2xl mb-3">camera_enhance</span>
+        <h4 class="font-label-lg text-sm font-bold text-on-surface">{{ strings.worksReportTitle }}</h4>
+        <p class="font-label-md text-xs text-on-surface-variant mt-1.5 leading-relaxed">{{ strings.worksReportDesc }}</p>
+      </div>
+      <div class="p-4 bg-primary/5 rounded-xl border border-outline-variant/30 flex flex-col items-center text-center">
+        <span class="material-symbols-outlined text-primary text-2xl mb-3">commute</span>
+        <h4 class="font-label-lg text-sm font-bold text-on-surface">{{ strings.worksTransitTitle }}</h4>
+        <p class="font-label-md text-xs text-on-surface-variant mt-1.5 leading-relaxed">{{ strings.worksTransitDesc }}</p>
+      </div>
+      <div class="p-4 bg-surface-container-high/40 rounded-xl border border-outline-variant/30 flex flex-col items-center text-center">
+        <span class="material-symbols-outlined text-on-surface-variant text-2xl mb-3">loyalty</span>
+        <h4 class="font-label-lg text-sm font-bold text-on-surface">{{ strings.worksLevelTitle }}</h4>
+        <p class="font-label-md text-xs text-on-surface-variant mt-1.5 leading-relaxed">{{ strings.worksLevelDesc }}</p>
+      </div>
+    </div>
+  </div>
+</main>

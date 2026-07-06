@@ -1,0 +1,384 @@
+<div class="add-edit-dept-layout">
+
+  <!-- ── Main Form Column ──────────────────────────────────────────────── -->
+  <div class="form-canvas">
+    
+    <!-- Breadcrumb back link -->
+    <div class="breadcrumb-container">
+      <button 
+        type="button" 
+        class="btn-back" 
+        (click)="cancel()">
+        <span class="material-symbols-outlined">arrow_back</span>
+        {{ strings.addEditDepartment.backButton }}
+      </button>
+    </div>
+
+    <!-- Page Title -->
+    <div class="page-title-block">
+      <h1 class="pd-headline-md page-title">
+        {{ isEditMode ? strings.addEditDepartment.pageTitleEdit : strings.addEditDepartment.pageTitleAdd }}
+      </h1>
+      <p class="pd-body-md page-subtitle">
+        {{ isEditMode ? strings.addEditDepartment.pageSubtitleEdit : strings.addEditDepartment.pageSubtitleAdd }}
+      </p>
+    </div>
+
+    <!-- Error Banner -->
+    <div *ngIf="errorMessage" class="error-banner" role="alert">
+      <span class="material-symbols-outlined error-banner__icon">error</span>
+      <span class="pd-body-sm error-banner__text">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Section 1: Basic Details -->
+    <fieldset class="form-card">
+      <legend class="pd-title-md form-card__legend">{{ strings.addEditDepartment.sections.basicDetails }}</legend>
+      
+      <!-- Dept Name -->
+      <div class="form-group">
+        <label class="pd-label-md form-label">
+          {{ strings.addEditDepartment.fields.name }} <span class="required-star">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="name" 
+          (ngModelChange)="updateHierarchyPreview()"
+          [placeholder]="strings.addEditDepartment.fields.namePlaceholder"
+          required />
+      </div>
+
+      <!-- Dept ID (Readonly in Edit Mode, not editable/addable) -->
+      <div *ngIf="isEditMode" class="form-group mt-gutter">
+        <label class="pd-label-md form-label">
+          {{ strings.addEditDepartment.fields.id }}
+        </label>
+        <div class="form-static-text font-mono">
+          {{ id }}
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.addEditDepartment.fields.description }}</label>
+        <textarea 
+          class="form-textarea" 
+          rows="3" 
+          [(ngModel)]="description" 
+          [placeholder]="strings.addEditDepartment.fields.descriptionPlaceholder">
+        </textarea>
+      </div>
+    </fieldset>
+
+    <!-- Section 2: Hierarchy & Leadership -->
+    <fieldset class="form-card">
+      <legend class="pd-title-md form-card__legend">{{ strings.addEditDepartment.sections.hierarchy }}</legend>
+      
+      <!-- Parent Department -->
+      <div class="form-group">
+        <label class="pd-label-md form-label">{{ strings.addEditDepartment.fields.parentDept }}</label>
+        <div class="select-wrapper">
+          <span class="material-symbols-outlined select-icon">account_tree</span>
+          <select 
+            class="form-select" 
+            [(ngModel)]="parentDepartmentId" 
+            (change)="updateHierarchyPreview()">
+            <option *ngFor="let opt of parentDepartmentOptions" [value]="opt.value">
+              {{ opt.label }}
+            </option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+
+      <!-- Department Head(s) -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.addEditDepartment.fields.deptHeads }}</label>
+        
+        <div class="heads-list-container">
+          <!-- Active Head Chips -->
+          <div *ngIf="departmentHeads.length > 0" class="chips-row">
+            <div *ngFor="let head of departmentHeads" class="head-chip">
+              <span class="chip-avatar-circle" *ngIf="head.email">
+                <span class="chip-avatar-initials">{{ head.name.slice(0,2).toUpperCase() }}</span>
+              </span>
+              <span class="pd-label-md chip-name">{{ head.name }}</span>
+              <button 
+                type="button" 
+                class="chip-close-btn" 
+                [attr.aria-label]="'Remove ' + head.name" 
+                (click)="removeHead(head)">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search autocomplete field -->
+          <div class="search-dropdown-container">
+            <div class="search-input-wrapper">
+              <span class="material-symbols-outlined search-field-icon">search</span>
+              <input 
+                type="text" 
+                class="form-input pl-10" 
+                [(ngModel)]="officerHeadSearchQuery" 
+                (input)="onHeadSearchChange()"
+                [placeholder]="strings.addEditDepartment.fields.deptHeadsSearchPlaceholder" />
+            </div>
+
+            <!-- Heads Results Dropdown Overlay -->
+            <ul *ngIf="showHeadDropdown" class="autocomplete-overlay">
+              <li 
+                *ngFor="let officer of filteredHeads" 
+                class="autocomplete-item" 
+                (click)="selectHead(officer)">
+                <span class="item-avatar-circle">
+                  {{ officer.name.slice(0,2).toUpperCase() }}
+                </span>
+                <div class="item-details">
+                  <span class="pd-body-sm item-name">{{ officer.name }}</span>
+                  <span class="pd-label-sm item-username">&#64;{{ officer.officerUserName }}</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Section 3: Geographic & AI Configuration -->
+    <fieldset class="form-card">
+      <legend class="pd-title-md form-card__legend">{{ strings.addEditDepartment.sections.geoAiConfig }}</legend>
+      
+      <!-- Constituency Assignment -->
+      <div class="sub-section">
+        <h3 class="sub-section-title pd-label-md">{{ strings.addEditDepartment.fields.constituencyName }}</h3>
+        
+        <div class="form-group mb-4">
+          <input 
+            type="text" 
+            class="form-input" 
+            [(ngModel)]="constituencyName" 
+            [placeholder]="strings.addEditDepartment.fields.constituencyNamePlaceholder" />
+        </div>
+
+        <div class="form-group">
+          <label class="pd-label-sm form-label">{{ strings.addEditDepartment.fields.constituencyBoundary }}</label>
+          <textarea 
+            class="form-textarea font-mono text-sm" 
+            rows="3" 
+            [(ngModel)]="constituencyGeoJson" 
+            placeholder="Paste GeoJSON coordinates here...">
+          </textarea>
+
+          <!-- Simulated Visual Drawing Box -->
+          <div class="map-draw-card mt-3">
+            <span class="material-symbols-outlined map-draw-icon">polyline</span>
+            <p class="pd-body-sm map-draw-text">{{ strings.addEditDepartment.fields.constituencyBoundaryUpload }}</p>
+            <button 
+              type="button" 
+              class="btn-secondary" 
+              (click)="openMapModal()">
+              <span class="material-symbols-outlined">map</span>
+              {{ strings.addEditDepartment.fields.defineBoundaryBtn }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Configuration -->
+      <div class="sub-section mt-gutter border-t">
+        <h3 class="sub-section-title pd-label-md">{{ strings.addEditDepartment.fields.aiRoutingRules }}</h3>
+        <p class="pd-body-sm sub-section-desc">{{ strings.addEditDepartment.fields.aiRoutingRulesSubtext }}</p>
+        
+        <div class="form-group">
+          <textarea 
+            class="form-textarea" 
+            rows="4" 
+            [(ngModel)]="customPromptExtension" 
+            [placeholder]="strings.addEditDepartment.fields.aiRoutingRulesPlaceholder">
+          </textarea>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Section 4: Assigned Officers -->
+    <fieldset class="form-card">
+      <div class="form-card__header">
+        <legend class="pd-title-md form-card__legend">{{ strings.addEditDepartment.sections.assignedOfficers }}</legend>
+        
+        <!-- Toggle Assign Overlay -->
+        <button 
+          type="button" 
+          class="btn-text-action" 
+          (click)="showAssignDropdown = !showAssignDropdown">
+          <span class="material-symbols-outlined">person_add</span>
+          {{ strings.addEditDepartment.officersSection.addBtn }}
+        </button>
+      </div>
+
+      <!-- Assign Search Overlay Overlay -->
+      <div *ngIf="showAssignDropdown" class="assign-search-panel mt-3 mb-4">
+        <div class="search-input-wrapper">
+          <span class="material-symbols-outlined search-field-icon">search</span>
+          <input 
+            type="text" 
+            class="form-input pl-10" 
+            [(ngModel)]="officerAssignSearchQuery" 
+            (input)="onAssignSearchChange()"
+            [placeholder]="strings.addEditDepartment.officersSection.searchPlaceholder" />
+        </div>
+
+        <ul *ngIf="filteredAssignees.length > 0" class="assign-results-list mt-2">
+          <li 
+            *ngFor="let officer of filteredAssignees" 
+            class="assign-result-item" 
+            (click)="selectAssignee(officer)">
+            <span class="item-avatar-circle">
+              {{ officer.name.slice(0,2).toUpperCase() }}
+            </span>
+            <div class="item-details">
+              <span class="pd-body-sm item-name">{{ officer.name }}</span>
+              <span class="pd-label-sm item-id">{{ officer.id }}</span>
+            </div>
+            <span class="material-symbols-outlined add-icon-right">add</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Assigned list grid -->
+      <div *ngIf="assignedOfficers.length > 0; else emptyOfficers" class="officers-cards-grid">
+        <div *ngFor="let officer of assignedOfficers" class="officer-mini-card">
+          <div class="card-avatar-initials">
+            {{ officer.name.slice(0,2).toUpperCase() }}
+          </div>
+          <div class="card-info">
+            <span class="pd-body-sm card-name">{{ officer.name }}</span>
+            <span class="pd-label-sm card-meta">{{ officer.id }} | {{ officer.email }}</span>
+          </div>
+          <button 
+            type="button" 
+            class="btn-remove-officer" 
+            [attr.aria-label]="'Remove ' + officer.name"
+            (click)="removeAssignee(officer)">
+            <span class="material-symbols-outlined">delete_outline</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty state placeholder -->
+      <ng-template #emptyOfficers>
+        <div class="empty-state-box">
+          <span class="material-symbols-outlined empty-state-icon">groups</span>
+          <p class="pd-body-sm empty-state-text">{{ strings.addEditDepartment.officersSection.emptyText }}</p>
+        </div>
+      </ng-template>
+    </fieldset>
+
+    <!-- Footer Action Buttons -->
+    <div class="footer-actions">
+      <button 
+        type="button" 
+        class="btn-secondary px-6" 
+        (click)="cancel()">
+        {{ strings.addEditDepartment.actions.cancel }}
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary px-6" 
+        (click)="save()">
+        {{ strings.addEditDepartment.actions.save }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Hierarchy Preview Sidebar Column ──────────────────────────────── -->
+  <aside class="sidebar-column">
+    <div class="sticky-sidebar">
+      
+      <h3 class="pd-title-md sidebar-title">
+        <span class="material-symbols-outlined sidebar-title-icon">account_tree</span>
+        {{ strings.addEditDepartment.hierarchyPreview.title }}
+      </h3>
+
+      <!-- Tree list -->
+      <div class="tree-container">
+        <ul class="tree-list">
+          <li 
+            *ngFor="let node of hierarchyPreviewList" 
+            class="tree-node"
+            [class.tree-node--current]="node.isCurrent">
+            <span class="material-symbols-outlined tree-node-icon">{{ node.icon }}</span>
+            <span class="tree-node-name">{{ node.name }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Policy tip card -->
+      <div class="tip-card mt-gutter">
+        <span class="material-symbols-outlined tip-card-icon">info</span>
+        <p class="pd-body-sm tip-card-text">
+          {{ strings.addEditDepartment.hierarchyPreview.policyTip }}
+        </p>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
+
+<!-- ── Map Drawing Modal Overlay ────────────────────────────────────── -->
+<div *ngIf="showMapModal" class="modal-overlay">
+  <div class="modal-card">
+    
+    <div class="modal-header">
+      <div>
+        <h2 class="pd-headline-sm modal-title">{{ strings.addEditDepartment.mapModal.title }}</h2>
+        <p class="pd-body-sm modal-subtitle">{{ strings.addEditDepartment.mapModal.subtitle }}</p>
+      </div>
+      <button type="button" class="btn-close-modal" (click)="closeMapModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Error/Warning Banner inside the Modal -->
+    <div *ngIf="mapError" class="modal-error-banner alert-error" role="alert">
+      <span class="material-symbols-outlined">warning</span>
+      <span class="pd-body-sm ml-2">{{ mapError }}</span>
+    </div>
+
+    <div class="modal-body">
+      <!-- Google Map Container -->
+      <div id="googleMap" class="google-map-canvas"></div>
+
+      <!-- Plotted coordinates logger -->
+      <div class="coordinates-logger">
+        <span class="pd-label-md logger-title">{{ strings.addEditDepartment.mapModal.coordsLabel }}</span>
+        <div *ngIf="mapCoordinates.length > 0; else noCoords" class="logger-box font-mono">
+          <div *ngFor="let pt of mapCoordinates; let idx = index" class="logger-item">
+            Point {{ idx + 1 }}: [{{ pt.lng }}, {{ pt.lat }}]
+          </div>
+        </div>
+        <ng-template #noCoords>
+          <p class="pd-body-sm text-muted">{{ strings.addEditDepartment.mapModal.emptyCoords }}</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="clearPlottedPoints()">
+        <span class="material-symbols-outlined">delete</span>
+        {{ strings.addEditDepartment.mapModal.clearBtn }}
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary" 
+        [disabled]="mapCoordinates.length < 3"
+        (click)="applyBoundary()">
+        <span class="material-symbols-outlined font-semibold">check</span>
+        {{ strings.addEditDepartment.mapModal.closeBtn }}
+      </button>
+    </div>
+
+  </div>
+</div>
+

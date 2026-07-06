@@ -1,0 +1,20 @@
+{
+  "id": "ORG-001",
+  "name": "Praja Disha AI Organisation",
+  "createdAt": 1770000000000,
+  "constituency": {
+    "name": "Bengaluru Metropolitan Region",
+    "coordinates": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [77.5500, 12.9300],
+          [77.6500, 12.9300],
+          [77.6500, 13.0200],
+          [77.5500, 13.0200],
+          [77.5500, 12.9300]
+        ]
+      ]
+    }
+  }
+}

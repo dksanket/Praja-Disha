@@ -1,0 +1,124 @@
+<div class="min-h-screen flex flex-col md:flex-row w-full overflow-x-hidden">
+  <!-- Left Panel: Branding & Description (Hidden on Mobile) -->
+  <div class="hidden md:flex md:w-5/12 lg:w-1/2 bg-surface-container relative flex-col justify-between p-12 lg:p-16 border-r border-outline-variant/30">
+    <div class="absolute inset-0 opacity-20 mix-blend-multiply" 
+         style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBz3HWSqIuUWXFi64K6DOhJtxeim31mACQ-KhR3LVqR8XX8c0w_8oFREjyZJlpERX2fntzQXkaa816WlMd146TSaI-Wp35MWLWsgpTUA0hCsMICF1hlGKxSeuSTvEkyn2SYnu2paqxmUhDY5kkwOGyhxy5ZxopDWkSm5QAS83d6cyZUowM9xZrIvcfYPeu2SKlp7oQwLXWp_MNIeK-Fzq38omU4NKhlSJHTeiBOV5mFs5JVuxu6Nh9qT8sgZdxYpYcIAqzIaSYdyA'); background-size: cover; background-position: center;">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-surface-container-high/90 via-surface-container/50 to-transparent"></div>
+    
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-on-primary text-2xl">account_balance</span>
+        </div>
+        <span class="font-headline-md text-2xl font-bold text-on-background tracking-tight">{{ strings.brandName }}</span>
+      </div>
+    </div>
+    
+    <div class="relative z-10 max-w-md">
+      <h2 class="font-display-lg text-4xl font-extrabold text-on-background mb-6 leading-tight">{{ strings.leftTitle }}</h2>
+      <p class="font-body-lg text-lg text-on-surface-variant">{{ strings.leftDesc }}</p>
+    </div>
+  </div>
+
+  <!-- Right Panel: Registration Form -->
+  <div class="w-full md:w-7/12 lg:w-1/2 flex items-center justify-center p-6 sm:p-8 md:p-12 lg:p-16 relative">
+    <!-- Mobile Header (Visible only on small screens) -->
+    <div class="absolute top-6 left-6 flex items-center gap-2 md:hidden">
+      <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
+        <span class="material-symbols-outlined text-on-primary text-sm">account_balance</span>
+      </div>
+      <span class="font-label-lg text-sm font-bold text-on-background tracking-tight">{{ strings.brandName }}</span>
+    </div>
+
+    <div class="w-full max-w-[440px] mt-12 md:mt-0">
+      <div class="mb-10 text-center md:text-left">
+        <h1 class="font-headline-lg-mobile text-2xl font-bold text-on-background mb-3 md:font-headline-lg md:text-3xl">{{ strings.rightTitle }}</h1>
+        <p class="font-body-md text-sm text-on-surface-variant">{{ strings.rightSubtitle }}</p>
+      </div>
+
+      <form (submit)="onSubmit($event)" class="space-y-5">
+        <!-- Full Name -->
+        <div class="space-y-1.5">
+          <label class="block font-label-lg text-sm font-semibold text-on-surface" for="fullName">{{ strings.nameLabel }}</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-secondary">
+              <span class="material-symbols-outlined text-lg">person</span>
+            </div>
+            <input 
+              class="block w-full pl-11 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 outline-none" 
+              id="fullName" 
+              name="fullName" 
+              [placeholder]="strings.namePlaceholder" 
+              required 
+              type="text"
+              [(ngModel)]="fullName">
+          </div>
+        </div>
+
+        <!-- Verified Contact -->
+        <div class="space-y-1.5">
+          <label class="block font-label-lg text-sm font-semibold text-on-surface">{{ strings.contactLabel }}</label>
+          <div class="relative flex items-center">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-secondary">
+              <span class="material-symbols-outlined text-lg">mail</span>
+            </div>
+            <input 
+              class="block w-full pl-11 pr-24 py-3 bg-surface-container border border-outline-variant rounded-xl font-body-md text-sm text-on-surface-variant outline-none cursor-default" 
+              readonly 
+              [value]="verifiedContact" 
+              type="text">
+            <div class="absolute right-3 flex items-center gap-1 bg-primary/10 text-primary px-2.5 py-1 rounded-lg">
+              <span class="material-symbols-outlined text-sm font-bold">check_circle</span>
+              <span class="text-xs font-bold">{{ strings.verifiedBadge }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="flex items-start mt-6 mb-8">
+          <div class="flex items-center h-5">
+            <input 
+              class="w-5 h-5 border border-outline-variant rounded bg-surface-container-lowest checked:bg-primary checked:border-primary focus:ring-primary focus:ring-2 focus:ring-offset-2 transition-colors cursor-pointer text-primary" 
+              id="terms" 
+              name="terms" 
+              required 
+              type="checkbox"
+              [(ngModel)]="termsAccepted">
+          </div>
+          <div class="ml-3 text-sm">
+            <label class="font-body-md text-sm text-on-surface-variant cursor-pointer" for="terms">
+              {{ strings.termsAgreement }}
+              <a class="text-primary hover:underline font-semibold" href="#">{{ strings.termsLink }}</a> 
+              and 
+              <a class="text-primary hover:underline font-semibold" href="#">{{ strings.privacyLink }}</a>.
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Action -->
+        <button 
+          class="w-full min-h-[48px] bg-primary text-on-primary font-label-lg text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary-container focus:ring-4 focus:ring-primary/20 active:scale-[0.98] transition-all duration-200 shadow-sm" 
+          type="submit"
+          [disabled]="!fullName.trim() || !termsAccepted"
+          [class.opacity-60]="!fullName.trim() || !termsAccepted"
+          [class.cursor-not-allowed]="!fullName.trim() || !termsAccepted">
+          {{ strings.submitButton }}
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+      </form>
+
+      <!-- Sign In Link -->
+      <div class="mt-8 text-center">
+        <p class="font-body-md text-sm text-on-surface-variant">
+          {{ strings.signInLabel }}
+          <a class="font-label-lg text-sm text-primary hover:text-primary-container hover:underline transition-colors ml-1 inline-flex items-center gap-1 font-semibold" 
+             (click)="navigateToLogin()" 
+             href="javascript:void(0)">
+            {{ strings.signInLink }}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

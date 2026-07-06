@@ -1,0 +1,110 @@
+<main class="max-w-max-width-content mx-auto px-6 md:px-margin-desktop mt-8 pb-36">
+  <!-- Header Section -->
+  <section class="mb-8">
+    <h2 class="font-headline-lg-mobile text-2xl font-bold text-on-surface md:font-headline-lg md:text-3xl">{{ strings.title }}</h2>
+    <p class="font-body-md text-sm text-secondary mt-1">{{ strings.subtitle }}</p>
+  </section>
+
+  <!-- Frictionless Input Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+    <!-- Voice & Text Input Column -->
+    <div class="md:col-span-8 flex flex-col gap-6">
+      <!-- Text Area Card -->
+      <div class="bg-white p-6 rounded-xl border border-outline-variant/60 shadow-sm transition-all hover:shadow-md">
+        <label class="block font-label-lg text-sm font-semibold text-on-surface-variant mb-3">
+          {{ strings.textareaLabel }}
+        </label>
+        <div class="relative flex items-center">
+          <textarea 
+            class="w-full min-h-[140px] bg-background border border-outline-variant/60 rounded-xl p-4 pr-12 font-body-md text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-outline-variant"
+            [placeholder]="strings.textareaPlaceholder"
+            [(ngModel)]="description">
+          </textarea>
+          <button 
+            type="button"
+            class="absolute right-3.5 top-3.5 p-2.5 rounded-full hover:bg-surface-variant transition-colors text-primary flex items-center justify-center"
+            [class.mic-active]="isListening"
+            (click)="toggleMic()">
+            <span class="material-symbols-outlined">{{ isListening ? 'graphic_eq' : 'mic' }}</span>
+          </button>
+        </div>
+        <p class="mt-2 font-label-md text-xs text-outline flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">info</span>
+          {{ isListening ? strings.micListening : strings.textareaHint }}
+        </p>
+      </div>
+
+      <!-- Location Verification -->
+      <div class="bg-white rounded-xl border border-outline-variant/60 shadow-sm overflow-hidden">
+        <div class="p-6">
+          <label class="block font-label-lg text-sm font-semibold text-on-surface-variant mb-3">
+            {{ strings.locationLabel }}
+          </label>
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-2 border border-outline-variant/60 rounded-xl bg-background p-3">
+              <span class="material-symbols-outlined text-secondary">location_on</span>
+              <input 
+                class="w-full bg-transparent border-none focus:ring-0 font-body-md text-sm text-on-surface p-0" 
+                [placeholder]="strings.locationPlaceholder" 
+                type="text"
+                [(ngModel)]="location">
+            </div>
+            
+            <button 
+              type="button"
+              class="flex items-center justify-center gap-1.5 py-3 px-6 rounded-xl border border-primary text-primary font-label-lg text-sm font-semibold hover:bg-primary/5 transition-colors active:scale-95 duration-150"
+              (click)="detectLocation()"
+              [disabled]="isDetectingLocation">
+              <span class="material-symbols-outlined text-lg">{{ isDetectingLocation ? 'progress_activity' : 'my_location' }}</span>
+              {{ isDetectingLocation ? strings.detectingLocation : strings.locationDetectBtn }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Upload Column -->
+    <div class="md:col-span-4">
+      <div 
+        class="bg-white h-full p-6 rounded-xl border-2 border-dashed border-outline-variant hover:bg-surface-container-low transition-colors group flex flex-col items-center justify-center text-center cursor-pointer"
+        (click)="selectMockImage()">
+        
+        <div class="w-20 h-20 rounded-full bg-secondary-container/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-primary text-4xl">add_a_photo</span>
+        </div>
+        
+        <h3 class="font-headline-md text-lg font-bold text-on-surface mb-2">{{ strings.uploadLabel }}</h3>
+        <p class="font-body-md text-xs text-secondary px-4">{{ strings.uploadDesc }}</p>
+        <p class="font-label-md text-[10px] text-outline mt-2">{{ strings.uploadHint }}</p>
+
+        <!-- Preview Uploaded Image -->
+        <div class="mt-6 w-full" *ngIf="imageUrl">
+          <div class="grid grid-cols-1 gap-2">
+            <div class="relative aspect-video rounded-lg overflow-hidden border border-outline-variant">
+              <img class="w-full h-full object-cover" [src]="imageUrl" alt="Mock Upload Proof">
+              <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-white text-2xl">delete</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Sticky Bottom Submit Bar -->
+<div class="fixed bottom-20 md:bottom-0 left-0 right-0 bg-white/85 backdrop-blur-md border-t border-outline-variant/30 p-4 z-30 flex justify-center shadow-lg">
+  <div class="w-full max-w-max-width-content">
+    <button 
+      class="w-full h-14 bg-primary text-on-primary rounded-full font-headline-md text-lg font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:bg-primary-container transition-all active:scale-95"
+      [disabled]="isSubmitting || !description.trim()"
+      [class.opacity-70]="isSubmitting || !description.trim()"
+      [class.cursor-not-allowed]="isSubmitting || !description.trim()"
+      (click)="onSubmit()">
+      
+      <span class="material-symbols-outlined text-lg">{{ isSubmitting ? 'progress_activity' : 'send' }}</span>
+      {{ isSubmitting ? strings.submittingBtn : strings.submitBtn }}
+    </button>
+  </div>
+</div>

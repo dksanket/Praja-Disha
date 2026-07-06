@@ -1,0 +1,290 @@
+<div class="add-edit-officer-layout">
+
+  <!-- ── Main Form Column ──────────────────────────────────────────────── -->
+  <div class="form-canvas">
+    
+    <!-- Breadcrumb back link -->
+    <div class="breadcrumb-container">
+      <button 
+        type="button" 
+        class="btn-back" 
+        (click)="cancel()">
+        <span class="material-symbols-outlined">arrow_back</span>
+        {{ strings.addEditOfficer.backButton }}
+      </button>
+    </div>
+
+    <!-- Page Title -->
+    <div class="page-title-block">
+      <h1 class="pd-headline-md page-title">
+        {{ isEditMode ? strings.addEditOfficer.pageTitleEditPrefix + name : strings.addEditOfficer.pageTitleAdd }}
+      </h1>
+      <p class="pd-body-md page-subtitle">
+        {{ isEditMode ? strings.addEditOfficer.pageSubtitleEdit : strings.addEditOfficer.pageSubtitleAdd }}
+      </p>
+    </div>
+
+    <!-- Error Banner -->
+    <div *ngIf="errorMessage" class="error-banner" role="alert">
+      <span class="material-symbols-outlined error-banner__icon">error</span>
+      <span class="pd-body-sm error-banner__text">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Section 1: Basic Details -->
+    <fieldset class="form-card">
+      <legend class="pd-title-md form-card__legend">{{ strings.addEditOfficer.sections.basicInfo }}</legend>
+      
+      <!-- Full Name & Username -->
+      <div class="form-row-grid">
+        <div class="form-group">
+          <label class="pd-label-md form-label">
+            {{ strings.addEditOfficer.fields.fullName }} <span class="required-star">*</span>
+          </label>
+          <input 
+            type="text" 
+            class="form-input" 
+            [(ngModel)]="name" 
+            (ngModelChange)="updateProfileSidebar()"
+            [placeholder]="strings.addEditOfficer.fields.fullNamePlaceholder"
+            required />
+        </div>
+
+        <div class="form-group">
+          <label class="pd-label-md form-label">
+            {{ strings.addEditOfficer.fields.username }} <span class="required-star">*</span>
+          </label>
+          <input 
+            type="text" 
+            class="form-input font-mono" 
+            [(ngModel)]="officerUserName" 
+            (ngModelChange)="updateProfileSidebar()"
+            [placeholder]="strings.addEditOfficer.fields.usernamePlaceholder"
+            [disabled]="isEditMode"
+            required />
+        </div>
+      </div>
+
+      <!-- Email & Phone -->
+      <div class="form-row-grid mt-gutter">
+        <div class="form-group">
+          <label class="pd-label-md form-label">
+            {{ strings.addEditOfficer.fields.email }}
+          </label>
+          <input 
+            type="email" 
+            class="form-input" 
+            [(ngModel)]="email" 
+            (ngModelChange)="updateProfileSidebar()"
+            [placeholder]="strings.addEditOfficer.fields.emailPlaceholder" />
+        </div>
+
+        <div class="form-group">
+          <label class="pd-label-md form-label">
+            {{ strings.addEditOfficer.fields.phone }}
+          </label>
+          <div class="phone-input-group">
+            <span class="phone-prefix">{{ strings.addEditOfficer.fields.phonePrefix }}</span>
+            <input 
+              type="tel" 
+              class="form-input phone-input" 
+              [(ngModel)]="phoneLocal" 
+              (ngModelChange)="updateProfileSidebar()"
+              [placeholder]="strings.addEditOfficer.fields.phonePlaceholder" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Status -->
+      <div class="form-group mt-gutter pt-3 border-t-dashed">
+        <label class="pd-label-md form-label">{{ strings.addEditOfficer.fields.status }}</label>
+        <div class="status-toggle-container">
+          <label class="toggle-switch">
+            <input 
+              type="checkbox" 
+              class="sr-only" 
+              [(ngModel)]="isActive" 
+              (ngModelChange)="updateProfileSidebar()" />
+            <div class="toggle-slider"></div>
+          </label>
+          <span class="pd-body-sm toggle-label font-medium">
+            {{ isActive ? strings.addEditOfficer.fields.statusActive : strings.addEditOfficer.fields.statusInactive }}
+          </span>
+        </div>
+        <p class="pd-label-sm status-help-text mt-1">
+          {{ strings.addEditOfficer.fields.statusHelp }}
+        </p>
+      </div>
+    </fieldset>
+
+    <!-- Section 2: Department Assignments -->
+    <fieldset class="form-card">
+      <legend class="pd-title-md form-card__legend">{{ strings.addEditOfficer.sections.deptAssignments }}</legend>
+      <p class="pd-body-sm section-desc mb-3">{{ strings.addEditOfficer.fields.deptAssignDesc }}</p>
+
+      <div class="chips-container mb-3">
+        <!-- Assigned Department Chips -->
+        <div *ngIf="assignedDepartments.length > 0; else noDepts" class="chips-row">
+          <div *ngFor="let dept of assignedDepartments" class="dept-chip">
+            <span class="pd-label-md chip-name">{{ dept.name }}</span>
+            <button 
+              type="button" 
+              class="chip-close-btn" 
+              [attr.aria-label]="'Remove ' + dept.name" 
+              (click)="removeDepartment(dept)">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        </div>
+        <ng-template #noDepts>
+          <div class="empty-chips-box">
+            <span class="pd-body-sm empty-chips-text">No departments assigned yet. Use search below to assign.</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Search Departments -->
+      <div class="search-dropdown-container">
+        <div class="search-input-wrapper">
+          <span class="material-symbols-outlined search-field-icon">search</span>
+          <input 
+            type="text" 
+            class="form-input pl-10" 
+            [(ngModel)]="deptSearchQuery" 
+            (input)="onDeptSearchChange()"
+            [placeholder]="strings.addEditOfficer.fields.deptSearchPlaceholder" />
+        </div>
+
+        <!-- Autocomplete Dropdown overlay -->
+        <ul *ngIf="showDeptDropdown" class="autocomplete-overlay">
+          <li 
+            *ngFor="let dept of filteredDepartments" 
+            class="autocomplete-item" 
+            (click)="selectDepartment(dept)">
+            <span class="material-symbols-outlined item-icon">domain</span>
+            <div class="item-details">
+              <span class="pd-body-sm item-name">{{ dept.name }}</span>
+              <span class="pd-label-sm item-id font-mono">{{ dept.id }}</span>
+            </div>
+            <span class="material-symbols-outlined add-icon-right">add</span>
+          </li>
+        </ul>
+      </div>
+    </fieldset>
+
+    <!-- Section 3: Reporting Hierarchy -->
+    <fieldset class="form-card">
+      <legend class="pd-title-md form-card__legend">{{ strings.addEditOfficer.sections.reportingHierarchy }}</legend>
+      <p class="pd-body-sm section-desc mb-3">Assign the supervisors/managers this officer directly reports to.</p>
+
+      <div class="chips-container mb-3">
+        <!-- Assigned Manager Chips -->
+        <div *ngIf="assignedManagers.length > 0; else noManagers" class="chips-row-vertical">
+          <div *ngFor="let mgr of assignedManagers" class="manager-chip">
+            <span class="chip-avatar-circle">
+              <span class="chip-avatar-initials">{{ mgr.name.slice(0,2).toUpperCase() }}</span>
+            </span>
+            <div class="chip-info">
+              <span class="pd-body-sm chip-name font-medium">{{ mgr.name }}</span>
+              <span class="pd-label-sm chip-meta font-mono">@{{ mgr.officerUserName }}</span>
+            </div>
+            <button 
+              type="button" 
+              class="chip-remove-btn" 
+              [attr.aria-label]="'Remove manager ' + mgr.name" 
+              (click)="removeManager(mgr)">
+              <span class="material-symbols-outlined">delete_outline</span>
+            </button>
+          </div>
+        </div>
+        <ng-template #noManagers>
+          <div class="empty-chips-box">
+            <span class="pd-body-sm empty-chips-text">No managers assigned yet. Use search below to assign.</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Search Managers -->
+      <div class="search-dropdown-container">
+        <div class="search-input-wrapper">
+          <span class="material-symbols-outlined search-field-icon">search</span>
+          <input 
+            type="text" 
+            class="form-input pl-10" 
+            [(ngModel)]="managerSearchQuery" 
+            (input)="onManagerSearchChange()"
+            [placeholder]="strings.addEditOfficer.fields.managersSearchPlaceholder" />
+        </div>
+
+        <!-- Autocomplete Dropdown overlay -->
+        <ul *ngIf="showManagerDropdown" class="autocomplete-overlay">
+          <li 
+            *ngFor="let mgr of filteredManagers" 
+            class="autocomplete-item" 
+            (click)="selectManager(mgr)">
+            <span class="item-avatar-circle">
+              {{ mgr.name.slice(0,2).toUpperCase() }}
+            </span>
+            <div class="item-details">
+              <span class="pd-body-sm item-name">{{ mgr.name }}</span>
+              <span class="pd-label-sm item-username font-mono">@{{ mgr.officerUserName }}</span>
+            </div>
+            <span class="material-symbols-outlined add-icon-right">add</span>
+          </li>
+        </ul>
+      </div>
+    </fieldset>
+
+    <!-- Footer Actions -->
+    <div class="footer-actions">
+      <button 
+        type="button" 
+        class="btn-secondary px-6" 
+        (click)="cancel()">
+        {{ strings.addEditOfficer.actions.cancel }}
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary px-6" 
+        (click)="save()">
+        {{ strings.addEditOfficer.actions.save }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Profile Summary Sidebar Column ────────────────────────────────── -->
+  <aside class="sidebar-column">
+    <div class="sticky-sidebar">
+      
+      <h3 class="pd-title-md sidebar-title">
+        <span class="material-symbols-outlined sidebar-title-icon">account_box</span>
+        Profile Preview
+      </h3>
+
+      <!-- Profile attributes list -->
+      <div class="preview-card">
+        <ul class="preview-list">
+          <li 
+            *ngFor="let item of profileSidebarList" 
+            class="preview-item">
+            <span class="material-symbols-outlined preview-icon" aria-hidden="true">{{ item.icon }}</span>
+            <div class="preview-info">
+              <span class="pd-label-sm preview-label">{{ item.label }}</span>
+              <span class="pd-body-sm preview-value">{{ item.value }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Compliance Info card -->
+      <div class="tip-card mt-gutter">
+        <span class="material-symbols-outlined tip-card-icon">info</span>
+        <p class="pd-body-sm tip-card-text">
+          Officers assigned to multiple departments inherit data access clearance and AI routing rules mapped to each department respectively.
+        </p>
+      </div>
+
+    </div>
+  </aside>
+
+</div>

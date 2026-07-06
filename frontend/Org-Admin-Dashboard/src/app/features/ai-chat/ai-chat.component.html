@@ -1,0 +1,117 @@
+<div class="ai-chat">
+
+  <!-- ── Header ── -->
+  <header class="ai-chat__header" role="banner">
+    <div class="ai-chat__header-icon">
+      <span class="material-symbols-outlined">smart_toy</span>
+    </div>
+    <div class="ai-chat__header-info">
+      <h1 class="ai-chat__header-title">{{ strings.header.title }}</h1>
+      <p class="ai-chat__header-subtitle">{{ strings.header.subtitle }}</p>
+    </div>
+  </header>
+
+  <!-- ── Message Scrolling Area ── -->
+  <div class="ai-chat__messages-container" #scrollContainer>
+    <div class="ai-chat__messages-wrapper">
+      
+      <!-- Individual message cards -->
+      <div *ngFor="let message of messages"
+           class="chat-message"
+           [ngClass]="message.sender === 'ai' ? 'chat-message--ai' : 'chat-message--user'">
+        
+        <div class="chat-message__avatar">
+          <span class="material-symbols-outlined">
+            {{ message.sender === 'ai' ? 'smart_toy' : 'person' }}
+          </span>
+        </div>
+
+        <div class="chat-message__content">
+          <span class="chat-message__sender-name">
+            {{ message.sender === 'ai' ? strings.names.ai : strings.names.user }}
+          </span>
+
+          <!-- Directive automatically parses links and secures output -->
+          <div class="chat-message__bubble" [appLinkify]="message.text"></div>
+
+          <!-- Clickable suggestion prompts -->
+          <div *ngIf="message.sender === 'ai' && message.suggestions && message.suggestions.length > 0"
+               class="chat-message__suggestions">
+            <button *ngFor="let suggest of message.suggestions"
+                    class="chat-message__suggestion-chip"
+                    type="button"
+                    (click)="selectSuggestion(suggest)">
+              {{ suggest }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Typing Indicator -->
+      <div *ngIf="isAiTyping" class="chat-message chat-message--ai">
+        <div class="chat-message__avatar">
+          <span class="material-symbols-outlined">smart_toy</span>
+        </div>
+        <div class="chat-message__content">
+          <span class="chat-message__sender-name">{{ strings.names.ai }}</span>
+          <div class="chat-message__bubble">
+            <div class="chat-message__typing-indicator" aria-label="AI is typing">
+              <div class="chat-message__typing-dot"></div>
+              <div class="chat-message__typing-dot"></div>
+              <div class="chat-message__typing-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Sticky Bottom Input Bar ── -->
+  <div class="ai-chat__input-area">
+    <div class="ai-chat__input-wrapper">
+      <div class="ai-chat__input-box">
+        <textarea
+          class="ai-chat__textarea"
+          [placeholder]="strings.input.placeholder"
+          [(ngModel)]="userInput"
+          (keydown.enter)="handleKeyDown($event)"
+          rows="1"
+          #textInput
+        ></textarea>
+        
+        <div class="ai-chat__input-actions">
+          <div class="ai-chat__action-group">
+            <button
+              class="ai-chat__action-btn"
+              type="button"
+              [title]="strings.input.tooltipAttach"
+            >
+              <span class="material-symbols-outlined">attach_file</span>
+            </button>
+            <button
+              class="ai-chat__action-btn"
+              type="button"
+              [title]="strings.input.tooltipChart"
+            >
+              <span class="material-symbols-outlined">monitoring</span>
+            </button>
+          </div>
+          
+          <button
+            class="ai-chat__send-btn"
+            type="button"
+            [disabled]="!userInput.trim() || isAiTyping"
+            (click)="sendCurrentMessage()"
+          >
+            <span class="material-symbols-outlined">send</span>
+          </button>
+        </div>
+      </div>
+      
+      <p class="ai-chat__disclaimer">{{ strings.input.disclaimer }}</p>
+    </div>
+  </div>
+
+</div>

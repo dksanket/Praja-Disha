@@ -1,0 +1,375 @@
+// =============================================================================
+// login.component.scss — styles scoped to the Login page.
+// All values come from _tokens.scss via the global styles.scss import.
+// Never hardcode colours or fonts here.
+// =============================================================================
+
+@import '../../../styles/tokens';
+
+// ── Full-page layout ──────────────────────────────────────────────────────────
+.login-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--pd-background);
+  color: var(--pd-on-surface);
+  overflow: hidden;
+
+  // ── Subtle grid SVG overlay ────────────────────────────────────────────────
+  &__bg-grid {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    z-index: 0;
+  }
+
+  // ── Blurred decorative blobs ───────────────────────────────────────────────
+  &__blob {
+    position: fixed;
+    pointer-events: none;
+    border-radius: $rounded-full;
+    z-index: 0;
+    filter: blur(80px);
+  }
+
+  &__blob--top-right {
+    top: 0;
+    right: 0;
+    width: 33vw;
+    height: 50vh;
+    background-color: var(--pd-primary-container);
+    opacity: 0.18;
+    transform: translate(50%, -50%);
+  }
+
+  &__blob--bottom-left {
+    bottom: 0;
+    left: 0;
+    width: 25vw;
+    height: 33vh;
+    background-color: var(--pd-secondary-container);
+    opacity: 0.10;
+    transform: translate(-50%, 50%);
+  }
+
+  // ── Centred content column ─────────────────────────────────────────────────
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px $spacing-container-padding;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ── Login card ────────────────────────────────────────────────────────────────
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--pd-surface-container-lowest);
+  border: 1px solid var(--pd-outline-variant);
+  border-radius: $rounded-xl;
+  padding: 28px;
+  // Level-2 elevation shadow (light, non-distracting)
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+  // ── Header block ────────────────────────────────────────────────────────────
+  &__header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  // Scales the logo PNG to a fixed display width while preserving aspect ratio
+  &__logo-img {
+    width: 180px;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  &__title {
+    color: var(--pd-on-surface-variant);
+    margin-bottom: 0;
+  }
+
+  // ── Body form area ───────────────────────────────────────────────────────────
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    // Stack all form controls with uniform vertical rhythm
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+}
+
+// ── Google button ─────────────────────────────────────────────────────────────
+.btn-google {
+  width: 100%;
+  height: $spacing-row-standard;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid var(--pd-outline-variant);
+  border-radius: $rounded-lg;
+  background: transparent;
+  color: var(--pd-on-surface-variant);
+  font-size: $fs-title-md;
+  font-weight: $fw-semibold;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 100ms ease;
+
+  &:hover {
+    background-color: var(--pd-surface-container-low);
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  &__line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--pd-outline-variant);
+  }
+
+  &__label {
+    color: var(--pd-outline);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    background-color: var(--pd-surface-container-lowest);
+    padding: 0 4px;
+  }
+}
+
+// ── Auth method radio toggle ───────────────────────────────────────────────────
+.auth-toggle {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-left: 4px;
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  &__radio {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--pd-primary);
+    cursor: pointer;
+    border-color: var(--pd-outline-variant);
+  }
+
+  &__label {
+    color: var(--pd-on-surface);
+  }
+}
+
+// ── Input row ─────────────────────────────────────────────────────────────────
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+// Shared input styles
+.pd-input {
+  height: $spacing-row-standard;
+  border: 1px solid var(--pd-outline-variant);
+  border-radius: $rounded-lg;
+  background-color: var(--pd-surface);
+  color: var(--pd-on-surface);
+  font-size: $fs-body-md;
+  font-family: var(--pd-font-primary);
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &:focus {
+    border-color: var(--pd-primary-container);
+    box-shadow: 0 0 0 3px var(--pd-primary-fixed);
+  }
+
+  &--select {
+    width: 88px;
+    padding: 0 32px 0 12px;
+    appearance: none;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  &--identifier {
+    flex: 1;
+    padding: 0 16px;
+  }
+}
+
+// Country-code select wrapper (positions the expand_more chevron)
+.select-wrapper {
+  position: relative;
+
+  &__chevron {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--pd-outline);
+    font-size: 18px;
+    pointer-events: none;
+  }
+}
+
+// ── Primary action button ─────────────────────────────────────────────────────
+.btn-primary {
+  width: 100%;
+  height: $spacing-row-standard;
+  background-color: var(--pd-primary);
+  color: var(--pd-on-primary);
+  border: none;
+  border-radius: $rounded-lg;
+  font-size: $fs-title-md;
+  font-weight: $fw-semibold;
+  font-family: var(--pd-font-primary);
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 100ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+
+  &:hover {
+    background-color: var(--pd-primary-container);
+  }
+}
+
+// Shared press scale micro-interaction
+.btn--pressed {
+  transform: scale(0.98);
+}
+
+// ── Terms checkbox ────────────────────────────────────────────────────────────
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  // Extra breathing room between Send OTP and the agreement text
+  margin-top: 4px;
+
+  &__checkbox {
+    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    accent-color: var(--pd-primary);
+    cursor: pointer;
+  }
+
+  &__text {
+    color: var(--pd-on-surface-variant);
+  }
+
+  &__link {
+    color: var(--pd-primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ── Below-card link ───────────────────────────────────────────────────────────
+.below-card-link {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--pd-on-surface-variant);
+
+  &__anchor {
+    color: var(--pd-primary);
+    text-decoration: none;
+    font-weight: $fw-semibold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.login-footer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 12px $spacing-container-padding;
+  border-top: 1px solid var(--pd-outline-variant);
+  background-color: var(--pd-surface);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  &__copy,
+  &__link,
+  &__secure {
+    color: var(--pd-on-surface-variant);
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  &__link {
+    text-decoration: none;
+    transition: color 150ms ease;
+
+    &:hover {
+      color: var(--pd-primary);
+    }
+  }
+
+  &__secure {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .material-symbols-outlined {
+      font-size: 16px;
+    }
+  }
+}
+
+// ── Material Symbols baseline ─────────────────────────────────────────────────
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+}
