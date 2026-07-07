@@ -1,6 +1,7 @@
 package gov.prajadisha.backend.task.service;
 
 import gov.prajadisha.backend.ai.service.AiTriageService;
+import gov.prajadisha.backend.ai.service.OllamaClient;
 import gov.prajadisha.backend.common.ApiException;
 import gov.prajadisha.backend.common.Formats;
 import gov.prajadisha.backend.common.GeoPoint;
@@ -34,13 +35,16 @@ public class TaskService {
     private final TaskRepository tasks;
     private final OrganizationService organizations;
     private final AiTriageService triage;
+    private final OllamaClient ollama;
     private final ApplicationEventPublisher events;
 
     public TaskService(TaskRepository tasks, OrganizationService organizations,
-                       AiTriageService triage, ApplicationEventPublisher events) {
+                       AiTriageService triage, OllamaClient ollama,
+                       ApplicationEventPublisher events) {
         this.tasks = tasks;
         this.organizations = organizations;
         this.triage = triage;
+        this.ollama = ollama;
         this.events = events;
     }
 
@@ -95,6 +99,15 @@ public class TaskService {
             task.setCategory(c.category());
             task.setPriority(c.priority());
             task.setGlobalStatus("AI-Assigned");
+
+            // Best-effort vector embedding of the ticket text for duplicate detection.
+            List<Double> embedding = ollama.embed(
+                    (task.getTitle() == null ? "" : task.getTitle()) + ". "
+                            + (task.getDescription() == null ? "" : task.getDescription()));
+            if (!embedding.isEmpty()) {
+                task.setDescriptionEmbedding(embedding);
+            }
+
             task.getActivities().add(DetailedActivity.builder()
                     .timestamp(Formats.dateTime(System.currentTimeMillis()))
                     .action("AI_ASSIGNED")

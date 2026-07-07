@@ -47,11 +47,47 @@ The contract does not specify an auth scheme, so tenancy is resolved pragmatical
 Swap `OrganizationService#getActive` and the header resolution in `CitizenController` for real
 session/JWT handling when auth is introduced.
 
-## AI endpoints
+## AI endpoints (Ollama Cloud)
 
-`AiTriageService` (ticket auto-routing) and `AiChatService` (copilot) are deterministic stand-ins.
-Each has a documented single method to replace with a real LLM call (e.g. the Anthropic Messages
-API, `claude-opus-4-8`) without touching the controllers.
+The AI is powered by **Ollama Cloud** through [`OllamaClient`](src/main/java/gov/prajadisha/backend/ai/service/OllamaClient.java):
+
+- **`AiTriageService`** — sends each new ticket plus the org's categories/priorities/departments to
+  the model (constrained to a JSON schema) to pick a category, priority and routing department.
+- **`AiChatService`** — feeds a live civic-data snapshot (ticket counts by status/priority/category,
+  overdue counts, departments) to the model and returns an analytical answer with follow-up suggestions.
+- **Embeddings** — on triage, `descriptionEmbedding` is populated via Ollama's `/api/embed` for
+  duplicate detection (best-effort).
+
+Every AI call has a deterministic fallback, so the app stays fully functional even with no key or network.
+
+### Configuration
+
+Set your key via the `OLLAMA_API_KEY` env var (preferred) or in `application.properties`:
+
+```powershell
+$env:OLLAMA_API_KEY = "your-ollama-cloud-key"
+mvn spring-boot:run
+```
+
+| Property | Env var | Default |
+|----------|---------|---------|
+| `ollama.api-key` | `OLLAMA_API_KEY` | _(empty → fallback mode)_ |
+| `ollama.base-url` | `OLLAMA_BASE_URL` | `https://ollama.com` |
+| `ollama.chat-model` | `OLLAMA_CHAT_MODEL` | `gpt-oss:120b` |
+| `ollama.embed-model` | `OLLAMA_EMBED_MODEL` | `embeddinggemma` |
+| `ollama.enabled` | `OLLAMA_ENABLED` | `true` |
+
+## File storage (photos / videos / voice)
+
+Media is stored on the **server's local disk** (not in MongoDB) under `app.upload-dir` (default
+`./uploads`) and served back from `/files/...`.
+
+- `POST /api/files/upload` (multipart field `file`) → `{ "url": "/files/images/<id>.png", ... }`
+- `POST /api/files/upload-multiple` (multipart field `files`) → list of the above
+
+Flow: the client uploads the photo/video/voice first, then submits the ticket with the returned URL as
+`imageUrl` / `voiceUrl`. Max sizes are configurable (`spring.servlet.multipart.max-file-size`,
+default 100MB) to accommodate video.
 
 ## Endpoint map
 
@@ -85,7 +121,14 @@ API, `claude-opus-4-8`) without touching the controllers.
 ### AI Copilot
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/api/ai/chat` | Ask the AI Command Copilot |
+| POST | `/api/ai/chat` | Ask the AI Command Copilot (Ollama-backed) |
+
+### Files
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/files/upload` | Upload one photo/video/voice file, returns a local URL |
+| POST | `/api/files/upload-multiple` | Upload several files at once |
+| GET | `/files/**` | Serve a stored media file |
 
 ## Quick smoke test
 

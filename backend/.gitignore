@@ -2,6 +2,12 @@ target/
 *.class
 *.log
 
+# Locally stored citizen uploads (photos / videos / voice)
+uploads/
+
+# Local secrets / env overrides
+.env
+
 # IDE
 .idea/
 *.iml
