@@ -1,0 +1,9 @@
+# The build context only needs app.jar (produced by CI). Keep everything
+# else out so image builds stay small and fast.
+src/
+target/
+!app.jar
+.git/
+.env
+uploads/
+*.md

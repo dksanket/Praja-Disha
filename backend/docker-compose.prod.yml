@@ -1,0 +1,38 @@
+# Production compose file used on the GCP VM.
+# Secrets/config are read from a `.env` file that lives ONLY on the VM
+# (never commit it). See DEPLOYMENT.md for the full variable list.
+#
+# On the VM this file is copied by CI as docker-compose.yml, so the
+# deploy step just runs: docker compose up -d --build
+services:
+  backend:
+    build: .
+    image: praja-disha-backend:latest
+    container_name: praja-disha-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Injected from GitHub secrets by the deploy workflow. These override
+      # any values in .env (docker compose: shell env wins over env_file).
+      - MONGODB_URI=${MONGODB_URI}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY}
+    ports:
+      - "8080:8080"
+    volumes:
+      # Persist uploaded media across container rebuilds.
+      - uploads:/app/uploads
+
+  # Optional: run MongoDB on the VM instead of Atlas. If you enable this,
+  # set MONGODB_URI=mongodb://mongo:27017/praja_disha in .env and add
+  # `depends_on: [mongo]` to the backend service above.
+  # mongo:
+  #   image: mongo:7
+  #   container_name: praja-disha-mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - mongo_data:/data/db
+
+volumes:
+  uploads:
+  # mongo_data:

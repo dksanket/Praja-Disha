@@ -1,0 +1,66 @@
+name: Deploy
+
+# Deploys the backend on every push to master:
+#   - backend -> Docker container on the GCP Compute Engine VM (over SSH)
+# Can also be run manually from the Actions tab (workflow_dispatch).
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    name: Backend → GCP VM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Build JAR
+        working-directory: backend
+        run: mvn -B clean package
+
+      - name: Stage deploy bundle
+        working-directory: backend
+        run: |
+          mkdir -p deploy
+          cp target/*.jar deploy/app.jar
+          cp Dockerfile deploy/Dockerfile
+          cp .dockerignore deploy/.dockerignore
+          cp docker-compose.prod.yml deploy/docker-compose.yml
+
+      - name: Copy bundle to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "backend/deploy/*"
+          target: "praja-disha"
+          strip_components: 2
+          overwrite: true
+
+      - name: Build & restart container on VM
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          # Forward the secrets into the remote shell so docker compose can
+          # interpolate ${MONGODB_URI} / ${OLLAMA_API_KEY}.
+          envs: MONGODB_URI,OLLAMA_API_KEY
+          script: |
+            set -e
+            cd ~/praja-disha
+            docker compose up -d --build
+            docker image prune -f
