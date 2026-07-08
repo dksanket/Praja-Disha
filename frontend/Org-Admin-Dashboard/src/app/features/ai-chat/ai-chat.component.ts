@@ -36,6 +36,8 @@ export class AiChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   constructor(private readonly aiChatService: AiChatService) {}
 
   ngOnInit(): void {
+    this.aiChatService.loadHistory();
+
     // Listen for incoming messages
     this.subscription.add(
       this.aiChatService.getMessages().subscribe({

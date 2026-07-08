@@ -233,9 +233,52 @@
   padding: $spacing-gutter 20px;
   border-bottom: 1px solid $color-outline-variant;
 
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-unit * 2;
+  }
+
   &__title {
     color: $color-on-surface;
     margin: 0;
+  }
+
+  &__group-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background-color: rgba($color-primary, 0.08);
+    color: $color-primary;
+    border: 1px solid rgba($color-primary, 0.2);
+    border-radius: $rounded;
+    font-family: $font-primary;
+    
+    .filter-group-id {
+      font-weight: $fw-bold;
+    }
+  }
+
+  &__clear-filter-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-primary;
+    padding: 2px;
+    border-radius: $rounded-full;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 150ms ease;
+
+    .material-symbols-outlined {
+      font-size: 14px;
+    }
+
+    &:hover {
+      background-color: rgba($color-primary, 0.15);
+    }
   }
 
   &__search-container {
@@ -372,9 +415,17 @@
     margin-left: 8px;
     vertical-align: middle;
     white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
 
     .material-symbols-outlined {
       font-size: 14px;
+    }
+
+    &:hover {
+      background-color: $color-surface-container-highest;
+      border-color: $color-outline;
+      color: $color-primary;
     }
   }
 
@@ -425,6 +476,50 @@
       background-color: $color-surface-container;
       color: $color-primary;
     }
+  }
+
+  &__filter-row {
+    background-color: rgba($color-surface-container, 0.25);
+  }
+
+  &__filter-th {
+    padding: 8px $spacing-gutter;
+    border-bottom: 1px solid $color-outline-variant;
+    background-color: rgba($color-surface-container, 0.25);
+    vertical-align: middle;
+  }
+
+  &__filter-input,
+  &__filter-select {
+    width: 100%;
+    padding: 6px 10px;
+    font-family: $font-primary;
+    font-size: $fs-label-sm;
+    color: $color-on-surface;
+    background-color: $color-surface-container-lowest;
+    border: 1px solid $color-outline-variant;
+    border-radius: $rounded;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $color-outline;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px $color-primary-fixed;
+    }
+  }
+
+  &__filter-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2368778d'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 28px;
   }
 
   &__empty-state {
@@ -624,3 +719,71 @@
 .text-secondary {
   color: $color-on-surface-variant !important;
 }
+
+// ── Warning dialog popup modal (Future Feature Notice) ──────────────────────────
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 200ms ease-out;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-xl;
+  padding: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: scaleIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__icon {
+    color: $color-primary; // Using primary blue color for info icon
+    font-size: 28px;
+  }
+
+  &__title {
+    color: $color-on-surface;
+    margin: 0;
+  }
+
+  &__body {
+    color: $color-on-surface-variant;
+  }
+
+  &__message {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+

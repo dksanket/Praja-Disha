@@ -21,8 +21,24 @@ export class AiChatService {
   private readonly isAiTypingSubject = new BehaviorSubject<boolean>(false);
   readonly isAiTyping$ = this.isAiTypingSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {
-    this.initializeWelcomeMessage();
+  constructor(private readonly http: HttpClient) {}
+
+  /**
+   * Loads message history from backend. Falls back to welcome message if history is empty or on error.
+   */
+  loadHistory(): void {
+    this.http.get<ChatMessage[]>(`${this.chatUrl}/history`).subscribe({
+      next: (msgs) => {
+        if (msgs && msgs.length > 0) {
+          this.messagesSubject.next(msgs);
+        } else {
+          this.initializeWelcomeMessage();
+        }
+      },
+      error: () => {
+        this.initializeWelcomeMessage();
+      }
+    });
   }
 
   private initializeWelcomeMessage(): void {

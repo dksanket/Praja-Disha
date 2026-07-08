@@ -23,11 +23,45 @@
             {{ task.priority }} Critical
           </span>
           <!-- Status Badge -->
-          <span class="status-tag status-tag--active">
+          <span 
+            class="status-tag"
+            [class.status-tag--submitted]="task.globalStatus === 'Submitted' || task.globalStatus === 'SUBMITTED'"
+            [class.status-tag--ai-assigned]="task.globalStatus === 'AI-Assigned' || task.globalStatus === 'AI_ASSIGNED'"
+            [class.status-tag--in-progress]="task.globalStatus === 'In Progress' || task.globalStatus === 'IN_PROGRESS'"
+            [class.status-tag--resolved]="task.globalStatus === 'Resolved' || task.globalStatus === 'RESOLVED'"
+            [class.status-tag--rejected]="task.globalStatus === 'Rejected' || task.globalStatus === 'REJECTED'">
             <span class="status-tag__pulse"></span>
-            Active
+            {{ task.globalStatus }}
           </span>
         </div>
+      </div>
+
+      <!-- Actions Block -->
+      <div class="header-actions">
+        <button 
+          type="button"
+          (click)="openUpdateStatusModal()" 
+          class="pd-btn pd-btn--secondary" 
+          id="btn-update-status">
+          <span class="material-symbols-outlined">edit_note</span>
+          <span>{{ strings.headerActions.updateStatus }}</span>
+        </button>
+        <button 
+          type="button"
+          (click)="openEditAssigneeModal()" 
+          class="pd-btn pd-btn--secondary" 
+          id="btn-edit-assignee">
+          <span class="material-symbols-outlined">person_add</span>
+          <span>{{ strings.headerActions.editAssignee }}</span>
+        </button>
+        <button 
+          type="button"
+          (click)="openAddSubtaskModal()" 
+          class="pd-btn pd-btn--primary" 
+          id="btn-add-subtask">
+          <span class="material-symbols-outlined">add_task</span>
+          <span>{{ strings.headerActions.addSubtask }}</span>
+        </button>
       </div>
     </div>
     
@@ -342,4 +376,175 @@
 <div class="loading-state" *ngIf="!task">
   <span class="material-symbols-outlined loading-spinner">sync</span>
   <p>Loading task details...</p>
+</div>
+
+<!-- Update Status Modal Overlay -->
+<div *ngIf="showUpdateStatusModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="pd-headline-sm modal-title">{{ strings.updateStatusModal.title }}</h2>
+      <button type="button" class="btn-close-modal" (click)="closeUpdateStatusModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Status Selection -->
+      <div class="form-group">
+        <label class="pd-label-md form-label">{{ strings.updateStatusModal.statusLabel }}</label>
+        <div class="select-wrapper">
+          <select class="form-select" [(ngModel)]="selectedStatus">
+            <option value="Submitted">{{ strings.updateStatusModal.statuses.submitted }}</option>
+            <option value="AI-Assigned">{{ strings.updateStatusModal.statuses.aiAssigned }}</option>
+            <option value="In Progress">{{ strings.updateStatusModal.statuses.inProgress }}</option>
+            <option value="Resolved">{{ strings.updateStatusModal.statuses.resolved }}</option>
+            <option value="Rejected">{{ strings.updateStatusModal.statuses.rejected }}</option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+      <!-- Remarks -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.updateStatusModal.remarksLabel }}</label>
+        <textarea 
+          class="form-textarea" 
+          rows="3" 
+          [(ngModel)]="statusRemarks" 
+          [placeholder]="strings.updateStatusModal.remarksPlaceholder">
+        </textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="pd-btn pd-btn--secondary" (click)="closeUpdateStatusModal()">
+        {{ strings.updateStatusModal.cancelBtn }}
+      </button>
+      <button type="button" class="pd-btn pd-btn--primary" (click)="submitStatus()">
+        {{ strings.updateStatusModal.submitBtn }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Assignee Modal Overlay -->
+<div *ngIf="showEditAssigneeModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="pd-headline-sm modal-title">{{ strings.editAssigneeModal.title }}</h2>
+      <button type="button" class="btn-close-modal" (click)="closeEditAssigneeModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Department Dropdown -->
+      <div class="form-group">
+        <label class="pd-label-md form-label">{{ strings.editAssigneeModal.deptLabel }}</label>
+        <div class="select-wrapper">
+          <select class="form-select" [(ngModel)]="selectedDeptId" (change)="onAssigneeDeptChange()">
+            <option value="">{{ strings.editAssigneeModal.deptPlaceholder }}</option>
+            <option *ngFor="let dept of departmentsList" [value]="dept.id">{{ dept.name }}</option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+      <!-- Officer Dropdown -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.editAssigneeModal.officerLabel }}</label>
+        <div class="select-wrapper">
+          <select class="form-select" [(ngModel)]="selectedOfficerId" [disabled]="!selectedDeptId">
+            <option value="">{{ strings.editAssigneeModal.officerPlaceholder }}</option>
+            <option *ngFor="let off of filteredOfficersList" [value]="off.id">{{ off.name }}</option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="pd-btn pd-btn--secondary" (click)="closeEditAssigneeModal()">
+        {{ strings.editAssigneeModal.cancelBtn }}
+      </button>
+      <button type="button" class="pd-btn pd-btn--primary" (click)="submitAssignee()">
+        {{ strings.editAssigneeModal.submitBtn }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Subtask Modal Overlay -->
+<div *ngIf="showAddSubtaskModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="pd-headline-sm modal-title">{{ strings.addSubtaskModal.title }}</h2>
+      <button type="button" class="btn-close-modal" (click)="closeAddSubtaskModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Title -->
+      <div class="form-group">
+        <label class="pd-label-md form-label">{{ strings.addSubtaskModal.taskTitleLabel }} *</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="subtaskTitle" 
+          [placeholder]="strings.addSubtaskModal.taskTitlePlaceholder" 
+          required />
+      </div>
+      <!-- Description -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.addSubtaskModal.descLabel }}</label>
+        <textarea 
+          class="form-textarea" 
+          rows="3" 
+          [(ngModel)]="subtaskDescription" 
+          [placeholder]="strings.addSubtaskModal.descPlaceholder">
+        </textarea>
+      </div>
+      <!-- Priority -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.addSubtaskModal.priorityLabel }}</label>
+        <div class="select-wrapper">
+          <select class="form-select" [(ngModel)]="subtaskPriority">
+            <option value="P0">P0 Critical</option>
+            <option value="P1">P1 High</option>
+            <option value="P2">P2 Medium</option>
+            <option value="P3">P3 Low</option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+      <!-- Department Dropdown -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.editAssigneeModal.deptLabel }}</label>
+        <div class="select-wrapper">
+          <select class="form-select" [(ngModel)]="subtaskDeptId" (change)="onSubtaskDeptChange()">
+            <option value="">{{ strings.editAssigneeModal.deptPlaceholder }}</option>
+            <option *ngFor="let dept of departmentsList" [value]="dept.id">{{ dept.name }}</option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+      <!-- Officer Dropdown -->
+      <div class="form-group mt-gutter">
+        <label class="pd-label-md form-label">{{ strings.editAssigneeModal.officerLabel }}</label>
+        <div class="select-wrapper">
+          <select class="form-select" [(ngModel)]="subtaskOfficerId" [disabled]="!subtaskDeptId">
+            <option value="">{{ strings.editAssigneeModal.officerPlaceholder }}</option>
+            <option *ngFor="let off of filteredOfficersList" [value]="off.id">{{ off.name }}</option>
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="pd-btn pd-btn--secondary" (click)="closeAddSubtaskModal()">
+        {{ strings.addSubtaskModal.cancelBtn }}
+      </button>
+      <button 
+        type="button" 
+        class="pd-btn pd-btn--primary" 
+        [disabled]="!subtaskTitle.trim()"
+        (click)="submitSubtask()">
+        {{ strings.addSubtaskModal.submitBtn }}
+      </button>
+    </div>
+  </div>
 </div>

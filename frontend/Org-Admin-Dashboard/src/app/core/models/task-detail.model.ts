@@ -44,6 +44,7 @@ export interface TaskDetailPayload {
   groupId: string;
   parentTaskId: string | null;
   orgId: string;
+  globalStatus: string;
   createdAt: string;
   reportedBy: string;
   reporterType: string;

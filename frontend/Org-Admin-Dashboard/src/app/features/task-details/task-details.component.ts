@@ -6,6 +6,10 @@ import { Subscription } from 'rxjs';
 import { TASK_DETAILS_STRINGS } from './task-details.strings';
 import { TaskDetailsService } from '../../core/services/task-details.service';
 import { TaskDetailPayload } from '../../core/models/task-detail.model';
+import { DepartmentService } from '../../core/services/department.service';
+import { OfficerService } from '../../core/services/officer.service';
+import { Department } from '../../core/models/department.model';
+import { Officer } from '../../core/models/officer.model';
 import { environment } from '../../../environments/environment';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -30,6 +34,31 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   newCommentText = '';
   newNoteText = '';
 
+  // Master Lists
+  departmentsList: Department[] = [];
+  officersList: Officer[] = [];
+  filteredOfficersList: Officer[] = [];
+
+  // Modal Visibility States
+  showUpdateStatusModal = false;
+  showEditAssigneeModal = false;
+  showAddSubtaskModal = false;
+
+  // Update Status Form Inputs
+  selectedStatus: 'Submitted' | 'AI-Assigned' | 'In Progress' | 'Resolved' | 'Rejected' = 'In Progress';
+  statusRemarks = '';
+
+  // Edit Assignee Form Inputs
+  selectedDeptId = '';
+  selectedOfficerId = '';
+
+  // Add Subtask Form Inputs
+  subtaskTitle = '';
+  subtaskDescription = '';
+  subtaskPriority: 'P0' | 'P1' | 'P2' | 'P3' = 'P2';
+  subtaskDeptId = '';
+  subtaskOfficerId = '';
+
   // Audio simulation state
   isAudioPlaying = false;
   audioPercent = 0;
@@ -46,6 +75,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly location: Location,
     private readonly taskDetailsService: TaskDetailsService,
+    private readonly departmentService: DepartmentService,
+    private readonly officerService: OfficerService,
     private readonly sanitizer: DomSanitizer,
     private readonly cdr: ChangeDetectorRef
   ) {}
@@ -60,6 +91,9 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // Fetch lists of departments and officers
+    this.loadDepartmentsAndOfficers();
   }
 
   ngOnDestroy(): void {
@@ -291,6 +325,165 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
           this.newNoteText = '';
         },
         error: (err) => console.error('Error saving note:', err)
+      })
+    );
+  }
+
+  private loadDepartmentsAndOfficers(): void {
+    this.subscription.add(
+      this.departmentService.getDepartments().subscribe({
+        next: (depts) => {
+          this.departmentsList = depts;
+        },
+        error: (err) => console.error('Error fetching departments:', err)
+      })
+    );
+
+    this.subscription.add(
+      this.officerService.getOfficers().subscribe({
+        next: (off) => {
+          this.officersList = off;
+        },
+        error: (err) => console.error('Error fetching officers:', err)
+      })
+    );
+  }
+
+  onAssigneeDeptChange(): void {
+    if (!this.selectedDeptId) {
+      this.filteredOfficersList = [];
+    } else {
+      this.filteredOfficersList = this.officersList.filter(o => 
+        o.departmentIds && o.departmentIds.includes(this.selectedDeptId)
+      );
+    }
+    this.selectedOfficerId = '';
+  }
+
+  onSubtaskDeptChange(): void {
+    if (!this.subtaskDeptId) {
+      this.filteredOfficersList = [];
+    } else {
+      this.filteredOfficersList = this.officersList.filter(o => 
+        o.departmentIds && o.departmentIds.includes(this.subtaskDeptId)
+      );
+    }
+    this.subtaskOfficerId = '';
+  }
+
+  // ── Update Status Modal Handlers ───────────────────────────────────────────
+  openUpdateStatusModal(): void {
+    if (this.task) {
+      this.selectedStatus = (this.task.globalStatus as any) || 'In Progress';
+      this.statusRemarks = '';
+      this.showUpdateStatusModal = true;
+    }
+  }
+
+  closeUpdateStatusModal(): void {
+    this.showUpdateStatusModal = false;
+  }
+
+  submitStatus(): void {
+    if (!this.task) return;
+
+    this.subscription.add(
+      this.taskDetailsService.updateStatus(
+        this.task.id,
+        this.selectedStatus,
+        this.statusRemarks
+      ).subscribe({
+        next: (updatedTask) => {
+          this.task = this.processTaskDetails(updatedTask);
+          this.closeUpdateStatusModal();
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Error updating status:', err)
+      })
+    );
+  }
+
+  // ── Edit Assignee Modal Handlers ────────────────────────────────────────────
+  openEditAssigneeModal(): void {
+    if (this.task) {
+      this.selectedDeptId = '';
+      this.selectedOfficerId = '';
+      
+      if (this.task.subTasks && this.task.subTasks.length > 0) {
+        const rootNode = this.task.subTasks[0];
+        const dept = this.departmentsList.find(d => d.name === rootNode.department);
+        if (dept) {
+          this.selectedDeptId = dept.id;
+          this.onAssigneeDeptChange();
+          const officer = this.officersList.find(o => o.name === rootNode.assignee);
+          if (officer) {
+            this.selectedOfficerId = officer.id;
+          }
+        }
+      }
+      
+      this.showEditAssigneeModal = true;
+    }
+  }
+
+  closeEditAssigneeModal(): void {
+    this.showEditAssigneeModal = false;
+  }
+
+  submitAssignee(): void {
+    if (!this.task) return;
+
+    this.subscription.add(
+      this.taskDetailsService.updateAssignee(
+        this.task.id,
+        this.selectedDeptId || null,
+        this.selectedOfficerId || null
+      ).subscribe({
+        next: (updatedTask) => {
+          this.task = this.processTaskDetails(updatedTask);
+          this.closeEditAssigneeModal();
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Error updating assignee:', err)
+      })
+    );
+  }
+
+  // ── Add Subtask Modal Handlers ──────────────────────────────────────────────
+  openAddSubtaskModal(): void {
+    if (this.task) {
+      this.subtaskTitle = '';
+      this.subtaskDescription = '';
+      this.subtaskPriority = 'P2';
+      this.subtaskDeptId = '';
+      this.subtaskOfficerId = '';
+      this.filteredOfficersList = [];
+      this.showAddSubtaskModal = true;
+    }
+  }
+
+  closeAddSubtaskModal(): void {
+    this.showAddSubtaskModal = false;
+  }
+
+  submitSubtask(): void {
+    if (!this.task || !this.subtaskTitle.trim()) return;
+
+    this.subscription.add(
+      this.taskDetailsService.createSubTask(
+        this.task.id,
+        this.subtaskTitle.trim(),
+        this.subtaskDescription.trim(),
+        this.subtaskPriority,
+        this.task.category,
+        this.subtaskDeptId || null,
+        this.subtaskOfficerId || null
+      ).subscribe({
+        next: () => {
+          this.loadTaskDetails(this.task!.id);
+          this.closeAddSubtaskModal();
+        },
+        error: (err) => console.error('Error creating subtask:', err)
       })
     );
   }

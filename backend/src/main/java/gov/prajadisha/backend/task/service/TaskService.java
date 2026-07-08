@@ -360,9 +360,126 @@ public class TaskService {
         }
         String mapUrl = "https://maps.google.com/?q=" + lat + "," + lng;
 
-        List<Task> subTasks = tasks.findByParentTaskId(t.getId());
-        if (subTasks == null) {
-            subTasks = new ArrayList<>();
+        List<Task> sub = tasks.findByParentTaskId(t.getId());
+        if (sub == null) {
+            sub = new ArrayList<>();
+        }
+
+        List<gov.prajadisha.backend.task.dto.TaskDtos.SubTask> mappedSubTasks = new ArrayList<>();
+
+        // 1. Add the root task itself as the first item in the subTasks tree
+        String rootDept = t.getCategory();
+        String rootAssignee = "";
+        String rootRole = "Root Task";
+        try {
+            List<TaskAssignment> rootAssigns = taskAssignments.findByTaskId(t.getId());
+            if (rootAssigns != null && !rootAssigns.isEmpty()) {
+                TaskAssignment rootAssign = rootAssigns.get(0);
+                String deptName = departments.findById(rootAssign.getDepartmentId())
+                        .map(gov.prajadisha.backend.org.model.Department::getName)
+                        .orElse("");
+                if (!deptName.isEmpty()) {
+                    rootDept = deptName;
+                }
+                if (rootAssign.getOfficerId() != null && !rootAssign.getOfficerId().isBlank()) {
+                    rootAssignee = officers.findById(rootAssign.getOfficerId())
+                            .map(gov.prajadisha.backend.org.model.Officer::getName)
+                            .orElse("");
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Failed to fetch assignments for root task: {}", t.getId(), ex);
+        }
+
+        mappedSubTasks.add(new gov.prajadisha.backend.task.dto.TaskDtos.SubTask(
+                t.getId(),
+                null,
+                t.getTitle(),
+                rootRole,
+                rootDept,
+                "account_tree",
+                "ACTIVE",
+                "bg-primary-container text-on-primary-container",
+                rootAssignee,
+                ""
+        ));
+
+        // 2. Add each actual subtask
+        for (Task subT : sub) {
+            String deptName = "";
+            String officerName = "";
+            String roleStr = "Unassigned";
+
+            try {
+                List<TaskAssignment> assigns = taskAssignments.findByTaskId(subT.getId());
+                if (assigns != null && !assigns.isEmpty()) {
+                    TaskAssignment assign = assigns.get(0);
+                    gov.prajadisha.backend.org.model.Department dept = departments.findById(assign.getDepartmentId()).orElse(null);
+                    if (dept != null) {
+                        deptName = dept.getName();
+                    }
+                    if (assign.getOfficerId() != null && !assign.getOfficerId().isBlank()) {
+                        gov.prajadisha.backend.org.model.Officer officer = officers.findById(assign.getOfficerId()).orElse(null);
+                        if (officer != null) {
+                            officerName = officer.getName();
+                            if (dept != null) {
+                                roleStr = "Officer: " + officer.getName() + " (" + dept.getName() + ")";
+                            } else {
+                                roleStr = "Officer: " + officer.getName();
+                            }
+                        } else {
+                            if (dept != null) {
+                                roleStr = "Assigned to " + dept.getName();
+                            }
+                        }
+                    } else {
+                        if (dept != null) {
+                            roleStr = "Assigned to " + dept.getName();
+                        }
+                    }
+                } else {
+                    deptName = subT.getCategory() != null ? subT.getCategory() : "";
+                    roleStr = "Unassigned";
+                }
+            } catch (Exception ex) {
+                log.error("Failed to fetch assignment details for subtask: {}", subT.getId(), ex);
+            }
+
+            // Choose icon
+            String titleLower = subT.getTitle() != null ? subT.getTitle().toLowerCase() : "";
+            String icon = "engineering"; // default
+            if (titleLower.contains("traffic") || titleLower.contains("police")) {
+                icon = "traffic";
+            } else if (titleLower.contains("urgent") || titleLower.contains("hazard") || titleLower.contains("emergency") || titleLower.contains("warning")) {
+                icon = "warning";
+            } else if (titleLower.contains("construction") || titleLower.contains("repair") || titleLower.contains("road") || titleLower.contains("grid") || titleLower.contains("line")) {
+                icon = "construction";
+            }
+
+            // Map status
+            String statusVal = subT.getGlobalStatus() != null ? subT.getGlobalStatus() : "Pending";
+            String statusUpper = statusVal.toUpperCase().replace(" ", "_");
+            String statusClass = "bg-surface-container-high text-on-surface-variant"; // default
+            if ("IN_PROGRESS".equals(statusUpper)) {
+                statusClass = "bg-secondary-container text-on-secondary-container";
+            } else if ("RESOLVED".equals(statusUpper)) {
+                statusClass = "bg-success-container text-on-success-container";
+            } else if ("ACTIVE".equals(statusUpper) || "SUBMITTED".equals(statusUpper)) {
+                statusClass = "bg-primary-container text-on-primary-container";
+            }
+
+            mappedSubTasks.add(new gov.prajadisha.backend.task.dto.TaskDtos.SubTask(
+                    subT.getId(),
+                    t.getId(), // parentId in frontend maps to root task id
+                    subT.getTitle(),
+                    roleStr,
+                    deptName,
+                    icon,
+                    statusUpper,
+                    statusClass,
+                    officerName,
+                    Formats.dateTime(subT.getCreatedAt())
+            ));
         }
 
         return new TaskDetailPayload(
@@ -372,6 +489,7 @@ public class TaskService {
                 t.getGroupId(),
                 t.getParentTaskId(),
                 t.getOrgId(),
+                t.getGlobalStatus() == null ? "Submitted" : t.getGlobalStatus(),
                 Formats.dateTime(t.getCreatedAt()),
                 t.getCitizenUserName(),
                 t.getReporterType() == null ? "Citizen" : t.getReporterType(),
@@ -383,7 +501,7 @@ public class TaskService {
                 new TaskDetailPayload.Location(address, lat, lng),
                 t.getImageUrl(),
                 mapUrl,
-                subTasks,
+                mappedSubTasks,
                 t.getComments(),
                 t.getNotes(),
                 t.getActivities(),
@@ -429,6 +547,63 @@ public class TaskService {
                 .remarks("Internal note added")
                 .build());
         tasks.save(t);
+        return detail(id);
+    }
+
+    public TaskDetailPayload updateAssignee(String id, gov.prajadisha.backend.task.dto.TaskDtos.UpdateAssigneeRequest req) {
+        taskAssignments.deleteByTaskId(id);
+        
+        if (req.departmentId() != null && !req.departmentId().isBlank()) {
+            TaskAssignment assignment = TaskAssignment.builder()
+                    .taskId(id)
+                    .departmentId(req.departmentId())
+                    .officerId(req.officerId())
+                    .status("PENDING")
+                    .assignedAt(System.currentTimeMillis())
+                    .build();
+            taskAssignments.save(assignment);
+        }
+        
+        Task task = get(id);
+        
+        if (req.departmentId() != null && !req.departmentId().isBlank()) {
+            String newCategory = departments.findById(req.departmentId())
+                    .map(gov.prajadisha.backend.org.model.Department::getName)
+                    .orElse(task.getCategory());
+            task.setCategory(newCategory);
+        }
+        
+        String deptName = req.departmentId() != null && !req.departmentId().isBlank() ? 
+            departments.findById(req.departmentId()).map(gov.prajadisha.backend.org.model.Department::getName).orElse("None") : "None";
+        String officerName = req.officerId() != null && !req.officerId().isBlank() ? 
+            officers.findById(req.officerId()).map(gov.prajadisha.backend.org.model.Officer::getName).orElse("None") : "None";
+            
+        task.getActivities().add(DetailedActivity.builder()
+                .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                .action("ASSIGNEE_CHANGED")
+                .performedBy("Officer")
+                .remarks("Reassigned to Department: " + deptName + ", Officer: " + officerName)
+                .build());
+        tasks.save(task);
+        return detail(id);
+    }
+
+    public TaskDetailPayload updateStatus(String id, gov.prajadisha.backend.task.dto.TaskDtos.UpdateStatusRequest req) {
+        Task task = get(id);
+        String oldStatus = task.getGlobalStatus();
+        task.setGlobalStatus(req.status());
+        if ("Resolved".equalsIgnoreCase(req.status()) || "Rejected".equalsIgnoreCase(req.status())) {
+            task.setReviewed(true);
+        }
+        
+        task.getActivities().add(DetailedActivity.builder()
+                .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                .action("STATUS_CHANGED")
+                .performedBy("Officer")
+                .remarks("Status changed from '" + oldStatus + "' to '" + req.status() + "'." 
+                    + (req.remarks() != null && !req.remarks().isBlank() ? " Remarks: " + req.remarks() : ""))
+                .build());
+        tasks.save(task);
         return detail(id);
     }
 
@@ -592,7 +767,7 @@ public class TaskService {
             }
 
             double distance = distanceInMeters(task.getLocation(), existing.getLocation());
-            if (distance > 300.0) { // 300 meters threshold
+            if (distance > 500.0) { // 500 meters threshold
                 continue;
             }
 
@@ -610,15 +785,16 @@ public class TaskService {
 
             // Fallback word similarity check
             if (!isDuplicate) {
-                if (task.getCategory() != null && task.getCategory().equalsIgnoreCase(existing.getCategory())) {
-                    double textSim = wordSimilarity(
-                            (task.getTitle() + " " + task.getDescription()),
-                            (existing.getTitle() + " " + existing.getDescription())
-                    );
-                    if (textSim >= 0.35) {
-                        isDuplicate = true;
-                        log.info("Detected duplicate via text word similarity ({}): {} and {}", textSim, task.getId(), existing.getId());
-                    }
+                boolean isCategoryMatch = isCategorySimilar(task.getCategory(), existing.getCategory());
+                double textSim = wordSimilarity(
+                        (task.getTitle() + " " + task.getDescription()),
+                        (existing.getTitle() + " " + existing.getDescription())
+                );
+                
+                // If same area and high text similarity (>= 0.30 with category match, or >= 0.45 without)
+                if ((isCategoryMatch && textSim >= 0.30) || textSim >= 0.45) {
+                    isDuplicate = true;
+                    log.info("Detected duplicate via text word similarity ({}): {} and {}", textSim, task.getId(), existing.getId());
                 }
             }
 
@@ -643,6 +819,16 @@ public class TaskService {
                 break; 
             }
         }
+    }
+
+    /**
+     * Checks if two categories are similar (either exactly match, or one contains/starts with the other).
+     */
+    private boolean isCategorySimilar(String cat1, String cat2) {
+        if (cat1 == null || cat2 == null) return false;
+        String c1 = cat1.toLowerCase().trim();
+        String c2 = cat2.toLowerCase().trim();
+        return c1.equals(c2) || c1.contains(c2) || c2.contains(c1);
     }
 
     /**
