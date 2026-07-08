@@ -52,15 +52,23 @@ jobs:
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
+          OLLAMA_BASE_URL: ${{ vars.OLLAMA_BASE_URL }}
+          OLLAMA_ENABLED: ${{ vars.OLLAMA_ENABLED }}
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
-          # Forward the secrets into the remote shell so docker compose can
-          # interpolate ${MONGODB_URI} / ${OLLAMA_API_KEY}.
-          envs: MONGODB_URI,OLLAMA_API_KEY
+          # Forward the variables/secrets into the remote shell so docker compose can
+          # interpolate them.
+          envs: MONGODB_URI,OLLAMA_API_KEY,GCP_PROJECT_ID,GCP_BUCKET_NAME,OLLAMA_BASE_URL,OLLAMA_ENABLED
           script: |
             set -e
             cd ~/praja-disha
             docker compose up -d --build
             docker image prune -f
+
+
+
+

@@ -28,7 +28,7 @@ export const LOGIN_STRINGS = {
   verifyOtpBtn:    'Verify & Enter',
   defaultOtpValue: '123456',
   demoWarningTitle:'Demo Info',
-  demoWarningMessage: 'jplease use only the default phone number 9999988888 to login for the demo',
+  demoWarningMessage: 'Please use only the default phone number 9999988888 and OTP 123456 to login for the demo',
   closeBtn:        'Understood',
   backBtn:         'Back to Login',
 };

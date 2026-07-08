@@ -78,25 +78,21 @@ public class OllamaClient {
         return enabled && !apiKey.isEmpty();
     }
 
-    /**
-     * Free-form chat completion. Returns the assistant's message content.
-     *
-     * @param system system prompt (may be null/blank)
-     * @param user   user prompt
-     */
     public String chat(String system, String user) {
-        return chatInternal(system, user, null).path("message").path("content").asText("");
+        return chat(system, null, user);
     }
 
-    /**
-     * Structured chat completion constrained to the given JSON schema. Returns the parsed JSON
-     * object from the assistant's message content.
-     *
-     * @param jsonSchema an Ollama {@code format} JSON-schema object (as a Map), or null for free JSON
-     */
+    public String chat(String system, List<Map<String, String>> history, String user) {
+        return chatInternal(system, history, user, null).path("message").path("content").asText("");
+    }
+
     public JsonNode chatJson(String system, String user, Map<String, Object> jsonSchema) {
+        return chatJson(system, null, user, jsonSchema);
+    }
+
+    public JsonNode chatJson(String system, List<Map<String, String>> history, String user, Map<String, Object> jsonSchema) {
         Object format = jsonSchema != null ? jsonSchema : "json";
-        JsonNode response = chatInternal(system, user, format);
+        JsonNode response = chatInternal(system, history, user, format);
         String content = response.path("message").path("content").asText("");
         try {
             return mapper.readTree(content);
@@ -105,13 +101,16 @@ public class OllamaClient {
         }
     }
 
-    private JsonNode chatInternal(String system, String user, Object format) {
+    private JsonNode chatInternal(String system, List<Map<String, String>> history, String user, Object format) {
         if (!isEnabled()) {
             throw new OllamaException("Ollama is disabled or no API key configured");
         }
         List<Map<String, String>> messages = new ArrayList<>();
         if (system != null && !system.isBlank()) {
             messages.add(Map.of("role", "system", "content", system));
+        }
+        if (history != null) {
+            messages.addAll(history);
         }
         messages.add(Map.of("role", "user", "content", user == null ? "" : user));
 

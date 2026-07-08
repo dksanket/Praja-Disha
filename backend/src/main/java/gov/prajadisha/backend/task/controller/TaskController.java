@@ -4,6 +4,8 @@ import gov.prajadisha.backend.task.dto.TaskDtos.CommentRequest;
 import gov.prajadisha.backend.task.dto.TaskDtos.NoteRequest;
 import gov.prajadisha.backend.task.dto.TaskDtos.TaskDetailPayload;
 import gov.prajadisha.backend.task.dto.TaskDtos.CreateSubTaskRequest;
+import gov.prajadisha.backend.task.dto.TaskDtos.UpdateAssigneeRequest;
+import gov.prajadisha.backend.task.dto.TaskDtos.UpdateStatusRequest;
 import gov.prajadisha.backend.task.model.Task;
 import gov.prajadisha.backend.task.service.TaskService;
 import jakarta.validation.Valid;
@@ -40,5 +42,15 @@ public class TaskController {
     @PostMapping("/{parentId}/subtasks")
     public Task createSubTask(@PathVariable String parentId, @Valid @RequestBody CreateSubTaskRequest req) {
         return taskService.createSubTask(parentId, req);
+    }
+
+    @PutMapping("/{id}/assignee")
+    public TaskDetailPayload updateAssignee(@PathVariable String id, @Valid @RequestBody UpdateAssigneeRequest req) {
+        return taskService.updateAssignee(id, req);
+    }
+
+    @PutMapping("/{id}/status")
+    public TaskDetailPayload updateStatus(@PathVariable String id, @Valid @RequestBody UpdateStatusRequest req) {
+        return taskService.updateStatus(id, req);
     }
 }

@@ -13,10 +13,14 @@ services:
     env_file:
       - .env
     environment:
-      # Injected from GitHub secrets by the deploy workflow. These override
+      # Injected from GitHub variables/secrets by the deploy workflow. These override
       # any values in .env (docker compose: shell env wins over env_file).
       - MONGODB_URI=${MONGODB_URI}
       - OLLAMA_API_KEY=${OLLAMA_API_KEY}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_BUCKET_NAME=${GCP_BUCKET_NAME}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - OLLAMA_ENABLED=${OLLAMA_ENABLED}
     ports:
       - "8080:8080"
     volumes:

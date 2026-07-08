@@ -859,3 +859,261 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+// ── Header Actions ───────────────────────────────────────────────────────────
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-unit * 2;
+}
+
+// ── Modals & Overlay Layouts ────────────────────────────────────────────────
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba($color-inverse-surface, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-gutter;
+}
+
+.modal-card {
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded-xl;
+  box-shadow: $elevation-2-shadow;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-enter 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-gutter $spacing-container-padding;
+  border-bottom: 1px solid $color-outline-variant;
+}
+
+.modal-title {
+  color: $color-on-surface;
+  margin: 0;
+  font-family: $font-primary;
+  font-size: $fs-headline-sm;
+  font-weight: $fw-semibold;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-on-surface-variant;
+  padding: $spacing-unit;
+  border-radius: $rounded-full;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: $color-surface-container;
+  }
+}
+
+.modal-body {
+  padding: $spacing-container-padding;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-gutter;
+  padding: $spacing-gutter $spacing-container-padding;
+  border-top: 1px solid $color-outline-variant;
+  background-color: $color-surface-container-low;
+}
+
+// ── Form Components ─────────────────────────────────────────────────────────
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-unit * 2;
+}
+
+.form-label {
+  color: $color-on-surface-variant;
+  font-family: $font-primary;
+  font-size: $fs-label-md;
+  font-weight: $fw-semibold;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  font-family: $font-primary;
+  font-size: $fs-body-md;
+  color: $color-on-surface;
+  background-color: $color-surface-container-lowest;
+  border: 1px solid $color-outline-variant;
+  border-radius: $rounded;
+  padding: 10px 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &::placeholder {
+    color: $color-outline;
+  }
+
+  &:focus:not(:disabled) {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.15);
+  }
+
+  &:disabled {
+    background-color: $color-surface-container-low;
+    color: $color-outline;
+    cursor: not-allowed;
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+
+  .form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px;
+  }
+}
+
+.select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: $color-on-surface-variant;
+  pointer-events: none;
+}
+
+.mt-gutter {
+  margin-top: $spacing-gutter;
+}
+
+.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px $spacing-gutter;
+  font-family: $font-primary;
+  font-size: $fs-label-md;
+  font-weight: $fw-semibold;
+  border-radius: $rounded;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+  line-height: 1;
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  &--primary {
+    background-color: $color-primary;
+    color: $color-on-primary;
+    border: 1px solid $color-primary;
+
+    &:hover:not(:disabled) {
+      background-color: $color-on-primary-fixed-variant;
+      border-color: $color-on-primary-fixed-variant;
+    }
+
+    &:disabled {
+      background-color: $color-surface-container-high;
+      border-color: $color-outline-variant;
+      color: $color-outline;
+      cursor: not-allowed;
+    }
+  }
+
+  &--secondary {
+    background-color: $color-surface-container-lowest;
+    color: $color-on-surface;
+    border: 1px solid $color-outline-variant;
+
+    &:hover {
+      background-color: $color-surface-container-low;
+    }
+  }
+}
+
+// Dynamic status badge color states
+.status-tag {
+  &--submitted {
+    background-color: rgba($color-secondary, 0.08);
+    color: $color-secondary;
+    border-color: rgba($color-secondary, 0.15);
+    .status-tag__pulse {
+      background-color: $color-secondary;
+    }
+  }
+
+  &--ai-assigned {
+    background-color: rgba($color-primary-container, 0.08);
+    color: $color-primary-container;
+    border-color: rgba($color-primary-container, 0.15);
+    .status-tag__pulse {
+      background-color: $color-primary-container;
+    }
+  }
+
+  &--in-progress {
+    background-color: rgba($color-tertiary-container, 0.08);
+    color: $color-tertiary-container;
+    border-color: rgba($color-tertiary-container, 0.15);
+    .status-tag__pulse {
+      background-color: $color-tertiary-container;
+    }
+  }
+
+  &--resolved {
+    background-color: rgba(#16a34a, 0.08);
+    color: #16a34a;
+    border-color: rgba(#16a34a, 0.15);
+    .status-tag__pulse {
+      background-color: #16a34a;
+    }
+  }
+
+  &--rejected {
+    background-color: rgba($color-error, 0.08);
+    color: $color-error;
+    border-color: rgba($color-error, 0.15);
+    .status-tag__pulse {
+      background-color: $color-error;
+    }
+  }
+}

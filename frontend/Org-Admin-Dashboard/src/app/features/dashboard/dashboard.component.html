@@ -11,14 +11,16 @@
         <button
           type="button"
           class="pd-btn pd-btn--secondary"
-          id="btn-export-report">
+          id="btn-export-report"
+          (click)="openFutureFeatureModal()">
           <span class="material-symbols-outlined">download</span>
           {{ strings.actions.exportReport }}
         </button>
         <button
           type="button"
           class="pd-btn pd-btn--primary"
-          id="btn-new-task">
+          id="btn-new-task"
+          (click)="openFutureFeatureModal()">
           <span class="material-symbols-outlined">add</span>
           {{ strings.actions.newTask }}
         </button>
@@ -89,18 +91,21 @@
     <!-- ── Central Triage Task Table ────────────────────────────────────── -->
     <div class="triage-section">
       <div class="triage-header">
-        <h3 class="pd-title-md triage-header__title">{{ strings.triageTable.title }}</h3>
-        
-        <div class="triage-header__search-container">
-          <span class="material-symbols-outlined triage-header__search-icon">search</span>
-          <input
-            type="text"
-            class="triage-header__search-input"
-            [placeholder]="strings.triageTable.searchPlaceholder"
-            [(ngModel)]="searchTerm"
-            (ngModelChange)="onSearchChange()"
-            aria-label="Search triage tasks"
-            id="triage-search-input" />
+        <div class="triage-header__left">
+          <h3 class="pd-title-md triage-header__title">{{ strings.triageTable.title }}</h3>
+          
+          <!-- Group Filter Indicator -->
+          <div *ngIf="selectedGroupId" class="triage-header__group-filter-badge">
+            <span class="pd-label-sm">{{ strings.triageTable.filterGroupLabel }}</span>
+            <span class="pd-label-sm text-mono filter-group-id">{{ selectedGroupId }}</span>
+            <button
+              type="button"
+              class="triage-header__clear-filter-btn"
+              [title]="strings.triageTable.clearFilterLabel"
+              (click)="clearGroupFilter()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -115,6 +120,76 @@
               <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.dueDate }}</th>
               <th class="pd-label-sm triage-table__th">{{ strings.triageTable.headers.status }}</th>
               <th class="triage-table__th triage-table__th--actions"></th>
+            </tr>
+            <tr class="triage-table__filter-row">
+              <th class="triage-table__filter-th">
+                <input
+                  type="text"
+                  class="triage-table__filter-input text-mono"
+                  [placeholder]="strings.triageTable.filterPlaceholders.taskId"
+                  [(ngModel)]="filterTaskId"
+                  (ngModelChange)="onFilterChange()"
+                  aria-label="Filter by Task ID"
+                  id="filter-task-id" />
+              </th>
+              <th class="triage-table__filter-th">
+                <input
+                  type="text"
+                  class="triage-table__filter-input"
+                  [placeholder]="strings.triageTable.filterPlaceholders.titleContext"
+                  [(ngModel)]="filterTitle"
+                  (ngModelChange)="onFilterChange()"
+                  aria-label="Filter by Title"
+                  id="filter-title" />
+              </th>
+              <th class="triage-table__filter-th">
+                <select
+                  class="triage-table__filter-select"
+                  [(ngModel)]="filterPriority"
+                  (ngModelChange)="onFilterChange()"
+                  aria-label="Filter by Priority"
+                  id="filter-priority">
+                  <option value="all">{{ strings.triageTable.filterPlaceholders.priorityAll }}</option>
+                  <option value="P0">{{ strings.triageTable.filterPlaceholders.priorityP0 }}</option>
+                  <option value="P1">{{ strings.triageTable.filterPlaceholders.priorityP1 }}</option>
+                  <option value="P2">{{ strings.triageTable.filterPlaceholders.priorityP2 }}</option>
+                </select>
+              </th>
+              <th class="triage-table__filter-th">
+                <input
+                  type="text"
+                  class="triage-table__filter-input"
+                  [placeholder]="strings.triageTable.filterPlaceholders.assignment"
+                  [(ngModel)]="filterAssignment"
+                  (ngModelChange)="onFilterChange()"
+                  aria-label="Filter by Assignment"
+                  id="filter-assignment" />
+              </th>
+              <th class="triage-table__filter-th">
+                <input
+                  type="text"
+                  class="triage-table__filter-input"
+                  [placeholder]="strings.triageTable.filterPlaceholders.dueDate"
+                  [(ngModel)]="filterDueDate"
+                  (ngModelChange)="onFilterChange()"
+                  aria-label="Filter by Due Date"
+                  id="filter-due-date" />
+              </th>
+              <th class="triage-table__filter-th">
+                <select
+                  class="triage-table__filter-select"
+                  [(ngModel)]="filterStatus"
+                  (ngModelChange)="onFilterChange()"
+                  aria-label="Filter by Status"
+                  id="filter-status">
+                  <option value="all">{{ strings.triageTable.filterPlaceholders.statusAll }}</option>
+                  <option value="ai-pending">{{ strings.triageTable.filterPlaceholders.statusAiPending }}</option>
+                  <option value="in-progress">{{ strings.triageTable.filterPlaceholders.statusInProgress }}</option>
+                  <option value="drafting">{{ strings.triageTable.filterPlaceholders.statusDrafting }}</option>
+                  <option value="completed">{{ strings.triageTable.filterPlaceholders.statusCompleted }}</option>
+                </select>
+              </th>
+              <th class="triage-table__filter-th triage-table__th--actions"></th>
             </tr>
           </thead>
           <tbody>
@@ -133,13 +208,15 @@
                     [class.triage-table__accent-line--water]="task.indicatorColorClass === 'indicator-water'">
                   </div>
                   <a [routerLink]="['/task-details', task.id]" class="pd-label-md triage-table__title triage-table__title--link">{{ task.title }}</a>
-                  <span
-                    *ngIf="task.isDuplicateGroup"
+                  <button
+                    type="button"
+                    *ngIf="task.isDuplicateGroup && task.groupId"
                     class="triage-table__duplicate-badge"
-                    [title]="strings.triageTable.duplicateTooltip">
+                    [title]="strings.triageTable.duplicateTooltip"
+                    (click)="selectGroupId(task.groupId)">
                     <span class="material-symbols-outlined">link</span>
-                    {{ strings.triageTable.duplicateBadge }}
-                  </span>
+                    {{ task.groupId }}
+                  </button>
                 </div>
               </td>
               
@@ -260,4 +337,26 @@
       <a href="#" class="pd-label-sm dashboard-footer__link">{{ strings.footer.versionLabel }}</a>
     </div>
   </footer>
+</div>
+
+<!-- Premium Warning Dialog Popup Modal (Future Feature Notice) -->
+<div *ngIf="showFutureFeatureModal" class="modal-backdrop" (click)="closeFutureFeatureModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-card__header">
+      <span class="material-symbols-outlined modal-card__icon">info</span>
+      <h3 class="pd-headline-sm modal-card__title">{{ strings.futureFeaturePopup.title }}</h3>
+    </div>
+    <div class="modal-card__body">
+      <p class="pd-body-md modal-card__message">{{ strings.futureFeaturePopup.message }}</p>
+    </div>
+    <div class="modal-card__footer">
+      <button
+        id="btn-close-future-modal"
+        type="button"
+        class="pd-btn pd-btn--primary"
+        (click)="closeFutureFeatureModal()">
+        {{ strings.futureFeaturePopup.closeBtn }}
+      </button>
+    </div>
+  </div>
 </div>

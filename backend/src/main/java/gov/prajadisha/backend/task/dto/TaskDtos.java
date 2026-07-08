@@ -40,6 +40,19 @@ public class TaskDtos {
             long dueTodayCount,
             long myDeptCount) {}
 
+    public record SubTask(
+            String id,
+            String parentId,
+            String title,
+            String role,
+            String department,
+            String icon,
+            String status,
+            String statusClass,
+            String assignee,
+            String timestamp
+    ) {}
+
     /** Unified detail payload consumed by the ticket inspector page. */
     public record TaskDetailPayload(
             String id,
@@ -48,6 +61,7 @@ public class TaskDtos {
             String groupId,
             String parentTaskId,
             String orgId,
+            String globalStatus,
             String createdAt,
             String reportedBy,
             String reporterType,
@@ -59,7 +73,7 @@ public class TaskDtos {
             Location location,
             String imageUrl,
             String mapUrl,
-            List<Task> subTasks,
+            List<SubTask> subTasks,
             List<DetailedComment> comments,
             List<DetailedNote> notes,
             List<DetailedActivity> activities,
@@ -84,4 +98,12 @@ public class TaskDtos {
             String category,
             String departmentId,
             String officerId) {}
+
+    public record UpdateAssigneeRequest(
+            String departmentId,
+            String officerId) {}
+
+    public record UpdateStatusRequest(
+            @NotBlank String status,
+            String remarks) {}
 }

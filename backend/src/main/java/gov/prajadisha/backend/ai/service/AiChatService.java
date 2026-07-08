@@ -2,10 +2,15 @@ package gov.prajadisha.backend.ai.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import gov.prajadisha.backend.ai.dto.AiDtos.ChatResponse;
+import gov.prajadisha.backend.ai.model.AiChatMessage;
+import gov.prajadisha.backend.ai.repository.AiChatMessageRepository;
 import gov.prajadisha.backend.org.model.Department;
 import gov.prajadisha.backend.org.repository.DepartmentRepository;
+import gov.prajadisha.backend.org.repository.OfficerRepository;
 import gov.prajadisha.backend.org.service.OrganizationService;
 import gov.prajadisha.backend.task.model.Task;
+import gov.prajadisha.backend.task.model.TaskAssignment;
+import gov.prajadisha.backend.task.repository.TaskAssignmentRepository;
 import gov.prajadisha.backend.task.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,32 +40,78 @@ public class AiChatService {
     private final TaskRepository tasks;
     private final DepartmentRepository departments;
     private final OrganizationService organizations;
+    private final AiChatMessageRepository aiChatMessages;
+    private final TaskAssignmentRepository taskAssignments;
+    private final OfficerRepository officers;
 
     public AiChatService(OllamaClient ollama, TaskRepository tasks,
-                         DepartmentRepository departments, OrganizationService organizations) {
+                         DepartmentRepository departments, OrganizationService organizations,
+                         AiChatMessageRepository aiChatMessages, TaskAssignmentRepository taskAssignments,
+                         OfficerRepository officers) {
         this.ollama = ollama;
         this.tasks = tasks;
         this.departments = departments;
         this.organizations = organizations;
+        this.aiChatMessages = aiChatMessages;
+        this.taskAssignments = taskAssignments;
+        this.officers = officers;
     }
 
     public ChatResponse reply(String userText) {
-        long now = System.currentTimeMillis();
-        String dataContext = buildDataContext();
+        return reply(userText, "rajesh_kumar");
+    }
 
+    public ChatResponse reply(String userText, String officerUserName) {
+        long now = System.currentTimeMillis();
+        String orgId;
+        try {
+            orgId = organizations.getActiveOrgId();
+        } catch (Exception e) {
+            orgId = "ORG-BBMP";
+        }
+
+        // 1. Save user message to database
+        long userTimestamp = now;
+        AiChatMessage userMsg = AiChatMessage.builder()
+                .id("msg-user-" + userTimestamp)
+                .officerUserName(officerUserName)
+                .orgId(orgId)
+                .sender("user")
+                .text(userText)
+                .timestamp(userTimestamp)
+                .build();
+        aiChatMessages.save(userMsg);
+
+        // 2. Build context snapshot
+        String dataContext = buildDataContext(orgId);
+
+        // 3. Generate response (either via LLM or fallback)
         if (ollama.isEnabled()) {
             try {
-                return llmReply(userText, dataContext, now);
+                return llmReply(userText, dataContext, officerUserName, orgId, userTimestamp);
             } catch (Exception e) {
                 log.warn("AI copilot via Ollama failed ({}); using data-summary fallback.", e.getMessage());
             }
         }
-        return fallbackReply(userText, dataContext, now);
+        return fallbackReply(userText, dataContext, officerUserName, orgId, userTimestamp);
+    }
+
+    public List<ChatResponse> getHistory(String officerUserName) {
+        String orgId;
+        try {
+            orgId = organizations.getActiveOrgId();
+        } catch (Exception e) {
+            orgId = "ORG-BBMP";
+        }
+        List<AiChatMessage> messages = aiChatMessages.findByOfficerUserNameAndOrgIdOrderByTimestampAsc(officerUserName, orgId);
+        return messages.stream()
+                .map(m -> new ChatResponse(m.getId(), m.getSender(), m.getText(), m.getTimestamp(), m.getSuggestions()))
+                .collect(Collectors.toList());
     }
 
     // ------------------------------------------------------------------ LLM path
 
-    private ChatResponse llmReply(String userText, String dataContext, long now) {
+    private ChatResponse llmReply(String userText, String dataContext, String officerUserName, String orgId, long userTimestamp) {
         String system = """
                 You are the AI Command Copilot for a municipal Org-Admin dashboard.
                 Answer the officer's question using ONLY the civic data snapshot provided.
@@ -68,13 +119,29 @@ public class AiChatService {
                 If the data does not contain the answer, say so plainly rather than inventing figures.
                 Respond ONLY with JSON: {"text": string, "suggestions": string[]} where suggestions
                 are up to 3 short, relevant follow-up questions the officer might ask next.
-                """;
-        String user = "Civic data snapshot:\n" + dataContext + "\n\nOfficer question: " + userText;
 
-        JsonNode result = ollama.chatJson(system, user, chatSchema());
+                Civic data snapshot:
+                """ + dataContext;
+
+        // Fetch last 10 messages from DB before the new userMsg (which has timestamp = userTimestamp)
+        List<AiChatMessage> dbHistory = aiChatMessages.findByOfficerUserNameAndOrgIdOrderByTimestampAsc(officerUserName, orgId);
+        List<Map<String, String>> ollamaHistory = new ArrayList<>();
+        List<AiChatMessage> pastMessages = dbHistory.stream()
+                .filter(m -> m.getTimestamp() < userTimestamp)
+                .collect(Collectors.toList());
+        int startIdx = Math.max(0, pastMessages.size() - 10);
+        for (int i = startIdx; i < pastMessages.size(); i++) {
+            AiChatMessage msg = pastMessages.get(i);
+            ollamaHistory.add(Map.of(
+                "role", "user".equals(msg.getSender()) ? "user" : "assistant",
+                "content", msg.getText()
+            ));
+        }
+
+        JsonNode result = ollama.chatJson(system, ollamaHistory, userText, chatSchema());
         String text = result.path("text").asText("");
         if (text.isBlank()) {
-            text = ollama.chat(system, user);
+            text = ollama.chat(system, ollamaHistory, userText);
         }
 
         List<String> suggestions = new ArrayList<>();
@@ -88,7 +155,20 @@ public class AiChatService {
         if (suggestions.isEmpty()) {
             suggestions.addAll(defaultSuggestions());
         }
-        return new ChatResponse("msg-ai-" + now, "ai", text, now, suggestions);
+
+        long aiTime = System.currentTimeMillis();
+        AiChatMessage aiMsg = AiChatMessage.builder()
+                .id("msg-ai-" + aiTime)
+                .officerUserName(officerUserName)
+                .orgId(orgId)
+                .sender("ai")
+                .text(text)
+                .timestamp(aiTime)
+                .suggestions(suggestions)
+                .build();
+        aiChatMessages.save(aiMsg);
+
+        return new ChatResponse("msg-ai-" + aiTime, "ai", text, aiTime, suggestions);
     }
 
     private Map<String, Object> chatSchema() {
@@ -104,12 +184,26 @@ public class AiChatService {
 
     // -------------------------------------------------------------- fallback path
 
-    private ChatResponse fallbackReply(String userText, String dataContext, long now) {
+    private ChatResponse fallbackReply(String userText, String dataContext, String officerUserName, String orgId, long userTimestamp) {
         String text = "Here is a live summary of the civic data for your query \"" + userText + "\":\n"
                 + dataContext
                 + "\n(Set an Ollama Cloud API key in application.properties to enable full "
                 + "natural-language analysis.)";
-        return new ChatResponse("msg-ai-" + now, "ai", text, now, defaultSuggestions());
+        List<String> suggestions = defaultSuggestions();
+
+        long aiTime = System.currentTimeMillis();
+        AiChatMessage aiMsg = AiChatMessage.builder()
+                .id("msg-ai-" + aiTime)
+                .officerUserName(officerUserName)
+                .orgId(orgId)
+                .sender("ai")
+                .text(text)
+                .timestamp(aiTime)
+                .suggestions(suggestions)
+                .build();
+        aiChatMessages.save(aiMsg);
+
+        return new ChatResponse("msg-ai-" + aiTime, "ai", text, aiTime, suggestions);
     }
 
     private List<String> defaultSuggestions() {
@@ -121,15 +215,13 @@ public class AiChatService {
 
     // ---------------------------------------------------------- data collection
 
-    private String buildDataContext() {
-        String orgId;
-        String orgName;
+    private String buildDataContext(String orgId) {
+        String orgName = "BBMP";
         try {
             var org = organizations.getActive();
-            orgId = org.getId();
             orgName = org.getName();
         } catch (Exception e) {
-            return "No organization data available.";
+            // ignore
         }
 
         List<Task> all = tasks.findByOrgId(orgId, Pageable.unpaged());
@@ -149,8 +241,14 @@ public class AiChatService {
                 .count();
 
         List<Department> depts = departments.findByOrgId(orgId);
+        Map<String, String> deptNameMap = depts.stream()
+                .collect(Collectors.toMap(Department::getId, Department::getName, (a, b) -> a));
 
         StringBuilder sb = new StringBuilder();
+        String currentDateStr = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                .withZone(java.time.ZoneId.systemDefault())
+                .format(java.time.Instant.ofEpochMilli(nowMs));
+        sb.append("Current Date: ").append(currentDateStr).append("\n");
         sb.append("Organization: ").append(orgName).append(" (").append(orgId).append(")\n");
         sb.append("Total tickets: ").append(total).append("\n");
         sb.append("Overdue & unresolved: ").append(overdue).append("\n");
@@ -158,7 +256,34 @@ public class AiChatService {
         sb.append("By priority: ").append(mapToString(byPriority)).append("\n");
         sb.append("By category: ").append(mapToString(byCategory)).append("\n");
         sb.append("Departments (").append(depts.size()).append("): ")
-                .append(depts.stream().map(Department::getName).collect(Collectors.joining(", ")));
+                .append(depts.stream().map(Department::getName).collect(Collectors.joining(", "))).append("\n");
+
+        sb.append("\nDetailed Task List:\n");
+        for (Task t : all) {
+            String createdStr = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    .withZone(java.time.ZoneId.systemDefault())
+                    .format(java.time.Instant.ofEpochMilli(t.getCreatedAt()));
+
+            // Find resolved assigned departments
+            List<TaskAssignment> assignments = taskAssignments.findByTaskId(t.getId());
+            String assignedDepts = assignments.stream()
+                    .map(a -> deptNameMap.getOrDefault(a.getDepartmentId(), a.getDepartmentId()))
+                    .collect(Collectors.joining(", "));
+            if (assignedDepts.isEmpty()) {
+                assignedDepts = t.getCategory() != null ? t.getCategory() : "None";
+            }
+
+            sb.append(String.format("- Task ID: %s | Title: %s | Created: %s | Status: %s | Priority: %s | Category: %s | Department: %s | Description: %s\n",
+                    t.getId(),
+                    t.getTitle(),
+                    createdStr,
+                    t.getGlobalStatus(),
+                    t.getPriority(),
+                    t.getCategory(),
+                    assignedDepts,
+                    t.getDescription() == null ? "" : t.getDescription()));
+        }
+
         return sb.toString();
     }
 

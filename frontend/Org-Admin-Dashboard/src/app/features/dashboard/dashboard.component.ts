@@ -30,12 +30,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   // Filter & Search states
-  searchTerm = '';
+  filterTaskId = '';
+  filterTitle = '';
+  filterPriority = 'all';
+  filterAssignment = '';
+  filterDueDate = '';
+  filterStatus = 'all';
   selectedFilter: 'all' | 'ai-pending' | 'due-today' = 'all';
+  selectedGroupId: string | null = null;
+  showFutureFeatureModal = false;
 
   // Pagination states
   currentPage = 1;
-  readonly pageSize = 3;
+  readonly pageSize = 7;
 
   // Pre-calculated template values (no function calls in HTML)
   filteredTasks: DashboardTask[] = [];
@@ -79,9 +86,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Updates search filter state and recalculates views.
+   * Updates column filters state and recalculates views.
    */
-  onSearchChange(): void {
+  onFilterChange(): void {
     this.currentPage = 1; // Resets pagination to first page
     this.applyFiltersAndPagination();
   }
@@ -121,9 +128,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * Updates bound variables to guarantee 0 function calls inside HTML.
    */
   private applyFiltersAndPagination(): void {
-    // 1. Apply category and text search filters
-    const search = this.searchTerm.trim().toLowerCase();
+    // 1. Apply category, group, and column filters
     this.filteredTasks = this.allTasks.filter((task) => {
+      // Group ID filter check
+      if (this.selectedGroupId && task.groupId !== this.selectedGroupId) {
+        return false;
+      }
+
       // Category filter check
       if (this.selectedFilter === 'ai-pending' && task.statusType !== 'ai-pending') {
         return false;
@@ -132,12 +143,54 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return false;
       }
 
-      // Text search match check (IDs or Titles)
-      if (search) {
-        const idMatch = task.id.toLowerCase().includes(search);
-        const titleMatch = task.title.toLowerCase().includes(search);
-        const priorityMatch = task.priority.toLowerCase().includes(search);
-        return idMatch || titleMatch || priorityMatch;
+      // Column Filters
+      // 1. Task ID filter (case-insensitive partial match)
+      if (this.filterTaskId) {
+        const idSearch = this.filterTaskId.trim().toLowerCase();
+        if (!task.id.toLowerCase().includes(idSearch)) {
+          return false;
+        }
+      }
+
+      // 2. Title filter (case-insensitive partial match)
+      if (this.filterTitle) {
+        const titleSearch = this.filterTitle.trim().toLowerCase();
+        if (!task.title.toLowerCase().includes(titleSearch)) {
+          return false;
+        }
+      }
+
+      // 3. Priority filter (exact match if not 'all')
+      if (this.filterPriority && this.filterPriority !== 'all') {
+        if (task.priority !== this.filterPriority) {
+          return false;
+        }
+      }
+
+      // 4. Assignment filter (checks if any assignment label contains the search text)
+      if (this.filterAssignment) {
+        const assignSearch = this.filterAssignment.trim().toLowerCase();
+        const hasAssignMatch = task.assignments.some((assign) =>
+          assign.label.toLowerCase().includes(assignSearch)
+        );
+        if (!hasAssignMatch) {
+          return false;
+        }
+      }
+
+      // 5. Due Date filter (case-insensitive partial match)
+      if (this.filterDueDate) {
+        const dueSearch = this.filterDueDate.trim().toLowerCase();
+        if (!task.dueDate.toLowerCase().includes(dueSearch)) {
+          return false;
+        }
+      }
+
+      // 6. Status filter (exact match on statusType if not 'all')
+      if (this.filterStatus && this.filterStatus !== 'all') {
+        if (task.statusType !== this.filterStatus) {
+          return false;
+        }
       }
 
       return true;
@@ -184,5 +237,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ...t,
       isDuplicateGroup: t.groupId ? (groupCounts.get(t.groupId) || 0) > 1 : false,
     }));
+  }
+
+  /**
+   * Set the active group ID filter.
+   */
+  selectGroupId(groupId: string): void {
+    this.selectedGroupId = this.selectedGroupId === groupId ? null : groupId;
+    this.currentPage = 1;
+    this.applyFiltersAndPagination();
+  }
+
+  /**
+   * Clear the active group ID filter.
+   */
+  clearGroupFilter(): void {
+    this.selectedGroupId = null;
+    this.currentPage = 1;
+    this.applyFiltersAndPagination();
+  }
+
+  /**
+   * Opens the future feature notice modal.
+   */
+  openFutureFeatureModal(): void {
+    this.showFutureFeatureModal = true;
+  }
+
+  /**
+   * Closes the future feature notice modal.
+   */
+  closeFutureFeatureModal(): void {
+    this.showFutureFeatureModal = false;
   }
 }

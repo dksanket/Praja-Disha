@@ -43,4 +43,46 @@ export class TaskDetailsService {
       userName
     });
   }
+
+  /**
+   * Updates task assignee (department and officer) and returns the updated task payload.
+   */
+  updateAssignee(taskId: string, departmentId: string | null, officerId: string | null): Observable<TaskDetailPayload> {
+    return this.http.put<TaskDetailPayload>(`${this.baseUrl}/${taskId}/assignee`, {
+      departmentId,
+      officerId
+    });
+  }
+
+  /**
+   * Updates task status and returns the updated task payload.
+   */
+  updateStatus(taskId: string, status: string, remarks: string | null): Observable<TaskDetailPayload> {
+    return this.http.put<TaskDetailPayload>(`${this.baseUrl}/${taskId}/status`, {
+      status,
+      remarks
+    });
+  }
+
+  /**
+   * Creates a subtask under a parent task and returns the created subtask.
+   */
+  createSubTask(
+    parentId: string,
+    title: string,
+    description: string,
+    priority: string,
+    category: string,
+    departmentId: string | null,
+    officerId: string | null
+  ): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/${parentId}/subtasks`, {
+      title,
+      description,
+      priority,
+      category,
+      departmentId,
+      officerId
+    });
+  }
 }
