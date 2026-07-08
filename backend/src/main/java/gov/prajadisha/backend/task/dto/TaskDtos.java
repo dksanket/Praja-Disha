@@ -3,7 +3,7 @@ package gov.prajadisha.backend.task.dto;
 import gov.prajadisha.backend.task.model.DetailedActivity;
 import gov.prajadisha.backend.task.model.DetailedComment;
 import gov.prajadisha.backend.task.model.DetailedNote;
-import gov.prajadisha.backend.task.model.SubTask;
+import gov.prajadisha.backend.task.model.Task;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
@@ -23,7 +23,8 @@ public class TaskDtos {
             boolean dueDateCritical,
             String status,
             String statusType,
-            String indicatorColorClass) {}
+            String indicatorColorClass,
+            String groupId) {}
 
     public record Assignment(String type, String value, String label) {
         public static Assignment dept(String label) {
@@ -58,10 +59,11 @@ public class TaskDtos {
             Location location,
             String imageUrl,
             String mapUrl,
-            List<SubTask> subTasks,
+            List<Task> subTasks,
             List<DetailedComment> comments,
             List<DetailedNote> notes,
-            List<DetailedActivity> activities) {
+            List<DetailedActivity> activities,
+            List<String> mediaUrls) {
 
         public record Location(String address, String lat, String lng) {}
     }
@@ -74,4 +76,12 @@ public class TaskDtos {
     public record NoteRequest(
             @NotBlank String text,
             String userName) {}
+
+    public record CreateSubTaskRequest(
+            @NotBlank String title,
+            String description,
+            String priority,
+            String category,
+            String departmentId,
+            String officerId) {}
 }

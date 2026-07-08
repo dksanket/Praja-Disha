@@ -7,10 +7,10 @@
 
   <!-- Frictionless Input Grid -->
   <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-    <!-- Voice & Text Input Column -->
-    <div class="md:col-span-8 flex flex-col gap-6">
+    <!-- Voice, Text, Location & Image Input Column -->
+    <div class="md:col-span-8 md:col-start-3 flex flex-col gap-6">
       <!-- Text Area Card -->
-      <div class="bg-white p-6 rounded-xl border border-outline-variant/60 shadow-sm transition-all hover:shadow-md">
+      <div *ngIf="!voicePreviewUrl && !isListening" class="bg-white p-6 rounded-xl border border-outline-variant/60 shadow-sm transition-all hover:shadow-md">
         <label class="block font-label-lg text-sm font-semibold text-on-surface-variant mb-3">
           {{ strings.textareaLabel }}
         </label>
@@ -23,31 +23,119 @@
           <button 
             type="button"
             class="absolute right-3.5 top-3.5 p-2.5 rounded-full hover:bg-surface-variant transition-colors text-primary flex items-center justify-center"
-            [class.mic-active]="isListening"
             (click)="toggleMic()">
-            <span class="material-symbols-outlined">{{ isListening ? 'graphic_eq' : 'mic' }}</span>
+            <span class="material-symbols-outlined">mic</span>
           </button>
         </div>
         <p class="mt-2 font-label-md text-xs text-outline flex items-center gap-1">
           <span class="material-symbols-outlined text-sm">info</span>
-          {{ isListening ? strings.micListening : strings.textareaHint }}
+          {{ strings.textareaHint }}
         </p>
       </div>
 
+      <!-- Voice Listening / Recording Card -->
+      <div *ngIf="isListening" class="bg-white p-6 rounded-xl border border-error/20 bg-error/5 shadow-sm transition-all hover:shadow-md flex flex-col items-center justify-center min-h-[220px]">
+        <div class="flex flex-col items-center gap-4 w-full">
+          <!-- Pulsing Red Circle Stop Listening Button -->
+          <div class="relative flex items-center justify-center h-28 w-28">
+            <!-- Pulsing outer rings -->
+            <span class="absolute inline-flex h-20 w-20 rounded-full bg-error/20 animate-ping opacity-75"></span>
+            <span class="absolute inline-flex h-24 w-24 rounded-full bg-error/10 animate-pulse"></span>
+            
+            <button 
+              type="button"
+              class="relative z-10 w-16 h-16 rounded-full bg-error text-white flex items-center justify-center shadow-lg hover:bg-error/90 active:scale-95 transition-all duration-150"
+              (click)="stopRecording()">
+              <span class="material-symbols-outlined text-3xl">stop</span>
+            </button>
+          </div>
+          
+          <div class="text-center">
+            <h3 class="font-headline-md text-base font-bold text-error flex items-center justify-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-error animate-pulse"></span>
+              {{ strings.micListening }}
+            </h3>
+            <p class="font-headline-lg text-2xl font-bold text-on-surface mt-2 tracking-wider">
+              {{ formattedRecordingTime || '0:00' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice Recording Preview Card -->
+      <div *ngIf="voicePreviewUrl" class="bg-white p-6 rounded-xl border border-outline-variant/60 shadow-sm transition-all hover:shadow-md">
+        <div class="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 flex-1">
+            <button 
+              type="button"
+              class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 active:scale-95 transition-all shadow-sm flex-shrink-0"
+              (click)="toggleVoicePlayback()">
+              <span class="material-symbols-outlined">{{ isVoicePlaying ? 'pause' : 'play_arrow' }}</span>
+            </button>
+            
+            <div class="flex-1 flex flex-col gap-1 min-w-0">
+              <span class="font-label-md text-xs font-semibold text-primary truncate">{{ strings.voiceMessageLabel }}</span>
+              <div class="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
+                <div class="h-full bg-primary transition-all duration-100" [style.width.%]="voicePlaybackPercent"></div>
+              </div>
+              <div class="flex justify-between font-label-md text-[10px] text-secondary">
+                <span>{{ formattedVoicePlayTime }}</span>
+                <span>{{ formattedVoiceDuration }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <button 
+            type="button"
+            class="p-2 text-error hover:bg-error/10 rounded-full transition-colors active:scale-95 flex items-center justify-center flex-shrink-0"
+            [title]="strings.removeMedia"
+            (click)="removeVoiceMessage()">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+
+        <!-- Speech Language Selector -->
+        <div class="mt-4 flex flex-col gap-2">
+          <label class="block font-label-md text-xs font-semibold text-on-surface-variant">
+            {{ strings.speechLanguageLabel }}
+          </label>
+          <select 
+            [(ngModel)]="selectedSpeechCode" 
+            class="w-full bg-background border border-outline-variant/60 rounded-xl p-3 font-body-md text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            <option *ngFor="let lang of speechLanguages" [value]="lang.code">{{ lang.name }}</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Location Verification -->
-      <div class="bg-white rounded-xl border border-outline-variant/60 shadow-sm overflow-hidden">
+      <div class="bg-white rounded-xl border border-outline-variant/60 shadow-sm overflow-visible">
         <div class="p-6">
           <label class="block font-label-lg text-sm font-semibold text-on-surface-variant mb-3">
             {{ strings.locationLabel }}
           </label>
           <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-2 border border-outline-variant/60 rounded-xl bg-background p-3">
-              <span class="material-symbols-outlined text-secondary">location_on</span>
-              <input 
-                class="w-full bg-transparent border-none focus:ring-0 font-body-md text-sm text-on-surface p-0" 
-                [placeholder]="strings.locationPlaceholder" 
-                type="text"
-                [(ngModel)]="location">
+            <div class="location-input-container flex flex-col relative w-full">
+              <div class="flex items-center gap-2 border border-outline-variant/60 rounded-xl bg-background p-3">
+                <span class="material-symbols-outlined text-secondary">location_on</span>
+                <input 
+                  #locationInput
+                  class="w-full bg-transparent border-none focus:ring-0 font-body-md text-sm text-on-surface p-0" 
+                  [placeholder]="strings.locationPlaceholder" 
+                  type="text"
+                  [(ngModel)]="location"
+                  (input)="onLocationInput($event)">
+              </div>
+
+              <!-- Places Suggestion Dropdown -->
+              <div *ngIf="predictions.length > 0" class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-outline-variant/60 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                <button 
+                  *ngFor="let pred of predictions"
+                  type="button"
+                  class="w-full text-left px-4 py-3 hover:bg-surface-variant/40 transition-colors border-b border-outline-variant/30 last:border-b-0 text-sm text-on-surface flex flex-col gap-0.5"
+                  (click)="selectPrediction(pred)">
+                  <span class="font-semibold text-on-surface">{{ pred.placePrediction.text.text }}</span>
+                </button>
+              </div>
             </div>
             
             <button 
@@ -61,31 +149,56 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Image Upload Column -->
-    <div class="md:col-span-4">
-      <div 
-        class="bg-white h-full p-6 rounded-xl border-2 border-dashed border-outline-variant hover:bg-surface-container-low transition-colors group flex flex-col items-center justify-center text-center cursor-pointer"
-        (click)="selectMockImage()">
-        
-        <div class="w-20 h-20 rounded-full bg-secondary-container/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-          <span class="material-symbols-outlined text-primary text-4xl">add_a_photo</span>
+      <!-- Image Upload Section -->
+      <div>
+        <div 
+          class="bg-white p-6 rounded-xl border-2 border-dashed border-outline-variant hover:bg-surface-container-low transition-colors group flex flex-col items-center justify-center text-center cursor-pointer relative min-h-[220px]"
+          (click)="fileInput.click()">
+          
+          <!-- Hidden File Input -->
+          <input 
+            type="file" 
+            #fileInput 
+            multiple 
+            accept="image/*,video/*" 
+            class="hidden" 
+            (change)="onFileSelected($event)">
+          
+          <div class="w-16 h-16 rounded-full bg-secondary-container/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-primary text-3xl">add_a_photo</span>
+          </div>
+          
+          <h3 class="font-headline-md text-base font-bold text-on-surface mb-2">{{ strings.uploadLabel }}</h3>
+          <p class="font-body-md text-xs text-secondary px-4">{{ strings.uploadDesc }}</p>
+          <p class="font-label-md text-[10px] text-outline mt-2">{{ strings.uploadHint }}</p>
         </div>
-        
-        <h3 class="font-headline-md text-lg font-bold text-on-surface mb-2">{{ strings.uploadLabel }}</h3>
-        <p class="font-body-md text-xs text-secondary px-4">{{ strings.uploadDesc }}</p>
-        <p class="font-label-md text-[10px] text-outline mt-2">{{ strings.uploadHint }}</p>
 
-        <!-- Preview Uploaded Image -->
-        <div class="mt-6 w-full" *ngIf="imageUrl">
-          <div class="grid grid-cols-1 gap-2">
-            <div class="relative aspect-video rounded-lg overflow-hidden border border-outline-variant">
-              <img class="w-full h-full object-cover" [src]="imageUrl" alt="Mock Upload Proof">
-              <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <span class="material-symbols-outlined text-white text-2xl">delete</span>
+        <!-- Preview Uploaded Files Grid -->
+        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 w-full" *ngIf="selectedMedia.length > 0">
+          <div 
+            *ngFor="let item of selectedMedia; let idx = index" 
+            class="relative aspect-square rounded-xl overflow-hidden border border-outline-variant/60 bg-surface-variant group shadow-sm">
+            
+            <!-- Image Preview -->
+            <img *ngIf="!item.isVideo" class="w-full h-full object-cover" [src]="item.previewUrl" alt="Media Proof">
+            
+            <!-- Video Preview -->
+            <div *ngIf="item.isVideo" class="w-full h-full relative">
+              <video class="w-full h-full object-cover" [src]="item.previewUrl"></video>
+              <div class="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
+                <span class="material-symbols-outlined text-white text-3xl">play_circle</span>
               </div>
             </div>
+
+            <!-- Top-right delete button overlay -->
+            <button 
+              type="button"
+              class="absolute top-2 right-2 w-7 h-7 bg-black/60 hover:bg-error text-white rounded-full transition-colors active:scale-95 flex items-center justify-center z-10 shadow-md"
+              [title]="strings.removeMedia"
+              (click)="removeMedia(idx); $event.stopPropagation()">
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
           </div>
         </div>
       </div>
@@ -98,9 +211,9 @@
   <div class="w-full max-w-max-width-content">
     <button 
       class="w-full h-14 bg-primary text-on-primary rounded-full font-headline-md text-lg font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:bg-primary-container transition-all active:scale-95"
-      [disabled]="isSubmitting || !description.trim()"
-      [class.opacity-70]="isSubmitting || !description.trim()"
-      [class.cursor-not-allowed]="isSubmitting || !description.trim()"
+      [disabled]="isSubmitting || !location.trim() || (!description.trim() && !voicePreviewUrl)"
+      [class.opacity-70]="isSubmitting || !location.trim() || (!description.trim() && !voicePreviewUrl)"
+      [class.cursor-not-allowed]="isSubmitting || !location.trim() || (!description.trim() && !voicePreviewUrl)"
       (click)="onSubmit()">
       
       <span class="material-symbols-outlined text-lg">{{ isSubmitting ? 'progress_activity' : 'send' }}</span>

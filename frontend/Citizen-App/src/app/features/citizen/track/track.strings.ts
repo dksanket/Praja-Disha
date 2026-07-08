@@ -3,13 +3,14 @@ const en = {
   subtitle: 'Real-time updates on your community reports.',
   emptyState: 'No reports filed yet. Tap the plus button to file your first civic ticket.',
   infoCardTitle: 'Did you know?',
-  infoCardDesc: 'Praja Disha uses AI to route your tickets to the right municipal department in under 3 seconds, speeding up response times by 40%.',
+  infoCardDesc: 'Praja Disha uses AI to route your tickets to the right government department in under 3 seconds, speeding up response times by 40%.',
   infoCardBtn: 'Learn about AI Routing',
   lastUpdateLabel: 'Last update:',
   statusLabel: 'Status: Routing to Department',
   viewDetailsBtn: 'View Details',
   feedbackBtn: 'Feedback',
-  completedLabel: 'Completed:'
+  completedLabel: 'Completed:',
+  createTicketBtn: 'Report an Issue'
 };
 
 export const TRACK_STRINGS: Record<string, typeof en> = {
@@ -25,7 +26,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'स्थिति: विभाग को रूट किया जा रहा है',
     viewDetailsBtn: 'विवरण देखें',
     feedbackBtn: 'प्रतिक्रिया',
-    completedLabel: 'पूरा किया गया:'
+    completedLabel: 'पूरा किया गया:',
+    createTicketBtn: 'समस्या की रिपोर्ट करें'
   },
   kn: {
     title: 'ನನ್ನ ಟಿಕೆಟ್‌ಗಳು',
@@ -38,7 +40,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'ಸ್ಥಿತಿ: ಇಲಾಖೆಗೆ ವರ್ಗಾಯಿಸಲಾಗುತ್ತಿದೆ',
     viewDetailsBtn: 'ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ',
     feedbackBtn: 'ಪ್ರತಿಕ್ರಿಯೆ',
-    completedLabel: 'ಪೂರ್ಣಗೊಂಡಿದೆ:'
+    completedLabel: 'ਪੂਰਣಗೊಂಡಿದೆ:',
+    createTicketBtn: 'ಸಮಸ್ಯೆ ವರದಿ ಮಾಡಿ'
   },
   bn: {
     title: 'আমার টিকিট',
@@ -51,7 +54,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'অবস্থা: বিভাগে পাঠানো হচ্ছে',
     viewDetailsBtn: 'বিস্তারিত দেখুন',
     feedbackBtn: 'মতামত',
-    completedLabel: 'সম্পন্ন হয়েছে:'
+    completedLabel: 'সম্পন্ন হয়েছে:',
+    createTicketBtn: 'সমস্যা রিপোর্ট করুন'
   },
   ta: {
     title: 'எனது புகார்கள்',
@@ -64,7 +68,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'நிலை: துறைக்கு அனுப்பப்படுகிறது',
     viewDetailsBtn: 'விவரங்களைக் காண்க',
     feedbackBtn: 'கருத்து',
-    completedLabel: 'முடிந்தது:'
+    completedLabel: 'முடிந்தது:',
+    createTicketBtn: 'பிரச்சினையைப் புகாரளி'
   },
   te: {
     title: 'నా టిక్కెట్లు',
@@ -77,7 +82,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'స్థితి: విభాగానికి మళ్లింపు',
     viewDetailsBtn: 'వివరాలను వీక్షించండి',
     feedbackBtn: 'అభిప్రాయం',
-    completedLabel: 'పూర్తయింది:'
+    completedLabel: 'పూర్తయింది:',
+    createTicketBtn: 'సమస్యను నివేదించండి'
   },
   mr: {
     title: 'माझी तिकिटे',
@@ -90,7 +96,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'स्थिती: विभागाकडे वर्ग करत आहे',
     viewDetailsBtn: 'तपशील पहा',
     feedbackBtn: 'अभिप्राय',
-    completedLabel: 'पूर्ण झाले:'
+    completedLabel: 'पूर्ण झाले:',
+    createTicketBtn: 'समस्येची तक्रार करा'
   },
   ur: {
     title: 'میرے ٹکٹ',
@@ -103,7 +110,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'حیثیت: متعلقہ شعبہ کو منتقلی',
     viewDetailsBtn: 'تفصیلات دیکھیں',
     feedbackBtn: 'رائے',
-    completedLabel: 'مکمل شدہ:'
+    completedLabel: 'مکمل شدہ:',
+    createTicketBtn: 'مسئلہ رپورٹ کریں'
   },
   gu: {
     title: 'મારી ટિકિટો',
@@ -116,7 +124,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'સ્થિતિ: વિભાગને મોકલાઈ રહી છે',
     viewDetailsBtn: 'વિગતો જુઓ',
     feedbackBtn: 'પ્રતિસાદ',
-    completedLabel: 'પૂર્ણ થયેલ:'
+    completedLabel: 'પૂર્ણ થયેલ:',
+    createTicketBtn: 'સમસ્યા રિપોર્ટ કરો'
   },
   ml: {
     title: 'എന്റെ ടിക്കറ്റുകൾ',
@@ -129,7 +138,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'നില: വകുപ്പിലേക്ക് മാറ്റുന്നു',
     viewDetailsBtn: 'വിശദാംശങ്ങൾ കാണുക',
     feedbackBtn: 'അഭിപ്രായം',
-    completedLabel: 'പൂർത്തിയായി:'
+    completedLabel: 'പൂർത്തിയായി:',
+    createTicketBtn: 'പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക'
   },
   pa: {
     title: 'ਮੇਰੀਆਂ ਟਿਕਟਾਂ',
@@ -142,7 +152,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'ਸਥਿਤੀ: ਵਿਭਾਗ ਨੂੰ ਭੇਜੀ ਜਾ ਰਹੀ ਹੈ',
     viewDetailsBtn: 'ਵੇਰਵੇ ਦੇਖੋ',
     feedbackBtn: 'ਫੀਡਬੈਕ',
-    completedLabel: 'ਪੂਰਾ ਹੋਇਆ:'
+    completedLabel: 'ਪੂਰਾ ਹੋਇਆ:',
+    createTicketBtn: 'ਸਮੱਸਿਆ ਦੀ ਰਿਪੋਰਟ ਕਰੋ'
   },
   or: {
     title: 'ମୋର ଟିକେଟ୍',
@@ -155,7 +166,8 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'ଅବସ୍ଥା: ସମ୍ବନ୍ଧିତ ବିଭାଗକୁ ପ୍ରେରଣ',
     viewDetailsBtn: 'ବିବରଣୀ ଦେଖନ୍ତୁ',
     feedbackBtn: 'ମତାମତ',
-    completedLabel: 'ସମ୍ପନ୍ନ:'
+    completedLabel: 'ସମ୍ପନ୍ନ:',
+    createTicketBtn: 'ସମସ୍ୟା ରିପୋର୍ଟ କରନ୍ତୁ'
   },
   as: {
     title: 'মোৰ টিকটসমূহ',
@@ -168,6 +180,7 @@ export const TRACK_STRINGS: Record<string, typeof en> = {
     statusLabel: 'স্থিতি: বিভাগলৈ প্ৰেৰণ কৰা হৈছে',
     viewDetailsBtn: 'বিশদ তথ্য চাওক',
     feedbackBtn: 'মতামত',
-    completedLabel: 'সম্পূৰ্ণ হ’ল:'
+    completedLabel: 'সম্পূৰ্ণ হ’ল:',
+    createTicketBtn: 'অভিযোগ দাখিল কৰক'
   }
 };

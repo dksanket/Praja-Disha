@@ -29,6 +29,13 @@ export class TrackComponent implements OnInit, OnDestroy {
   strings = TRACK_STRINGS['en'];
   
   displayTickets: DisplayTicket[] = [];
+  isRefreshing = false;
+
+  // Pull to refresh state
+  pullStartY = 0;
+  pullDistance = 0;
+  readonly pullThreshold = 70; // Threshold distance in pixels to trigger refresh
+  private readonly maxPull = 120; // Cap pull distance to prevent excessive drawing
   
   private subscription = new Subscription();
 
@@ -37,7 +44,75 @@ export class TrackComponent implements OnInit, OnDestroy {
     private readonly citizenService: CitizenService
   ) {}
 
+  private isAtTop(): boolean {
+    return (window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0) === 0;
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (this.isAtTop()) {
+      this.pullStartY = event.touches[0].clientY;
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (this.isAtTop() && this.pullStartY > 0 && !this.isRefreshing) {
+      const currentY = event.touches[0].clientY;
+      const diff = currentY - this.pullStartY;
+      
+      if (diff > 0) {
+        // Apply scaling resistance
+        this.pullDistance = Math.min(diff * 0.4, this.maxPull);
+        // Prevent default overscroll pull on mobile browsers if pullDistance is positive
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+      }
+    }
+  }
+
+  onTouchEnd(): void {
+    if (this.pullDistance >= this.pullThreshold && !this.isRefreshing) {
+      this.pullDistance = 50; // Hold at loading state height
+      this.refreshTickets();
+    } else if (!this.isRefreshing) {
+      this.resetPullDistance();
+    }
+    this.pullStartY = 0;
+  }
+
+  refreshTickets(): void {
+    this.isRefreshing = true;
+    this.citizenService.loadTickets().subscribe({
+      next: () => {
+        // Visual delay to ensure the spinner is visible to the user
+        setTimeout(() => {
+          this.isRefreshing = false;
+          this.resetPullDistance();
+        }, 800);
+      },
+      error: (err) => {
+        console.error('Error refreshing tickets:', err);
+        this.isRefreshing = false;
+        this.resetPullDistance();
+      }
+    });
+  }
+
+  private resetPullDistance(): void {
+    const step = this.pullDistance / 8;
+    const animate = () => {
+      if (this.pullDistance > 0) {
+        this.pullDistance = Math.max(0, this.pullDistance - step);
+        requestAnimationFrame(animate);
+      }
+    };
+    requestAnimationFrame(animate);
+  }
+
   ngOnInit(): void {
+    // Load tickets from backend on initialization
+    this.citizenService.loadTickets().subscribe();
+
     this.subscription.add(
       this.citizenService.tickets$.subscribe({
         next: (tickets) => {

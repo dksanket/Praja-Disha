@@ -3,19 +3,7 @@
  * These mirror the backend MongoDB schema for departments and officers.
  */
 
-/** Represents a single department in the organisational hierarchy */
-export interface Department {
-  id: string;                        // e.g. "DPT-001"
-  name: string;
-  parentDepartmentId: string | null; // null for root departments
-  parentDepartmentName: string | null;
-  headOfficerId: string | null;      // null when position is vacant
-  headOfficerName: string | null;
-  headOfficerAvatarUrl: string | null;
-  officerCount: number;
-  /** Depth level in the hierarchy tree (0 = root) */
-  depth: number;
-}
+export { Department } from '../department.model';
 
 /** Abbreviated officer reference used in table cells */
 export interface OfficerRef {

@@ -145,6 +145,12 @@
     gap: $spacing-unit * 2;
   }
 
+  &__brand-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+  }
+
   &__brand {
     color: $color-primary;
     font-weight: $fw-bold;
@@ -268,5 +274,47 @@
   &__avatar-icon {
     font-size: 32px;
     color: $color-on-surface-variant;
+  }
+
+  &__user-name {
+    font-weight: $fw-semibold;
+    color: $color-on-surface-variant;
+    margin-right: 8px;
+    align-self: center;
+  }
+
+  &__avatar-initials {
+    font-weight: $fw-bold;
+    font-size: $fs-label-md;
+    color: $color-primary;
+  }
+
+  &__logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    border-radius: $rounded;
+    cursor: pointer;
+    color: $color-on-surface-variant;
+    transition: background-color 150ms ease, color 150ms ease;
+    margin-left: 8px;
+
+    span {
+      font-size: 20px;
+    }
+
+    &:hover {
+      background-color: $color-surface-container-high;
+      color: $color-error;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
   }
 }

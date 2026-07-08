@@ -20,6 +20,9 @@ export class WalletComponent implements OnInit, OnDestroy {
   constructor(private readonly citizenService: CitizenService) {}
 
   ngOnInit(): void {
+    // Load wallet data from backend on initialization
+    this.citizenService.loadWalletData().subscribe();
+
     // Current profile and language strings update
     this.subscription.add(
       this.citizenService.currentUser$.subscribe({
@@ -53,11 +56,17 @@ export class WalletComponent implements OnInit, OnDestroy {
   }
 
   redeem(cost: number, title: string): void {
-    const success = this.citizenService.redeemPass(cost, title);
-    if (success) {
-      alert(this.strings.redeemSuccess);
-    } else {
-      alert(this.strings.redeemFail);
-    }
+    this.citizenService.redeemPass(cost, title).subscribe({
+      next: (res) => {
+        if (res.success) {
+          alert(this.strings.redeemSuccess);
+        } else {
+          alert(this.strings.redeemFail);
+        }
+      },
+      error: () => {
+        alert(this.strings.redeemFail);
+      }
+    });
   }
 }

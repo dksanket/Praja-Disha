@@ -1,49 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { DashboardTask, DashboardStats } from '../models/dashboard.model';
+import { environment } from '../../../environments/environment';
 
 /**
- * DashboardService — loads and structures metric counts and task lists
- * for the Executive Command Center dashboard view.
+ * DashboardService — fetches real task rows and stat counters from the backend.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
-  private readonly tasksUrl = 'assets/mock-data/tasks.json';
+  private readonly baseUrl = `${environment.apiBaseUrl}/api/dashboard`;
 
   constructor(private readonly http: HttpClient) {}
 
   /**
-   * Loads the list of triage tasks from the mock database.
+   * Loads the live triage task list from the backend.
+   * Optional query params for filtering by statusType or priority.
    */
-  getTasks(): Observable<DashboardTask[]> {
-    return this.http.get<DashboardTask[]>(this.tasksUrl);
+  getTasks(statusType?: string, priority?: string): Observable<DashboardTask[]> {
+    const params: Record<string, string> = {};
+    if (statusType) params['statusType'] = statusType;
+    if (priority) params['priority'] = priority;
+    return this.http.get<DashboardTask[]>(`${this.baseUrl}/tasks`, { params });
   }
 
   /**
-   * Compiles live stats derived from the current task checklist.
+   * Fetches the live stats counters for the bento grid.
    */
   getStats(): Observable<DashboardStats> {
-    return this.getTasks().pipe(
-      map((tasks) => {
-        // Derives stats directly from the task attributes
-        const awaitingAiReviewCount = tasks.filter(
-          (t) => t.statusType === 'ai-pending'
-        ).length;
-        const dueTodayCount = tasks.filter(
-          (t) => t.dueDateCritical
-        ).length;
-        const myDeptCount = tasks.length; // Active workload
-
-        return {
-          awaitingAiReviewCount,
-          dueTodayCount,
-          myDeptCount,
-        };
-      })
-    );
+    return this.http.get<DashboardStats>(`${this.baseUrl}/stats`);
   }
 }

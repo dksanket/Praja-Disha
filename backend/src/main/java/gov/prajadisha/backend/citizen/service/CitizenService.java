@@ -2,6 +2,7 @@ package gov.prajadisha.backend.citizen.service;
 
 import gov.prajadisha.backend.citizen.dto.CitizenDtos.FeedbackResponse;
 import gov.prajadisha.backend.citizen.dto.CitizenDtos.RedeemResponse;
+import gov.prajadisha.backend.citizen.dto.CitizenDtos.TicketRow;
 import gov.prajadisha.backend.citizen.model.CitizenProfile;
 import gov.prajadisha.backend.citizen.model.PointActivity;
 import gov.prajadisha.backend.citizen.model.TransitPass;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -93,14 +95,70 @@ public class CitizenService {
     // ---------------------------------------------------------------- tickets
 
     public Task submitTicket(String username, String title, String description,
-                             String location, String imageUrl) {
+                             String location, Double latitude, Double longitude, String imageUrl, String voiceUrl, String voiceDuration,
+                             java.util.List<String> mediaUrls, String language) {
         // ensure the citizen exists (keeps the ledger consistent)
-        requireCitizen(username);
-        return taskService.createTicket(username, title, description, location, imageUrl);
+        CitizenProfile citizen = requireCitizen(username);
+        String finalLanguage = language;
+        if (finalLanguage == null || finalLanguage.isBlank()) {
+            finalLanguage = citizen.getLanguage();
+        }
+        String mappedLanguage = mapLanguageCode(finalLanguage);
+        return taskService.createTicket(username, title, description, location, latitude, longitude, imageUrl, voiceUrl, voiceDuration, mediaUrls, mappedLanguage);
+    }
+
+    private String mapLanguageCode(String code) {
+        if (code == null) {
+            return "English";
+        }
+        String clean = code.trim().toLowerCase();
+        if (clean.contains("-")) {
+            clean = clean.split("-")[0];
+        }
+        return switch (clean) {
+            case "en" -> "English";
+            case "kn" -> "Kannada";
+            case "hi" -> "Hindi";
+            case "te" -> "Telugu";
+            case "ta" -> "Tamil";
+            case "bn" -> "Bengali";
+            case "mr" -> "Marathi";
+            case "gu" -> "Gujarati";
+            case "ml" -> "Malayalam";
+            case "pa" -> "Punjabi";
+            case "ur" -> "Urdu";
+            case "as" -> "Assamese";
+            case "or" -> "Odia";
+            default -> "English";
+        };
     }
 
     public Task reopenTicket(String username, String ticketId) {
         return taskService.reopen(ticketId);
+    }
+
+    /** Returns all tickets submitted by the given citizen as lightweight rows. */
+    public List<TicketRow> getTickets(String username) {
+        return taskService.getTicketsForCitizen(username).stream()
+                .map(this::toTicketRow)
+                .toList();
+    }
+
+    /** Maps a Task to the lightweight TicketRow DTO used by the Citizen Track list. */
+    private TicketRow toTicketRow(Task t) {
+        String location = t.getLocation() != null ? t.getLocation().getAddress() : "";
+        String date = Formats.fullDate(t.getCreatedAt());
+        String lastUpdate = Formats.shortOrToday(t.getCreatedAt());
+        return new TicketRow(
+                t.getId(),
+                t.getCategory(),
+                t.getTitle(),
+                t.getDescription(),
+                date,
+                t.getGlobalStatus(),
+                lastUpdate,
+                location,
+                t.getImageUrl());
     }
 
     public FeedbackResponse submitFeedback(String username, String ticketId, int rating, String comment) {
@@ -162,6 +220,16 @@ public class CitizenService {
                 .build());
 
         return new RedeemResponse(true, updated, savedPass);
+    }
+
+    /** Returns all transit passes owned by the citizen. */
+    public List<TransitPass> getPasses(String username) {
+        return passes.findByCitizenUserName(username);
+    }
+
+    /** Returns the citizen's point activity history, newest first. */
+    public List<PointActivity> getActivities(String username) {
+        return activities.findByCitizenUserNameOrderByCreatedAtDesc(username);
     }
 
     // ----------------------------------------------------------------- helpers

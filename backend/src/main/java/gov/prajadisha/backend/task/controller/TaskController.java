@@ -3,6 +3,8 @@ package gov.prajadisha.backend.task.controller;
 import gov.prajadisha.backend.task.dto.TaskDtos.CommentRequest;
 import gov.prajadisha.backend.task.dto.TaskDtos.NoteRequest;
 import gov.prajadisha.backend.task.dto.TaskDtos.TaskDetailPayload;
+import gov.prajadisha.backend.task.dto.TaskDtos.CreateSubTaskRequest;
+import gov.prajadisha.backend.task.model.Task;
 import gov.prajadisha.backend.task.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -33,5 +35,10 @@ public class TaskController {
     @PostMapping("/{id}/notes")
     public TaskDetailPayload addNote(@PathVariable String id, @Valid @RequestBody NoteRequest req) {
         return taskService.addNote(id, req);
+    }
+
+    @PostMapping("/{parentId}/subtasks")
+    public Task createSubTask(@PathVariable String parentId, @Valid @RequestBody CreateSubTaskRequest req) {
+        return taskService.createSubTask(parentId, req);
     }
 }

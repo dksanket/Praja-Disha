@@ -1,6 +1,6 @@
 /** Static UI strings for the dashboard layout shell. */
 export const LAYOUT_STRINGS = {
-  brand: 'GovSuite',
+  brand: 'Praja Disha',
   orgSwitcher: 'Org Switcher',
   searchPlaceholder: 'Search...',
 

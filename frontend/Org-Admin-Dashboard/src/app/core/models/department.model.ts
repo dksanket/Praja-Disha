@@ -19,4 +19,12 @@ export interface Department {
   roleDescription: string;
   constituency: DepartmentConstituency;
   customPromptExtension: string;     // Custom AI routing rules for this department
+
+  // Team Management fields matching backend / UI mapping
+  parentDepartmentName?: string | null;
+  headOfficerId?: string | null;
+  headOfficerName?: string | null;
+  headOfficerAvatarUrl?: string | null;
+  officerCount?: number;
+  depth?: number;
 }

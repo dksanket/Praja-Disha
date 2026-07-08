@@ -8,9 +8,7 @@
     
     <div class="relative z-10">
       <div class="flex items-center gap-3 mb-8">
-        <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-          <span class="material-symbols-outlined text-on-primary text-2xl">account_balance</span>
-        </div>
+        <img src="assets/logo/logo.png" [alt]="strings.brandName" class="h-12 w-auto object-contain" />
         <span class="font-headline-md text-2xl font-bold text-on-background tracking-tight">{{ strings.brandName }}</span>
       </div>
     </div>
@@ -25,9 +23,7 @@
   <div class="w-full md:w-7/12 lg:w-1/2 flex items-center justify-center p-6 sm:p-8 md:p-12 lg:p-16 relative">
     <!-- Mobile Header (Visible only on small screens) -->
     <div class="absolute top-6 left-6 flex items-center gap-2 md:hidden">
-      <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-        <span class="material-symbols-outlined text-on-primary text-sm">account_balance</span>
-      </div>
+      <img src="assets/logo/logo.png" [alt]="strings.brandName" class="h-8 w-auto object-contain" />
       <span class="font-label-lg text-sm font-bold text-on-background tracking-tight">{{ strings.brandName }}</span>
     </div>
 

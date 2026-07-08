@@ -37,6 +37,9 @@ export class TicketDetailsComponent implements OnInit, OnDestroy, AfterViewCheck
   ) {}
 
   ngOnInit(): void {
+    // Ensure ticket cache is loaded from the backend
+    this.citizenService.loadTickets().subscribe();
+
     this.subscription.add(
       this.route.paramMap.subscribe({
         next: (params) => {
@@ -72,6 +75,9 @@ export class TicketDetailsComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private loadTicketDetails(id: string): void {
+    // Load fresh comments/chat log for this ticket
+    this.citizenService.loadTicketComments(id).subscribe();
+
     this.subscription.add(
       this.citizenService.tickets$.subscribe({
         next: (tickets) => {
@@ -122,21 +128,27 @@ export class TicketDetailsComponent implements OnInit, OnDestroy, AfterViewCheck
       return;
     }
 
-    this.citizenService.submitFeedback(this.ticket.id, this.rating, this.feedbackComment);
-    this.feedbackSubmitted = true;
-    setTimeout(() => {
-      this.feedbackSubmitted = false;
-      this.rating = 0;
-      this.feedbackComment = '';
-    }, 3000);
+    this.citizenService.submitFeedback(this.ticket.id, this.rating, this.feedbackComment).subscribe({
+      next: () => {
+        this.feedbackSubmitted = true;
+        setTimeout(() => {
+          this.feedbackSubmitted = false;
+          this.rating = 0;
+          this.feedbackComment = '';
+        }, 3000);
+      }
+    });
   }
 
   reopenTicket(): void {
     if (!this.ticket) {
       return;
     }
-    this.citizenService.reopenTicket(this.ticket.id);
-    this.needScroll = true;
+    this.citizenService.reopenTicket(this.ticket.id).subscribe({
+      next: () => {
+        this.needScroll = true;
+      }
+    });
   }
 
   goBack(): void {

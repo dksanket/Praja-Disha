@@ -133,6 +133,13 @@
                     [class.triage-table__accent-line--water]="task.indicatorColorClass === 'indicator-water'">
                   </div>
                   <a [routerLink]="['/task-details', task.id]" class="pd-label-md triage-table__title triage-table__title--link">{{ task.title }}</a>
+                  <span
+                    *ngIf="task.isDuplicateGroup"
+                    class="triage-table__duplicate-badge"
+                    [title]="strings.triageTable.duplicateTooltip">
+                    <span class="material-symbols-outlined">link</span>
+                    {{ strings.triageTable.duplicateBadge }}
+                  </span>
                 </div>
               </td>
               

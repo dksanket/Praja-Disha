@@ -1,33 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Organization } from '../models/organization.model';
+import { environment } from '../../../environments/environment';
 
 /**
- * OrganizationService — handles fetching organization details.
- * Currently reads mock organization data with session caching.
+ * OrganizationService — fetches active organization details from the backend.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class OrganizationService {
-  private readonly mockUrl = 'assets/mock-data/organization.json';
-  private activeOrgCache: Organization | null = null;
+  private readonly activeUrl = `${environment.apiBaseUrl}/api/organizations/active`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   /**
-   * Fetches active organization details.
+   * Fetches the active organization's details.
    */
   getActiveOrganization(): Observable<Organization> {
-    if (this.activeOrgCache) {
-      return of(this.activeOrgCache);
-    }
-    return this.http.get<Organization>(this.mockUrl).pipe(
-      tap((org) => {
-        this.activeOrgCache = org;
-      })
-    );
+    return this.http.get<Organization>(this.activeUrl);
   }
 }

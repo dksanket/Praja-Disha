@@ -75,7 +75,7 @@
         <div class="section-block">
           <h3 class="section-title">
             <span class="material-symbols-outlined">record_voice_over</span>
-            <span>{{ strings.metaLabels.descAndAudio }}</span>
+            <span>{{ task.voiceUrl ? strings.metaLabels.transcription : strings.metaLabels.descAndAudio }}</span>
           </h3>
           <div class="description-bubble">
             "{{ task.description }}"
@@ -121,15 +121,38 @@
 
         <!-- Photo Snapshot Grid -->
         <div class="snapshots-grid border-top">
-          <div class="snapshot-card">
-            <div class="snapshot-img-container">
-              <img [src]="task.imageUrl" [alt]="strings.snapshots.incident" class="snapshot-img" />
+          <!-- Render from mediaUrls list if present -->
+          <ng-container *ngIf="task.mediaUrls && task.mediaUrls.length > 0">
+            <div class="snapshot-card" *ngFor="let url of task.mediaUrls; let idx = index">
+              <div class="snapshot-img-container bg-surface-variant flex items-center justify-center overflow-hidden">
+                <video *ngIf="url.includes('/videos/') || url.endsWith('.mp4') || url.endsWith('.webm')" [src]="url" class="snapshot-img w-full h-full object-cover" controls></video>
+                <img *ngIf="!(url.includes('/videos/') || url.endsWith('.mp4') || url.endsWith('.webm'))" [src]="url" [alt]="strings.snapshots.incident + ' ' + (idx + 1)" class="snapshot-img w-full h-full object-cover" />
+              </div>
+              <div class="snapshot-label">{{ (url.includes('/videos/') || url.endsWith('.mp4') || url.endsWith('.webm')) ? 'Video Proof' : (strings.snapshots.incident + ' ' + (idx + 1)) }}</div>
             </div>
-            <div class="snapshot-label">{{ strings.snapshots.incident }}</div>
-          </div>
-          <div class="snapshot-card">
+          </ng-container>
+
+          <!-- Fallback to single imageUrl if mediaUrls list is empty -->
+          <ng-container *ngIf="!task.mediaUrls || task.mediaUrls.length === 0">
+            <div class="snapshot-card" *ngIf="task.imageUrl">
+              <div class="snapshot-img-container bg-surface-variant flex items-center justify-center overflow-hidden">
+                <video *ngIf="task.imageUrl.includes('/videos/') || task.imageUrl.endsWith('.mp4') || task.imageUrl.endsWith('.webm')" [src]="task.imageUrl" class="snapshot-img w-full h-full object-cover" controls></video>
+                <img *ngIf="!(task.imageUrl.includes('/videos/') || task.imageUrl.endsWith('.mp4') || task.imageUrl.endsWith('.webm'))" [src]="task.imageUrl" [alt]="strings.snapshots.incident" class="snapshot-img w-full h-full object-cover" />
+              </div>
+              <div class="snapshot-label">{{ strings.snapshots.incident }}</div>
+            </div>
+          </ng-container>
+
+          <!-- Map mapping visualization -->
+          <div class="snapshot-card" *ngIf="sanitizedMapUrl">
             <div class="snapshot-img-container">
-              <img [src]="task.mapUrl" [alt]="strings.snapshots.mapping" class="snapshot-img" />
+              <iframe 
+                class="snapshot-img"
+                frameborder="0" 
+                style="border:0;" 
+                [src]="sanitizedMapUrl" 
+                allowfullscreen>
+              </iframe>
             </div>
             <div class="snapshot-label">{{ strings.snapshots.mapping }}</div>
           </div>
@@ -145,7 +168,7 @@
         <div class="tree-container">
           <div class="tree-scroller">
             <div class="tree-root">
-              <div *ngFor="let node of task.subTasks; let i = index" class="tree-node-wrapper">
+              <div *ngFor="let node of task.subTasks; let i = index" class="tree-node-wrapper" [class.tree-node-wrapper--nested]="node.parentId">
                 
                 <!-- Tree branch connector line (rendered for nested child items) -->
                 <div class="tree-line" *ngIf="node.parentId"></div>

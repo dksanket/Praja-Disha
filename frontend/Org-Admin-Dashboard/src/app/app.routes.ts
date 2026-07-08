@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
 
 /**
  * Application-level routes.
@@ -17,6 +18,7 @@ export const APP_ROUTES: Routes = [
   {
     // Authenticated shell — renders sidebar + topbar; children fill the content area
     path: '',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./features/dashboard-layout/dashboard-layout.component').then(
         m => m.DashboardLayoutComponent

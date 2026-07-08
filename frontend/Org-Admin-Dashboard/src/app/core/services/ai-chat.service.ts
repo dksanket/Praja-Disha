@@ -1,23 +1,27 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import { ChatMessage } from '../models/ai-chat.model';
+import { environment } from '../../../environments/environment';
 
 /**
  * AiChatService — manages the conversation thread state for the AI Assistant.
- * Simulates AI typing indicators and returns pre-baked responses containing
- * both raw URLs and Markdown-style links to test the LinkifyDirective.
+ * Messages are sent to the real backend AI endpoint; no simulated responses.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class AiChatService {
+  private readonly chatUrl = `${environment.apiBaseUrl}/api/ai/chat`;
+
   private readonly messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
   readonly messages$ = this.messagesSubject.asObservable();
 
   private readonly isAiTypingSubject = new BehaviorSubject<boolean>(false);
   readonly isAiTyping$ = this.isAiTypingSubject.asObservable();
 
-  constructor() {
+  constructor(private readonly http: HttpClient) {
     this.initializeWelcomeMessage();
   }
 
@@ -44,49 +48,41 @@ export class AiChatService {
   }
 
   /**
-   * Appends a user message to the thread and triggers a simulated AI response.
+   * Sends a user message to the backend AI and appends the response to the thread.
    */
   sendMessage(text: string): void {
     if (!text.trim()) return;
 
-    // 1. Append User Message
+    // 1. Append the user's message immediately
     const userMsg: ChatMessage = {
       id: `msg-user-${Date.now()}`,
       sender: 'user',
       text: text.trim(),
       timestamp: Date.now(),
     };
+    this.messagesSubject.next([...this.messagesSubject.value, userMsg]);
 
-    const currentMsgs = this.messagesSubject.value;
-    this.messagesSubject.next([...currentMsgs, userMsg]);
-
-    // 2. Set AI Typing indicator
+    // 2. Show typing indicator while awaiting the backend response
     this.isAiTypingSubject.next(true);
 
-    // 3. Simulate AI reply after a 1.2-second delay
-    setTimeout(() => {
-      let aiText = '';
-      const query = text.trim().toLowerCase();
-
-      if (query.includes('summarize the main concerns') || query.includes('q3 town hall')) {
-        aiText = "Based on the Q3 town hall survey (450 residents polled), the top three concerns are:\n\n1. **Road Maintenance (38% of complaints)**: Significant potholes and slow repair times on Main Street and Maple Avenue. See [Road Maintenance Dashboard](http://localhost:4200/manage-team).\n2. **Public Transit Frequency (27%)**: Requests for additional bus routes during peak commuter hours. See [Transit Quality Guidelines](https://example.com/transit-guidelines).\n3. **Park Safety & Lighting (19%)**: Poor illumination in Central Park after sunset.\n\nWould you like me to pull the raw comments regarding any of these topics?";
-      } else if (query.includes('trend in road maintenance') || query.includes('last 6 months')) {
-        aiText = "Here is the trend for road maintenance requests (January - June 2026):\n\n* **January**: 85 requests\n* **February**: 92 requests\n* **March**: 110 requests (Spring thaw surge)\n* **April**: 135 requests (Peak reporting period)\n* **May**: 95 requests (Repair crew deployment)\n* **June**: 70 requests (Post-repaired status)\n\nOverall, request volume spiked in April but has decreased by 48% over the last two months due to the accelerated road repair initiative. You can read the full report here: http://localhost:4200/reports/road-maintenance.";
-      } else if (query.includes('compare resident satisfaction') || query.includes('district a and district b')) {
-        aiText = "In the latest municipal review, resident satisfaction rates show the following breakdown:\n\n* **District A (North/Industrial)**:\n  * Overall Satisfaction: 68%\n  * Main strengths: High safety ratings, reliable waste collection.\n  * Main issues: Noise levels, road quality.\n\n* **District B (South/Residential)**:\n  * Overall Satisfaction: 82%\n  * Main strengths: Excellent public parks, active community centers.\n  * Main issues: High local property taxes, limited parking near retail zone.\n\nDistrict B has a 14% higher overall satisfaction rating, primarily driven by park quality and community facilities. Detailed charts are available at: http://localhost:4200/analytics/satisfaction.";
-      } else {
-        aiText = `I've analyzed your question: "${text}" and scanned the municipal records. I can confirm we have relevant logs and survey data matching your query. However, in this prototype interface, I can only provide structured answers to the example questions. Feel free to click one of the suggested prompts above or type one of them to see a live analysis demonstration!`;
+    // 3. Send to the backend and append the AI reply
+    this.http.post<ChatMessage>(this.chatUrl, { text: text.trim() }).pipe(
+      tap(() => this.isAiTypingSubject.next(false))
+    ).subscribe({
+      next: (aiResponse) => {
+        this.messagesSubject.next([...this.messagesSubject.value, aiResponse]);
+      },
+      error: () => {
+        // On error, hide typing indicator and show a fallback message
+        this.isAiTypingSubject.next(false);
+        const errorMsg: ChatMessage = {
+          id: `msg-err-${Date.now()}`,
+          sender: 'ai',
+          text: 'I encountered an error processing your request. Please try again.',
+          timestamp: Date.now(),
+        };
+        this.messagesSubject.next([...this.messagesSubject.value, errorMsg]);
       }
-
-      const aiMsg: ChatMessage = {
-        id: `msg-ai-${Date.now()}`,
-        sender: 'ai',
-        text: aiText,
-        timestamp: Date.now(),
-      };
-
-      this.isAiTypingSubject.next(false);
-      this.messagesSubject.next([...this.messagesSubject.value, aiMsg]);
-    }, 1200);
+    });
   }
 }

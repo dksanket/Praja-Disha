@@ -373,3 +373,140 @@
   vertical-align: middle;
   line-height: 1;
 }
+
+// ── Login Error Alert ─────────────────────────────────────────────────────────
+.login-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pd-error);
+  background-color: var(--pd-error-container);
+  border: 1px solid var(--pd-outline-variant);
+  padding: 10px 14px;
+  border-radius: $rounded-lg;
+  margin-top: 4px;
+  margin-bottom: 8px;
+
+  .material-symbols-outlined {
+    color: var(--pd-error);
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Secondary button ───────────────────────────────────────────────────────────
+.btn-secondary {
+  width: 100%;
+  height: $spacing-row-standard;
+  background-color: transparent;
+  color: var(--pd-on-surface-variant);
+  border: 1px solid var(--pd-outline-variant);
+  border-radius: $rounded-lg;
+  font-size: $fs-title-md;
+  font-weight: $fw-semibold;
+  font-family: var(--pd-font-primary);
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 100ms ease;
+
+  &:hover {
+    background-color: var(--pd-surface-container-low);
+  }
+}
+
+// ── OTP step styles ────────────────────────────────────────────────────────────
+.otp-subtitle {
+  color: var(--pd-on-surface-variant);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.otp-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+
+  .otp-label {
+    color: var(--pd-on-surface-variant);
+  }
+}
+
+.pd-input--otp {
+  flex: 1;
+  padding: 0 16px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  font-size: $fs-headline-sm;
+  font-weight: $fw-semibold;
+}
+
+.btn-verify {
+  margin-top: 8px;
+}
+
+// ── Warning dialog popup modal ──────────────────────────────────────────────────
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 200ms ease-out;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--pd-surface-container-lowest);
+  border: 1px solid var(--pd-outline-variant);
+  border-radius: $rounded-xl;
+  padding: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: scaleIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__icon {
+    color: var(--pd-error);
+    font-size: 28px;
+  }
+
+  &__title {
+    color: var(--pd-on-surface);
+    margin: 0;
+  }
+
+  &__body {
+    color: var(--pd-on-surface-variant);
+  }
+
+  &__message {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

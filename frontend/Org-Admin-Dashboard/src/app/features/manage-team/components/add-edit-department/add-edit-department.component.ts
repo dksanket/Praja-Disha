@@ -72,6 +72,7 @@ export class AddEditDepartmentComponent implements OnInit {
   googleMapPolygon: any;
   organizationBoundaryPolygon: any;
   organizationConstituency: OrgConstituency | null = null;
+  activeOrgId = '';
   mapError = '';
   mapCoordinates: { lat: number; lng: number }[] = [];
 
@@ -97,6 +98,7 @@ export class AddEditDepartmentComponent implements OnInit {
       next: (org) => {
         if (org) {
           this.organizationConstituency = org.constituency;
+          this.activeOrgId = org.id;
         }
       },
       error: (err) => console.error('Error fetching organization info:', err),
@@ -123,7 +125,10 @@ export class AddEditDepartmentComponent implements OnInit {
               this.name = dept.name;
               this.id = dept.id;
               this.parentDepartmentId = dept.parentDepartmentId;
-              this.description = ''; // Description is not on domain model but kept in state
+              this.description = dept.roleDescription || '';
+              if (dept.orgId) {
+                this.activeOrgId = dept.orgId;
+              }
 
               // Retrieve head officer if assigned
               if (dept.headOfficerId) {
@@ -138,21 +143,23 @@ export class AddEditDepartmentComponent implements OnInit {
                 o.departmentIds.includes(dept.id)
               );
 
-              // Pre-populate dummy configuration values for demo purposes
-              this.constituencyName = dept.name + ' Constituency';
-              this.constituencyGeoJson = JSON.stringify({
-                type: 'Polygon',
-                coordinates: [
-                  [
-                    [77.5946, 12.9716],
-                    [77.6046, 12.9716],
-                    [77.6046, 12.9816],
-                    [77.5946, 12.9816],
-                    [77.5946, 12.9716],
-                  ],
-                ],
-              }, null, 2);
-              this.customPromptExtension = 'Prioritize service requests inside ' + dept.name;
+              // Pre-populate configuration values
+              this.constituencyName = dept.constituency?.name || (dept.name + ' Constituency');
+              this.constituencyGeoJson = dept.constituency?.coordinates
+                ? JSON.stringify(dept.constituency.coordinates, null, 2)
+                : JSON.stringify({
+                    type: 'Polygon',
+                    coordinates: [
+                      [
+                        [77.5946, 12.9716],
+                        [77.6046, 12.9716],
+                        [77.6046, 12.9816],
+                        [77.5946, 12.9816],
+                        [77.5946, 12.9716],
+                      ],
+                    ],
+                  }, null, 2);
+              this.customPromptExtension = dept.customPromptExtension || ('Prioritize service requests inside ' + dept.name);
             }
             this.buildParentDropdown();
             this.updateHierarchyPreview();
@@ -677,13 +684,14 @@ export class AddEditDepartmentComponent implements OnInit {
     // Lookup parent details
     const parentDept = this.allDepartments.find((d) => d.id === this.parentDepartmentId);
     const parentName = parentDept ? parentDept.name : null;
-    const parentDepth = parentDept ? parentDept.depth : -1;
+    const parentDepth = parentDept?.depth ?? -1;
 
     // Head officer details
     const head = this.departmentHeads[0] || null;
 
     const departmentPayload: Department = {
       id: this.id.trim(),
+      orgId: this.activeOrgId || 'org-1',
       name: this.name.trim(),
       parentDepartmentId: this.parentDepartmentId,
       parentDepartmentName: parentName,
@@ -692,6 +700,23 @@ export class AddEditDepartmentComponent implements OnInit {
       headOfficerAvatarUrl: head ? head.email : null, // Uses email or default initials placeholder in table
       officerCount: this.assignedOfficers.length,
       depth: parentDepth + 1,
+      roleDescription: this.description.trim(),
+      constituency: {
+        name: this.constituencyName.trim() || (this.name.trim() + ' Constituency'),
+        coordinates: this.constituencyGeoJson.trim() ? JSON.parse(this.constituencyGeoJson.trim()) : {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [77.5946, 12.9716],
+              [77.6046, 12.9716],
+              [77.6046, 12.9816],
+              [77.5946, 12.9816],
+              [77.5946, 12.9716],
+            ]
+          ]
+        }
+      },
+      customPromptExtension: this.customPromptExtension.trim(),
     };
 
     // Update officers in-memory reference to hold department membership
