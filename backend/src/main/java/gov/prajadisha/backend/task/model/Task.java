@@ -42,6 +42,10 @@ public class Task {
     private String description;
     private String voiceUrl;
     private String imageUrl;
+
+    @Builder.Default
+    private List<String> mediaUrls = new ArrayList<>();
+
     private String language;
     private TaskLocation location;
     private String category;
@@ -56,8 +60,6 @@ public class Task {
     private List<Double> descriptionEmbedding;
 
     // Embedded detail collections
-    @Builder.Default
-    private List<SubTask> subTasks = new ArrayList<>();
     @Builder.Default
     private List<DetailedComment> comments = new ArrayList<>();
     @Builder.Default

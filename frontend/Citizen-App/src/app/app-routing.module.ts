@@ -8,6 +8,7 @@ import { TrackComponent } from './features/citizen/track/track.component';
 import { TicketDetailsComponent } from './features/citizen/ticket-details/ticket-details.component';
 import { WalletComponent } from './features/citizen/wallet/wallet.component';
 import { ProfileComponent } from './features/citizen/profile/profile.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -16,6 +17,7 @@ const routes: Routes = [
   {
     path: 'app',
     component: ShellLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'track', pathMatch: 'full' },
       { path: 'report', component: ReportComponent },

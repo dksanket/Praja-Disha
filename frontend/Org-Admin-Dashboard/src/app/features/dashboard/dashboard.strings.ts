@@ -32,6 +32,8 @@ export const DASHBOARD_STRINGS = {
       showingLabelSuffix: 'items',
     },
     emptyState: 'No matching tasks found in Central Triage.',
+    duplicateBadge: 'Same Issue Group',
+    duplicateTooltip: 'This ticket is grouped with other duplicate reports in the same area.',
   },
   footer: {
     brandCopy: 'Praja Disha Governance Suite © 2026',

@@ -16,6 +16,8 @@ export interface DashboardTask {
   status: string; // Formatted status text (e.g. "AI-Assigned: Review Pending")
   statusType: 'ai-pending' | 'in-progress' | 'drafting' | 'completed'; // Visual semantic grouping
   indicatorColorClass?: string; // Optional class for visual accent bar color
+  groupId?: string; // Group ID for grouping duplicate tickets
+  isDuplicateGroup?: boolean; // True if this task has duplicates in the list
 }
 
 /** Represents summary counters in the bento grid quick filters */

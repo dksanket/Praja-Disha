@@ -6,7 +6,7 @@ const en = {
   textareaHint: 'Type or tap the mic to speak.',
   micListening: 'Listening...',
   micTapToSpeak: 'Tap to Speak',
-  locationLabel: 'Location Verification',
+  locationLabel: 'Location of the Issue',
   locationPlaceholder: 'Enter address manually or detect',
   locationDetectBtn: 'Detect My Location',
   detectingLocation: 'Detecting...',
@@ -15,7 +15,10 @@ const en = {
   uploadHint: 'Max 5 images or videos',
   submitBtn: 'Submit Ticket',
   submittingBtn: 'Submitting...',
-  successNotification: 'Ticket submitted successfully!'
+  successNotification: 'Ticket submitted successfully!',
+  voiceMessageLabel: 'Voice Message',
+  speechLanguageLabel: 'Speech Language',
+  removeMedia: 'Remove'
 };
 
 export const REPORT_STRINGS: Record<string, typeof en> = {
@@ -28,7 +31,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'बोलने के लिए टाइप करें या माइक पर टैप करें।',
     micListening: 'सुन रहा है...',
     micTapToSpeak: 'बोलने के लिए टैप करें',
-    locationLabel: 'स्थान सत्यापन',
+    locationLabel: 'समस्या का स्थान',
     locationPlaceholder: 'पता मैन्युअल रूप से दर्ज करें या पता लगाएं',
     locationDetectBtn: 'मेरा स्थान ढूंढें',
     detectingLocation: 'पता लगा रहा है...',
@@ -37,7 +40,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'अधिकतम 5 चित्र या वीडियो',
     submitBtn: 'टिकट जमा करें',
     submittingBtn: 'जमा किया जा रहा है...',
-    successNotification: 'टिकट सफलतापूर्वक जमा किया गया!'
+    successNotification: 'टिकट सफलतापूर्वक जमा किया गया!',
+    voiceMessageLabel: 'आवाज़ संदेश',
+    speechLanguageLabel: 'बोलने की भाषा',
+    removeMedia: 'हटाएं'
   },
   kn: {
     title: 'ಸಮಸ್ಯೆ ವರದಿ ಮಾಡಿ',
@@ -47,7 +53,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಲು ಮೈಕ್ ಟ್ಯಾಪ್ ಮಾಡಿ.',
     micListening: 'ಕೇಳಿಸಿಕೊಳ್ಳುತ್ತಿದೆ...',
     micTapToSpeak: 'ಮಾತನಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ',
-    locationLabel: 'ಸ್ಥಳ ಪರಿಶೀಲನೆ',
+    locationLabel: 'ಸಮಸ್ಯೆಯ ಸ್ಥಳ',
     locationPlaceholder: 'ವಿಳಾಸವನ್ನು ಹಸ್ತಚಾಲಿತವಾಗಿ ನಮೂದಿಸಿ ಅಥವಾ ಪತ್ತೆ ಮಾಡಿ',
     locationDetectBtn: 'ನನ್ನ ಸ್ಥಳ ಪತ್ತೆ ಮಾಡಿ',
     detectingLocation: 'ಪತ್ತೆ ಮಾಡಲಾಗುತ್ತಿದೆ...',
@@ -56,7 +62,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'ಗರಿಷ್ಠ 5 ಚಿತ್ರಗಳು ಅಥವಾ ವೀಡಿಯೊಗಳು',
     submitBtn: 'ಟಿಕೆಟ್ ಸಲ್ಲಿಸಿ',
     submittingBtn: 'ಸಲ್ಲಿಸಲಾಗುತ್ತಿದೆ...',
-    successNotification: 'ಟಿಕೆಟ್ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಕೆಯಾಗಿದೆ!'
+    successNotification: 'ಟಿಕೆಟ್ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಕೆಯಾಗಿದೆ!',
+    voiceMessageLabel: 'ಧ್ವನಿ ಸಂದೇಶ',
+    speechLanguageLabel: 'ಮಾತನಾಡುವ ಭಾಷೆ',
+    removeMedia: 'ತೆಗೆದುಹಾಕಿ'
   },
   bn: {
     title: 'সমস্যা রিপোর্ট করুন',
@@ -66,7 +75,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'টাইপ করুন বা কথা বলার জন্য মাইকে চাপ দিন।',
     micListening: 'শুনছে...',
     micTapToSpeak: 'কথা বলতে চাপ দিন',
-    locationLabel: 'অবস্থান যাচাইকরণ',
+    locationLabel: 'সমস্যার অবস্থান',
     locationPlaceholder: 'ম্যানুয়ালি ঠিকানা লিখুন বা সনাক্ত করুন',
     locationDetectBtn: 'আমার অবস্থান সনাক্ত করুন',
     detectingLocation: 'সনাক্ত করা হচ্ছে...',
@@ -75,7 +84,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'সর্বোচ্চ ৫টি ছবি বা ভিডিও',
     submitBtn: 'টিকিট জমা দিন',
     submittingBtn: 'জমা হচ্ছে...',
-    successNotification: 'টিকিট সফলভাবে জমা হয়েছে!'
+    successNotification: 'টিকিট সফলভাবে জমা হয়েছে!',
+    voiceMessageLabel: 'ভয়েস মেসেজ',
+    speechLanguageLabel: 'বলার ভাষা',
+    removeMedia: 'মুছে ফেলুন'
   },
   ta: {
     title: 'பிரச்சினையைப் புகாரளி',
@@ -85,7 +97,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'தட்டச்சு செய்யவும் அல்லது பேச மைக் மீது தட்டவும்.',
     micListening: 'கேட்கிறது...',
     micTapToSpeak: 'பேச தட்டவும்',
-    locationLabel: 'இருப்பிட சரிபார்ப்பு',
+    locationLabel: 'பிரச்சினையின் இருப்பிடம்',
     locationPlaceholder: 'முகவரியை கைமுறையாக உள்ளிடவும் அல்லது கண்டறியவும்',
     locationDetectBtn: 'எனது இருப்பிடத்தைக் கண்டறி',
     detectingLocation: 'கண்டறியப்படுகிறது...',
@@ -94,7 +106,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'அதிகபட்சம் 5 படங்கள் அல்லது வீடியோக்கள்',
     submitBtn: 'புகாரைச் சமர்ப்பி',
     submittingBtn: 'சமர்ப்பிக்கப்படுகிறது...',
-    successNotification: 'புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!'
+    successNotification: 'புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!',
+    voiceMessageLabel: 'குரல் செய்தி',
+    speechLanguageLabel: 'பேசும் மொழி',
+    removeMedia: 'நீக்கு'
   },
   te: {
     title: 'సమస్యను నివేదించండి',
@@ -104,7 +119,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'టైప్ చేయండి లేదా మాట్లాడటానికి మైక్ నొక్కండి.',
     micListening: 'వింటోంది...',
     micTapToSpeak: 'మాట్లాడటానికి నొక్కండి',
-    locationLabel: 'స్థాన ధృవీకరణ',
+    locationLabel: 'సమస్య స్థానం',
     locationPlaceholder: 'చిరునామాను మాన్యువల్‌గా నమోదు చేయండి లేదా గుర్తించండి',
     locationDetectBtn: 'నా స్థానాన్ని గుర్తించు',
     detectingLocation: 'గుర్తిస్తోంది...',
@@ -113,7 +128,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'గరిష్టంగా 5 చిత్రాలు లేదా వీడియోలు',
     submitBtn: 'టికెట్ సమర్పించండి',
     submittingBtn: 'సమర్పిస్తోంది...',
-    successNotification: 'టికెట్ విజయవంతంగా సమర్పించబడింది!'
+    successNotification: 'టికెట్ విజయవంతంగా సమర్పించబడింది!',
+    voiceMessageLabel: 'வాయిస్ సందేశం',
+    speechLanguageLabel: 'మాట్లాడే భాష',
+    removeMedia: 'తొలగించు'
   },
   mr: {
     title: 'समस्येची तक्रार करा',
@@ -123,7 +141,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'टाईप करा किंवा बोलण्यासाठी माईकवर टॅप करा.',
     micListening: 'ऐकत आहे...',
     micTapToSpeak: 'बोलण्यासाठी टॅप करा',
-    locationLabel: 'स्थान पडताळणी',
+    locationLabel: 'समस्येचे ठिकाण',
     locationPlaceholder: 'पत्ता मॅन्युअली प्रविष्ट करा किंवा शोधा',
     locationDetectBtn: 'माझे स्थान शोधा',
     detectingLocation: 'शोधत आहे...',
@@ -132,7 +150,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'कमाल ५ चित्रे किंवा व्हिडिओ',
     submitBtn: 'तिकीट सबमिट करा',
     submittingBtn: 'सबमिट होत आहे...',
-    successNotification: 'तिकीट यशस्वीरित्या सबमिट झाले!'
+    successNotification: 'तिकीट यशस्वीरित्या सबमिट झाले!',
+    voiceMessageLabel: 'ध्वनी संदेश',
+    speechLanguageLabel: 'बोलण्याची भाषा',
+    removeMedia: 'काढून टाका'
   },
   ur: {
     title: 'مسئلہ رپورٹ کریں',
@@ -142,7 +163,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'ٹائپ کریں یا بولنے کے لیے مائیک دبائیں۔',
     micListening: 'سن رہا ہے...',
     micTapToSpeak: 'بولنے کے لیے دبائیں',
-    locationLabel: 'مقام کی تصدیق',
+    locationLabel: 'مسئلے کا مقام',
     locationPlaceholder: 'پتہ خود درج کریں یا تلاش کریں',
     locationDetectBtn: 'میرا مقام تلاش کریں',
     detectingLocation: 'تلاش کر رہا ہے...',
@@ -151,7 +172,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'زیادہ سے زیادہ 5 تصاویر یا ویڈیوز',
     submitBtn: 'ٹکٹ جمع کروائیں',
     submittingBtn: 'جمع ہو رہا ہے...',
-    successNotification: 'ٹکٹ کامیابی سے جمع ہو گیا!'
+    successNotification: 'ٹکٹ کامیابی سے جمع ہو گیا!',
+    voiceMessageLabel: 'وائس میسج',
+    speechLanguageLabel: 'بولنے کی زبان',
+    removeMedia: 'ہٹائیں'
   },
   gu: {
     title: 'સમસ્યા રિપોર્ટ કરો',
@@ -161,7 +185,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'ટાઈપ કરો અથવા બોલવા માટે માઈક ટેપ કરો.',
     micListening: 'સાંભળી રહ્યું છે...',
     micTapToSpeak: 'બોલવા માટે ટેપ કરો',
-    locationLabel: 'સ્થાન ચકાસણી',
+    locationLabel: 'સમસ્યાનું સ્થળ',
     locationPlaceholder: 'સરનામું જાતે દાખલ કરો અથવા શોધો',
     locationDetectBtn: 'મારું સ્થાન શોધો',
     detectingLocation: 'શોધી રહ્યું છે...',
@@ -170,7 +194,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'મહત્તમ 5 છબીઓ અથવા વિડિઓઝ',
     submitBtn: 'ટિકિટ સબમિટ કરો',
     submittingBtn: 'સબમિટ થઈ રહ્યું છે...',
-    successNotification: 'ટિકિટ સફળતાપૂર્વક સબમિટ થઈ ગઈ!'
+    successNotification: 'ટિકિટ સફળતાપૂર્વક સબમિટ થઈ ગઈ!',
+    voiceMessageLabel: 'વોઇસ મેસેજ',
+    speechLanguageLabel: 'બોલવાની ભાષા',
+    removeMedia: 'દૂર કરો'
   },
   ml: {
     title: 'പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക',
@@ -180,7 +207,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ സംസാരിക്കാൻ മൈക്ക് അമർത്തുക.',
     micListening: 'ശ്രദ്ധിക്കുന്നു...',
     micTapToSpeak: 'സംസാരിക്കാൻ അമർത്തുക',
-    locationLabel: 'ലൊക്കേഷൻ സ്ഥിരീകരണം',
+    locationLabel: 'പ്രശ്നത്തിന്റെ സ്ഥലം',
     locationPlaceholder: 'വിലാസം നേരിട്ട് നൽകുക അല്ലെങ്കിൽ കണ്ടെത്തുക',
     locationDetectBtn: 'എന്റെ ലൊക്കേഷൻ കണ്ടെത്തുക',
     detectingLocation: 'കണ്ടെത്തുന്നു...',
@@ -189,7 +216,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'പരമാവധി 5 ചിത്രങ്ങൾ അല്ലെങ്കിൽ വീഡിയോകൾ',
     submitBtn: 'ടിക്കറ്റ് സമർപ്പിക്കുക',
     submittingBtn: 'സമർപ്പിക്കുന്നു...',
-    successNotification: 'ടിക്കറ്റ് വിജയകരമായി സമർപ്പിച്ചു!'
+    successNotification: 'ടിക്കറ്റ് വിജയകരമായി സമർപ്പിച്ചു!',
+    voiceMessageLabel: 'ശബ്ദ സന്ദേശം',
+    speechLanguageLabel: 'സംസാരിക്കുന്ന ഭാഷ',
+    removeMedia: 'നീക്കം ചെയ്യുക'
   },
   pa: {
     title: 'ਸਮੱਸਿਆ ਦੀ ਰਿਪੋਰਟ ਕਰੋ',
@@ -199,7 +229,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'ਟਾਈਪ ਕਰੋ ਜਾਂ ਬੋਲਣ ਲਈ ਮਾਈਕ ਦਬਾਓ।',
     micListening: 'ਸੁਣ ਰਿਹਾ ਹੈ...',
     micTapToSpeak: 'ਬੋਲਣ ਲਈ ਦਬਾਓ',
-    locationLabel: 'ਸਥਾਨ ਦੀ ਪੁਸ਼ਟੀ',
+    locationLabel: 'ਸਮੱਸਿਆ ਦਾ ਸਥਾਨ',
     locationPlaceholder: 'ਪਤਾ ਖੁਦ ਦਰਜ ਕਰੋ ਜਾਂ ਖੋਜੋ',
     locationDetectBtn: 'ਮੇਰੀ ਲੋਕੇਸ਼ਨ ਲੱਭੋ',
     detectingLocation: 'ਲੱਭ ਰਿਹਾ ਹੈ...',
@@ -208,7 +238,10 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'ਵੱਧ ਤੋਂ ਵੱਧ 5 ਤਸਵੀਰਾਂ ਜਾਂ ਵੀਡੀਓ',
     submitBtn: 'ਟਿਕਟ ਜਮ੍ਹਾਂ ਕਰੋ',
     submittingBtn: 'ਜਮ੍ਹਾਂ ਹੋ ਰਿਹਾ ਹੈ...',
-    successNotification: 'ਟਿਕਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਜਮ੍ਹਾਂ ਹੋ ਗਈ ਹੈ!'
+    successNotification: 'ਟਿਕਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਜਮ੍ਹਾਂ ਹੋ ਗਈ ਹੈ!',
+    voiceMessageLabel: 'ਵੌਇਸ ਸੰਦੇਸ਼',
+    speechLanguageLabel: 'ਬੋਲਣ ਵਾਲੀ ਭਾਸ਼ਾ',
+    removeMedia: 'ਹਟਾਓ'
   },
   or: {
     title: 'ସମସ୍ୟା ରିପୋର୍ଟ କରନ୍ତୁ',
@@ -218,16 +251,19 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'ଟାଇପ୍ କରନ୍ତୁ କିମ୍ବା କହିବା ପାଇଁ ମାଇକ୍ ଦବାନ୍ତୁ।',
     micListening: 'ଶୁଣୁଛି...',
     micTapToSpeak: 'କହିବା ପାଇଁ ଦବାନ୍ତୁ',
-    locationLabel: 'ସ୍ଥାନ ଯାଞ୍ଚ',
+    locationLabel: 'ସମସ୍ୟାର ସ୍ଥାନ',
     locationPlaceholder: 'ଠିକଣା ନିଜେ ଲେଖନ୍ତୁ କିମ୍ବା ସନ୍ଧାନ କରନ୍ତୁ',
     locationDetectBtn: 'ମୋର ସ୍ଥାନ ଖୋଜନ୍ତୁ',
     detectingLocation: 'ଖୋଜୁଛି...',
     uploadLabel: 'ଛବି ପ୍ରମାଣ ଅପଲୋଡ୍ କରନ୍ତୁ',
-    uploadDesc: 'ଛବିଗୁଡିକ ଆମ ଦଳକୁ ସମସ୍ୟାର ସମାଧାନ ଶୀଘ୍ର କରିବାରେ ସାହାଯ្យ କରେ।',
+    uploadDesc: 'ଛବିଗୁଡିକ ଆମ ଦଳକୁ ସମସ୍ୟାର ସମାଧାନ ଶୀଘ୍ର କରିବାରେ ସାହାଯ୍ୟ କରେ।',
     uploadHint: 'ସର୍ବାଧିକ ୫ଟି ଛବି କିମ୍ବା ଭିଡିଓ',
     submitBtn: 'ଟିକେଟ୍ ଦାଖଲ କରନ୍ତୁ',
     submittingBtn: 'ଦାଖଲ ହେଉଛି...',
-    successNotification: 'ଟିକେଟ୍ ସଫଳତାର ସହ ଦାଖଲ ହେଲା!'
+    successNotification: 'ଟିକେଟ୍ ସଫଳତାର ସହ ଦାଖଲ ହେଲା!',
+    voiceMessageLabel: 'ସ୍ୱର ସନ୍ଦେଶ',
+    speechLanguageLabel: 'କହିବା ଭାଷା',
+    removeMedia: 'ହଟାନ୍ତୁ'
   },
   as: {
     title: 'অভিযোগ দাখিল কৰক',
@@ -237,7 +273,7 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     textareaHint: 'টাইপ কৰক বা কথা কবলৈ মাইকত টিপক।',
     micListening: 'শুনি থকা হৈছে...',
     micTapToSpeak: 'কথা কবলৈ টিপক',
-    locationLabel: 'স্থান পৰীক্ষণ',
+    locationLabel: 'সমস্যাৰ স্থান',
     locationPlaceholder: 'ঠিকনা নিজেই লিখক বা সন্ধান কৰক',
     locationDetectBtn: 'মোৰ স্থান উলিয়াওক',
     detectingLocation: 'বিচাৰি থকা হৈছে...',
@@ -246,6 +282,31 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     uploadHint: 'সৰ্বাধিক ৫খন ছবি বা ভিডিঅ’',
     submitBtn: 'টিকট দাখিল কৰক',
     submittingBtn: 'দাখিল কৰি থকা হৈছে...',
-    successNotification: 'টিকট সফলতাৰে দাখিল কৰা হৈছে!'
+    successNotification: 'টিকট সফলতাৰে দাখিল কৰা হৈছে!',
+    voiceMessageLabel: 'মাতৰ বাৰ্তা',
+    speechLanguageLabel: 'কোৱা ভাষা',
+    removeMedia: 'আঁতৰাওক'
   }
 };
+
+export interface SpeechLangOption {
+  code: string;
+  name: string;
+}
+
+export const SPEECH_LANGUAGES: SpeechLangOption[] = [
+  { code: 'en-IN', name: 'English (India)' },
+  { code: 'hi-IN', name: 'हिंदी (Hindi)' },
+  { code: 'kn-IN', name: 'ಕನ್ನಡ (Kannada)' },
+  { code: 'ta-IN', name: 'தமிழ் (Tamil)' },
+  { code: 'te-IN', name: 'తెలుగు (Telugu)' },
+  { code: 'bn-IN', name: 'বাংলা (Bengali)' },
+  { code: 'mr-IN', name: 'मराठी (Marathi)' },
+  { code: 'gu-IN', name: 'ગુજરાતી (Gujarati)' },
+  { code: 'ml-IN', name: 'മലയാളം (Malayalam)' },
+  { code: 'pa-IN', name: 'ਪੰਜਾਬੀ (Punjabi)' },
+  { code: 'ur-PK', name: 'اردو (Urdu)' },
+  { code: 'as-IN', name: 'অসমীয়া (Assamese)' },
+  { code: 'or-IN', name: 'ଓଡ଼ିଆ (Odia)' }
+];
+

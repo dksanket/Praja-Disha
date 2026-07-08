@@ -419,6 +419,18 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  &--nested {
+    margin-left: 16px;
+
+    .tree-line {
+      left: -12px;
+
+      &::after {
+        width: 12px;
+      }
+    }
+  }
 }
 
 .tree-line {

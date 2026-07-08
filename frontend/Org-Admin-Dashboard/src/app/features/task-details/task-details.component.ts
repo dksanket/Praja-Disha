@@ -1,10 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { Subscription, interval } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { TASK_DETAILS_STRINGS } from './task-details.strings';
-import { TaskDetailsService, TaskDetailPayload } from '../../core/services/task-details.service';
+import { TaskDetailsService } from '../../core/services/task-details.service';
+import { TaskDetailPayload } from '../../core/models/task-detail.model';
+import { environment } from '../../../environments/environment';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 /**
  * TaskDetailsComponent — handles the Task Deep-Dive detail dashboard,
@@ -35,12 +38,16 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   formattedAudioTime = '0:00';
 
   private readonly subscription = new Subscription();
-  private audioTimerSubscription: Subscription | null = null;
+  private audio: HTMLAudioElement | null = null;
+
+  sanitizedMapUrl: SafeResourceUrl | null = null;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly location: Location,
-    private readonly taskDetailsService: TaskDetailsService
+    private readonly taskDetailsService: TaskDetailsService,
+    private readonly sanitizer: DomSanitizer,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +64,50 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    this.stopAudioTimer();
+    this.cleanupAudio();
+  }
+
+  /**
+   * Resolves relative media URLs to absolute URLs using apiBaseUrl.
+   */
+  private resolveUrl(url: string | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // Prepend backend apiBaseUrl to relative paths (e.g. /files/images/...)
+    return `${environment.apiBaseUrl}${url}`;
+  }
+
+  /**
+   * Processes the task details payload after fetching/updating, reversing
+   * the activities array (newest first) and resolving relative media URLs.
+   */
+  private processTaskDetails(data: TaskDetailPayload): TaskDetailPayload {
+    if (data) {
+      if (data.activities) {
+        data.activities = [...data.activities].reverse();
+      }
+      if (data.imageUrl) {
+        data.imageUrl = this.resolveUrl(data.imageUrl);
+      }
+      if (data.mediaUrls) {
+        data.mediaUrls = data.mediaUrls.map(url => this.resolveUrl(url));
+      }
+      if (data.voiceUrl) {
+        data.voiceUrl = this.resolveUrl(data.voiceUrl);
+      }
+      // Generate a secure Google Maps embed URL using the task location coordinate points
+      if (data.location && data.location.lat && data.location.lng) {
+        const lat = data.location.lat;
+        const lng = data.location.lng;
+        const url = `https://maps.google.com/maps?q=${lat},${lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        this.sanitizedMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      } else {
+        this.sanitizedMapUrl = null;
+      }
+    }
+    return data;
   }
 
   /**
@@ -67,7 +117,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.taskDetailsService.getTaskDetails(id).subscribe({
         next: (data) => {
-          this.task = data;
+          this.cleanupAudio();
+          this.task = this.processTaskDetails(data);
           this.resetAudioPlayer(data.voiceDuration);
         },
         error: (err) => console.error('Error fetching task details:', err)
@@ -76,10 +127,10 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Resets the mock audio player state.
+   * Resets the audio player state.
    */
   private resetAudioPlayer(durationStr: string): void {
-    this.stopAudioTimer();
+    this.cleanupAudio();
     this.isAudioPlaying = false;
     this.audioPercent = 0;
     this.currentAudioSeconds = 0;
@@ -97,41 +148,74 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Toggles the audio simulation play/pause state.
+   * Toggles the audio play/pause state.
    */
   toggleAudio(): void {
-    this.isAudioPlaying = !this.isAudioPlaying;
+    if (!this.task || !this.task.voiceUrl) return;
+
     if (this.isAudioPlaying) {
-      this.startAudioTimer();
+      this.pauseAudio();
     } else {
-      this.stopAudioTimer();
+      this.playAudio();
     }
   }
 
-  /**
-   * Starts the mock timer ticking every second.
-   */
-  private startAudioTimer(): void {
-    this.stopAudioTimer(); // safeguard
-    this.audioTimerSubscription = interval(1000).subscribe(() => {
-      this.currentAudioSeconds++;
-      if (this.currentAudioSeconds >= this.audioDurationSeconds) {
-        this.currentAudioSeconds = this.audioDurationSeconds;
-        this.stopAudioTimer();
-        this.isAudioPlaying = false;
-      }
-      this.audioPercent = (this.currentAudioSeconds / this.audioDurationSeconds) * 100;
-      this.formattedAudioTime = this.formatTime(this.currentAudioSeconds);
+  private playAudio(): void {
+    if (!this.audio) {
+      this.audio = new Audio(this.task!.voiceUrl);
+
+      this.audio.addEventListener('timeupdate', () => {
+        if (this.audio) {
+          this.currentAudioSeconds = Math.floor(this.audio.currentTime);
+          const duration = this.audio.duration || this.audioDurationSeconds;
+          this.audioPercent = duration > 0 ? (this.audio.currentTime / duration) * 100 : 0;
+          this.formattedAudioTime = this.formatTime(this.currentAudioSeconds);
+          this.cdr.detectChanges();
+        }
+      });
+
+      this.audio.addEventListener('ended', () => {
+        this.resetAudioState();
+        this.cdr.detectChanges();
+      });
+
+      this.audio.addEventListener('loadedmetadata', () => {
+        if (this.audio && this.audio.duration) {
+          this.audioDurationSeconds = Math.floor(this.audio.duration);
+        }
+      });
+    }
+
+    this.audio.play().then(() => {
+      this.isAudioPlaying = true;
+      this.cdr.detectChanges();
+    }).catch(err => {
+      console.error('Failed to play audio:', err);
+      this.isAudioPlaying = false;
+      this.cdr.detectChanges();
     });
   }
 
-  /**
-   * Stops the active audio simulation subscription.
-   */
-  private stopAudioTimer(): void {
-    if (this.audioTimerSubscription) {
-      this.audioTimerSubscription.unsubscribe();
-      this.audioTimerSubscription = null;
+  private pauseAudio(): void {
+    if (this.audio) {
+      this.audio.pause();
+    }
+    this.isAudioPlaying = false;
+    this.cdr.detectChanges();
+  }
+
+  private resetAudioState(): void {
+    this.isAudioPlaying = false;
+    this.audioPercent = 0;
+    this.currentAudioSeconds = 0;
+    this.formattedAudioTime = '0:00';
+  }
+
+  private cleanupAudio(): void {
+    this.resetAudioState();
+    if (this.audio) {
+      this.audio.pause();
+      this.audio = null;
     }
   }
 
@@ -181,7 +265,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
         'Suresh M.' // Logged in officer name (mocked)
       ).subscribe({
         next: (updatedTask) => {
-          this.task = updatedTask;
+          this.task = this.processTaskDetails(updatedTask);
           this.newCommentText = '';
         },
         error: (err) => console.error('Error submitting comment:', err)
@@ -203,7 +287,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
         'Suresh M.' // Logged in officer name (mocked)
       ).subscribe({
         next: (updatedTask) => {
-          this.task = updatedTask;
+          this.task = this.processTaskDetails(updatedTask);
           this.newNoteText = '';
         },
         error: (err) => console.error('Error saving note:', err)

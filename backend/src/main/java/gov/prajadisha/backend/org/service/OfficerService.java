@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OfficerService {
@@ -44,6 +45,26 @@ public class OfficerService {
             input.setCreatedAt(existing.getCreatedAt());
         }
         return officers.save(input);
+    }
+
+    public Optional<Officer> findByIdentifier(String identifier) {
+        // Support lookup by username, email, or phone
+        return officers.findByOfficerUserName(identifier)
+                .or(() -> officers.findByEmail(identifier))
+                .or(() -> officers.findByPhone(identifier));
+    }
+
+    /**
+     * Checks if the officer is active and belongs to at least one organization or department.
+     */
+    public boolean canLogin(Officer officer) {
+        // Comment: Also check if the officer status is active
+        if (!officer.isActive()) {
+            return false;
+        }
+        boolean hasOrg = officer.getOrgIds() != null && !officer.getOrgIds().isEmpty();
+        boolean hasDept = officer.getDepartmentIds() != null && !officer.getDepartmentIds().isEmpty();
+        return hasOrg || hasDept;
     }
 
     private String uniqueId() {

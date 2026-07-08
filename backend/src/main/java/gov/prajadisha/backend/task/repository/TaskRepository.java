@@ -10,4 +10,7 @@ public interface TaskRepository extends MongoRepository<Task, String> {
     List<Task> findByOrgId(String orgId, Pageable pageable);
     List<Task> findByPriority(String priority, Pageable pageable);
     List<Task> findByCitizenUserName(String citizenUserName);
+    List<Task> findByParentTaskId(String parentTaskId);
+    List<Task> findByOrgIdAndParentTaskIdIsNull(String orgId, Pageable pageable);
+    List<Task> findByPriorityAndParentTaskIdIsNull(String priority, Pageable pageable);
 }

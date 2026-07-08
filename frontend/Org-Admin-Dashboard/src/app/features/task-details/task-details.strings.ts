@@ -9,6 +9,7 @@ export const TASK_DETAILS_STRINGS = {
     created: 'Created:',
     reportedBy: 'Reported by:',
     descAndAudio: 'Description & Audio',
+    transcription: 'Transcription',
     metadataHeader: 'Metadata',
     category: 'Category',
     language: 'Language',

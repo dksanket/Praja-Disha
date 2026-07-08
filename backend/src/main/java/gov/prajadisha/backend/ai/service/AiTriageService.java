@@ -43,7 +43,7 @@ public class AiTriageService {
         this.departments = departments;
     }
 
-    public record Classification(String category, String priority, String suggestedDepartment) {}
+    public record Classification(String category, String priority, String suggestedDepartment, String title, String language) {}
 
     public Classification classify(Task task) {
         if (ollama.isEnabled()) {
@@ -94,7 +94,10 @@ public class AiTriageService {
         String system = """
                 You are the auto-triage router for a municipal civic-issue platform.
                 Classify each citizen-reported ticket into exactly one category and one priority,
-                and route it to the single most appropriate department.
+                route it to the single most appropriate department, generate a short, concise,
+                actionable title (max 5-7 words) for the ticket based on the description, location, or voice transcript,
+                and detect the primary language of the ticket text (e.g. "English", "Kannada", "Hindi", "Telugu", "Tamil", etc.).
+                If the text is in an Indian language but written using English script (transliterated), identify it as the respective Indian language (e.g. "Kannada" or "Hindi").
                 Treat public-safety hazards (electrical, structural collapse, fire, flooding, accidents)
                 as the highest priority. Respond ONLY with JSON matching the requested schema.
                 """
@@ -114,6 +117,7 @@ public class AiTriageService {
                 %s
 
                 Pick the best-fitting category name, priority, and department name from the lists above.
+                Also generate a short summary title.
                 """.formatted(
                         nullToEmpty(task.getTitle()),
                         nullToEmpty(task.getDescription()),
@@ -127,8 +131,16 @@ public class AiTriageService {
                 priorities.isEmpty() ? "P2" : priorities.get(priorities.size() > 2 ? 2 : 0));
         String department = firstNonBlank(result.path("suggestedDepartment").asText(""),
                 deptNames.isEmpty() ? "General Administration" : deptNames.get(0));
+        String title = result.path("title").asText("").trim();
+        if (title.isBlank()) {
+            title = generateFallbackTitle(task.getDescription());
+        }
+        String language = result.path("language").asText("").trim();
+        if (language.isBlank()) {
+            language = "English";
+        }
 
-        return new Classification(category, priority, department);
+        return new Classification(category, priority, department, title, language);
     }
 
     private Map<String, Object> classificationSchema() {
@@ -138,8 +150,10 @@ public class AiTriageService {
         props.put("category", Map.of("type", "string"));
         props.put("priority", Map.of("type", "string"));
         props.put("suggestedDepartment", Map.of("type", "string"));
+        props.put("title", Map.of("type", "string"));
+        props.put("language", Map.of("type", "string"));
         schema.put("properties", props);
-        schema.put("required", List.of("category", "priority", "suggestedDepartment"));
+        schema.put("required", List.of("category", "priority", "suggestedDepartment", "title", "language"));
         return schema;
     }
 
@@ -156,26 +170,49 @@ public class AiTriageService {
                 .orElseGet(() -> List.of("P0", "P1", "P2", "P3"));
     }
 
-    // -------------------------------------------------------------- keyword path
-
     private Classification classifyByKeyword(Task task) {
         String text = (nullToEmpty(task.getTitle()) + " " + nullToEmpty(task.getDescription()))
                 .toLowerCase(Locale.ROOT);
 
         String category = "Grievance";
         String department = "General Administration";
+        String title = "Civic Concern";
         if (containsAny(text, "streetlight", "light", "road", "pothole", "signal", "footpath", "bridge")) {
             category = "Infrastructure";
             department = "Roads & Streetlights";
+            if (text.contains("light") || text.contains("lamp")) {
+                title = "Streetlight Issue";
+            } else if (text.contains("pothole")) {
+                title = "Road Pothole";
+            } else {
+                title = "Infrastructure Concern";
+            }
         } else if (containsAny(text, "garbage", "waste", "sewage", "drain", "sanitation", "toilet")) {
             category = "Sanitation";
             department = "Sanitation";
+            if (text.contains("garbage") || text.contains("waste")) {
+                title = "Garbage Dumping";
+            } else if (text.contains("sewage") || text.contains("drain")) {
+                title = "Drainage/Sewage Issue";
+            } else {
+                title = "Sanitation Concern";
+            }
         } else if (containsAny(text, "water", "supply", "leak", "pipe")) {
             category = "Water Supply";
             department = "Water Board";
+            if (text.contains("leak") || text.contains("pipe")) {
+                title = "Water Pipe Leak";
+            } else {
+                title = "Water Supply Concern";
+            }
         } else if (containsAny(text, "tree", "park", "garden", "horticulture")) {
             category = "Horticulture";
             department = "Horticulture";
+            title = "Horticulture Issue";
+        }
+
+        if ("Civic Concern".equals(title)) {
+            title = generateFallbackTitle(task.getDescription());
         }
 
         String priority = "P2";
@@ -185,7 +222,24 @@ public class AiTriageService {
             priority = "P1";
         }
 
-        return new Classification(category, priority, department);
+        return new Classification(category, priority, department, title, "English");
+    }
+
+    private String generateFallbackTitle(String description) {
+        if (description == null || description.isBlank()) {
+            return "Civic Concern";
+        }
+        String clean = description.trim();
+        int sentenceEnd = clean.indexOf('.');
+        if (sentenceEnd > 10 && sentenceEnd < 50) {
+            return clean.substring(0, sentenceEnd);
+        }
+        String[] words = clean.split("\\s+");
+        if (words.length <= 5) {
+            return clean;
+        } else {
+            return String.join(" ", java.util.Arrays.copyOfRange(words, 0, 5)) + "...";
+        }
     }
 
     // ----------------------------------------------------------------- helpers

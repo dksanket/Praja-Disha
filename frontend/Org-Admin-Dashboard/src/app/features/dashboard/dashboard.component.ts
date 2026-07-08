@@ -66,7 +66,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.dashboardService.getTasks().subscribe({
         next: (tasks) => {
-          this.allTasks = tasks;
+          this.allTasks = this.markDuplicateGroups(tasks);
           this.applyFiltersAndPagination();
         },
         error: (err) => console.error('Error fetching triage tasks:', err),
@@ -163,5 +163,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Calculate button availability
     this.hasPreviousPage = this.currentPage > 1;
     this.hasNextPage = this.currentPage < this.totalPages;
+  }
+
+  /**
+   * Helper to mark tasks as being part of a duplicate group if their groupId
+   * is shared with other tasks in the active list.
+   */
+  private markDuplicateGroups(tasks: DashboardTask[]): DashboardTask[] {
+    const groupCounts = new Map<string, number>();
+
+    // Count occurrences of each groupId
+    for (const t of tasks) {
+      if (t.groupId) {
+        groupCounts.set(t.groupId, (groupCounts.get(t.groupId) || 0) + 1);
+      }
+    }
+
+    // Mark tasks with isDuplicateGroup = true if the groupId occurs more than once
+    return tasks.map((t) => ({
+      ...t,
+      isDuplicateGroup: t.groupId ? (groupCounts.get(t.groupId) || 0) > 1 : false,
+    }));
   }
 }

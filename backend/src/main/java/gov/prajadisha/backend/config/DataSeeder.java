@@ -197,7 +197,6 @@ public class DataSeeder implements CommandLineRunner {
                 .reporterType("Citizen")
                 .dueDate(now + 4L * 24 * 60 * 60 * 1000)
                 .createdAt(now - 2L * 24 * 60 * 60 * 1000)
-                .subTasks(new ArrayList<>())
                 .comments(new ArrayList<>())
                 .notes(new ArrayList<>())
                 .activities(new ArrayList<>(List.of(DetailedActivity.builder()
