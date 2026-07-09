@@ -270,6 +270,11 @@ public class AiChatService {
                     .withZone(java.time.ZoneId.systemDefault())
                     .format(java.time.Instant.ofEpochMilli(t.getCreatedAt()));
 
+            // Format due date (display "None" if not set)
+            String dueStr = t.getDueDate() > 0 ? java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    .withZone(java.time.ZoneId.systemDefault())
+                    .format(java.time.Instant.ofEpochMilli(t.getDueDate())) : "None";
+
             // Find resolved assigned departments
             List<TaskAssignment> assignments = taskAssignments.findByTaskId(t.getId());
             String assignedDepts = assignments.stream()
@@ -279,10 +284,11 @@ public class AiChatService {
                 assignedDepts = t.getCategory() != null ? t.getCategory() : "None";
             }
 
-            sb.append(String.format("- Task ID: %s | Title: %s | Created: %s | Status: %s | Priority: %s | Category: %s | Department: %s | Description: %s\n",
+            sb.append(String.format("- Task ID: %s | Title: %s | Created: %s | Due Date: %s | Status: %s | Priority: %s | Category: %s | Department: %s | Description: %s\n",
                     t.getId(),
                     t.getTitle(),
                     createdStr,
+                    dueStr,
                     t.getGlobalStatus(),
                     t.getPriority(),
                     t.getCategory(),

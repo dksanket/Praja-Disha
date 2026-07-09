@@ -33,6 +33,10 @@ export const DASHBOARD_STRINGS = {
       priorityP1: 'P1',
       priorityP2: 'P2',
       assignment: 'Filter Dept',
+      assignmentSearch: 'Search departments...',
+      assignmentSelected: 'selected',
+      assignmentSelectAll: 'Select All',
+      assignmentClearAll: 'Clear All',
       dueDate: 'Filter Date',
       statusAll: 'All Statuses',
       statusAiPending: 'Awaiting AI Review',
@@ -50,6 +54,7 @@ export const DASHBOARD_STRINGS = {
     duplicateTooltip: 'This ticket is grouped with other duplicate reports in the same area. Click to filter.',
     filterGroupLabel: 'Filtering by Group:',
     clearFilterLabel: 'Clear',
+    unassigned: 'Unassigned',
   },
   footer: {
     brandCopy: 'Praja Disha Governance Suite © 2026',

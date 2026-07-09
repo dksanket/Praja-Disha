@@ -410,7 +410,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       this.selectedOfficerId = '';
       
       if (this.task.subTasks && this.task.subTasks.length > 0) {
-        const rootNode = this.task.subTasks[0];
+        const rootNode = this.task.subTasks.find(s => s.id === this.task!.id) || this.task.subTasks[0];
         const dept = this.departmentsList.find(d => d.name === rootNode.department);
         if (dept) {
           this.selectedDeptId = dept.id;

@@ -770,5 +770,69 @@ The escalation matrix is structured to ensure accountability. If a ticket is not
                         .remarks("Auto-classified as Utilities / P1 and routed to Utilities & Civil Infrastructure Liaison")
                         .build())))
                 .build());
+
+        // Seed TaskAssignments for PD-1001
+        java.util.Optional<Department> optMplads = departments.findByOrgId(orgId).stream()
+                .filter(d -> "MPLADS & Infrastructure Development".equals(d.getName()))
+                .findFirst();
+        java.util.Optional<Department> optPw = departments.findByOrgId(orgId).stream()
+                .filter(d -> "Public Works & Civic Amenities".equals(d.getName()))
+                .findFirst();
+        java.util.Optional<Officer> optAnanya = officers.findByOfficerUserName("ananya_sen");
+
+        if (optMplads.isPresent() && optPw.isPresent() && optAnanya.isPresent()) {
+            Department root = optMplads.get();
+            Department leaf = optPw.get();
+            Officer officer = optAnanya.get();
+            long assignedTime = now - 2L * 24 * 60 * 60 * 1000;
+
+            taskAssignments.save(gov.prajadisha.backend.task.model.TaskAssignment.builder()
+                    .taskId("PD-1001")
+                    .departmentId(root.getId())
+                    .officerId(root.getHeadOfficerId())
+                    .status("PENDING")
+                    .assignedAt(assignedTime)
+                    .build());
+
+            taskAssignments.save(gov.prajadisha.backend.task.model.TaskAssignment.builder()
+                    .taskId("PD-1001")
+                    .departmentId(leaf.getId())
+                    .officerId(officer.getId())
+                    .status("PENDING")
+                    .assignedAt(assignedTime)
+                    .build());
+        }
+
+        // Seed TaskAssignments for PD-1002
+        java.util.Optional<Department> optGrievance = departments.findByOrgId(orgId).stream()
+                .filter(d -> "Public Grievance, Sanitation & Waste Management".equals(d.getName()))
+                .findFirst();
+        java.util.Optional<Department> optDrainage = departments.findByOrgId(orgId).stream()
+                .filter(d -> "Drainage, Sewerage & Water Logging Control".equals(d.getName()))
+                .findFirst();
+        java.util.Optional<Officer> optPriya = officers.findByOfficerUserName("priya_iyer");
+
+        if (optGrievance.isPresent() && optDrainage.isPresent() && optPriya.isPresent()) {
+            Department root = optGrievance.get();
+            Department leaf = optDrainage.get();
+            Officer officer = optPriya.get();
+            long assignedTime = now - 1L * 24 * 60 * 60 * 1000;
+
+            taskAssignments.save(gov.prajadisha.backend.task.model.TaskAssignment.builder()
+                    .taskId("PD-1002")
+                    .departmentId(root.getId())
+                    .officerId(root.getHeadOfficerId())
+                    .status("PENDING")
+                    .assignedAt(assignedTime)
+                    .build());
+
+            taskAssignments.save(gov.prajadisha.backend.task.model.TaskAssignment.builder()
+                    .taskId("PD-1002")
+                    .departmentId(leaf.getId())
+                    .officerId(officer.getId())
+                    .status("PENDING")
+                    .assignedAt(assignedTime)
+                    .build());
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -6,6 +6,12 @@ import { Subscription } from 'rxjs';
 import { DASHBOARD_STRINGS } from './dashboard.strings';
 import { DashboardTask, DashboardStats } from '../../core/models/dashboard.model';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { DepartmentService } from '../../core/services/department.service';
+import { Department } from '../../core/models/department.model';
+
+export interface DropdownDepartment extends Department {
+  selected: boolean;
+}
 
 /**
  * DashboardComponent — Command Center Dashboard feature component.
@@ -33,12 +39,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   filterTaskId = '';
   filterTitle = '';
   filterPriority = 'all';
-  filterAssignment = '';
   filterDueDate = '';
   filterStatus = 'all';
   selectedFilter: 'all' | 'ai-pending' | 'due-today' = 'all';
   selectedGroupId: string | null = null;
   showFutureFeatureModal = false;
+
+  // Department dropdown states
+  hierarchicalDepartments: DropdownDepartment[] = [];
+  filteredDropdownDepts: DropdownDepartment[] = [];
+  selectedDeptNames: string[] = [];
+  selectedDeptNamesSummary = '';
+  dropdownOpen = false;
+  deptSearchQuery = '';
 
   // Pagination states
   currentPage = 1;
@@ -56,9 +69,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private readonly subscription = new Subscription();
 
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly departmentService: DepartmentService
+  ) {}
 
   ngOnInit(): void {
+    this.selectedDeptNamesSummary = this.strings.triageTable.filterPlaceholders.assignment;
+
     // Fetches live statistics
     this.subscription.add(
       this.dashboardService.getStats().subscribe({
@@ -77,6 +95,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.applyFiltersAndPagination();
         },
         error: (err) => console.error('Error fetching triage tasks:', err),
+      })
+    );
+
+    // Fetches departments
+    this.subscription.add(
+      this.departmentService.getDepartments().subscribe({
+        next: (depts) => {
+          this.buildHierarchicalDepartments(depts);
+        },
+        error: (err) => console.error('Error fetching departments:', err),
       })
     );
   }
@@ -167,11 +195,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       }
 
-      // 4. Assignment filter (checks if any assignment label contains the search text)
-      if (this.filterAssignment) {
-        const assignSearch = this.filterAssignment.trim().toLowerCase();
+      // 4. Assignment filter (checks if task assignments match any of the selected department names)
+      if (this.selectedDeptNames.length > 0) {
         const hasAssignMatch = task.assignments.some((assign) =>
-          assign.label.toLowerCase().includes(assignSearch)
+          this.selectedDeptNames.includes(assign.label)
         );
         if (!hasAssignMatch) {
           return false;
@@ -269,5 +296,104 @@ export class DashboardComponent implements OnInit, OnDestroy {
    */
   closeFutureFeatureModal(): void {
     this.showFutureFeatureModal = false;
+  }
+
+  /**
+   * Builds the sorted hierarchical department options.
+   */
+  private buildHierarchicalDepartments(depts: Department[]): void {
+    const rootDepts = depts.filter((d) => !d.parentDepartmentId);
+    const result: DropdownDepartment[] = [];
+
+    const traverse = (dept: Department) => {
+      result.push({
+        ...dept,
+        selected: false,
+      });
+      const children = depts.filter((d) => d.parentDepartmentId === dept.id);
+      children.sort((a, b) => a.name.localeCompare(b.name));
+      children.forEach(traverse);
+    };
+
+    rootDepts.sort((a, b) => a.name.localeCompare(b.name));
+    rootDepts.forEach(traverse);
+
+    // Fallback: append any orphaned departments
+    depts.forEach((d) => {
+      if (!result.some((r) => r.id === d.id)) {
+        result.push({
+          ...d,
+          selected: false,
+        });
+      }
+    });
+
+    this.hierarchicalDepartments = result;
+    this.filteredDropdownDepts = result;
+  }
+
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+    if (this.dropdownOpen) {
+      this.deptSearchQuery = '';
+      this.filteredDropdownDepts = this.hierarchicalDepartments;
+    }
+  }
+
+  toggleDeptSelection(deptName: string): void {
+    const dept = this.hierarchicalDepartments.find((d) => d.name === deptName);
+    if (dept) {
+      dept.selected = !dept.selected;
+      this.updateSelectionAndFilter();
+    }
+  }
+
+  selectAllDepts(): void {
+    this.filteredDropdownDepts.forEach((d) => {
+      d.selected = true;
+    });
+    this.updateSelectionAndFilter();
+  }
+
+  clearAllDepts(): void {
+    this.filteredDropdownDepts.forEach((d) => {
+      d.selected = false;
+    });
+    this.updateSelectionAndFilter();
+  }
+
+  onDeptSearchChange(): void {
+    const query = this.deptSearchQuery.toLowerCase().trim();
+    if (!query) {
+      this.filteredDropdownDepts = this.hierarchicalDepartments;
+    } else {
+      this.filteredDropdownDepts = this.hierarchicalDepartments.filter((d) =>
+        d.name.toLowerCase().includes(query)
+      );
+    }
+  }
+
+  private updateSelectionAndFilter(): void {
+    this.selectedDeptNames = this.hierarchicalDepartments
+      .filter((d) => d.selected)
+      .map((d) => d.name);
+
+    if (this.selectedDeptNames.length === 0) {
+      this.selectedDeptNamesSummary = this.strings.triageTable.filterPlaceholders.assignment;
+    } else if (this.selectedDeptNames.length === 1) {
+      this.selectedDeptNamesSummary = this.selectedDeptNames[0];
+    } else {
+      this.selectedDeptNamesSummary = `${this.selectedDeptNames.length} ${this.strings.triageTable.filterPlaceholders.assignmentSelected}`;
+    }
+
+    this.onFilterChange();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dept-dropdown-container')) {
+      this.dropdownOpen = false;
+    }
   }
 }
