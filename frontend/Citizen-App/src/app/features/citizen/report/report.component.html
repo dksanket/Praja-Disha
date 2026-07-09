@@ -146,6 +146,14 @@
               <span class="material-symbols-outlined text-lg">{{ isDetectingLocation ? 'progress_activity' : 'my_location' }}</span>
               {{ isDetectingLocation ? strings.detectingLocation : strings.locationDetectBtn }}
             </button>
+
+            <!-- Demo Constraint Location Note -->
+            <div class="p-3.5 bg-primary/5 rounded-xl border border-primary/20 flex items-start gap-2.5 shadow-sm">
+              <span class="material-symbols-outlined text-primary text-lg mt-0.5 select-none">info</span>
+              <p class="font-body-md text-xs text-secondary leading-normal">
+                {{ strings.locationNote }}
+              </p>
+            </div>
           </div>
         </div>
       </div>

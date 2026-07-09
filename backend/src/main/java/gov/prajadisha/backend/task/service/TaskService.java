@@ -289,15 +289,9 @@ public class TaskService {
                             assignedOfficer = officers.findById(targetDept.getHeadOfficerId()).orElse(null);
                         }
 
-                        taskAssignments.deleteByTaskId(task.getId());
-                        TaskAssignment assignment = TaskAssignment.builder()
-                                .taskId(task.getId())
-                                .departmentId(targetDept.getId())
-                                .officerId(assignedOfficer != null ? assignedOfficer.getId() : null)
-                                .status("PENDING")
-                                .assignedAt(System.currentTimeMillis())
-                                .build();
-                        taskAssignments.save(assignment);
+                        // Assign task to the entire department hierarchy (from root down to leaf)
+                        saveHierarchyAssignments(task.getId(), targetDept.getId(), assignedOfficer != null ? assignedOfficer.getId() : null, System.currentTimeMillis());
+
 
                         task.getActivities().add(DetailedActivity.builder()
                                 .timestamp(Formats.dateTime(System.currentTimeMillis()))
@@ -427,8 +421,14 @@ public class TaskService {
 
     private DashboardTaskRow toRow(Task t) {
         List<Assignment> assignments = new ArrayList<>();
-        if (t.getCategory() != null && !t.getCategory().isBlank()) {
-            assignments.add(Assignment.dept(t.getCategory()));
+        // Fetch all assignments in the hierarchy sorted from root to leaf
+        List<TaskAssignment> assigns = getSortedAssignmentsForTask(t.getId());
+        if (assigns != null && !assigns.isEmpty()) {
+            for (TaskAssignment a : assigns) {
+                departments.findById(a.getDepartmentId()).ifPresent(dept -> {
+                    assignments.add(Assignment.dept(dept.getName()));
+                });
+            }
         }
 
         String statusType = statusType(t);
@@ -495,42 +495,72 @@ public class TaskService {
 
         List<gov.prajadisha.backend.task.dto.TaskDtos.SubTask> mappedSubTasks = new ArrayList<>();
 
-        // 1. Add the root task itself as the first item in the subTasks tree
-        String rootDept = t.getCategory();
-        String rootAssignee = "";
-        String rootRole = "Root Task";
-        try {
-            List<TaskAssignment> rootAssigns = taskAssignments.findByTaskId(t.getId());
-            if (rootAssigns != null && !rootAssigns.isEmpty()) {
-                TaskAssignment rootAssign = rootAssigns.get(0);
-                String deptName = departments.findById(rootAssign.getDepartmentId())
-                        .map(gov.prajadisha.backend.org.model.Department::getName)
-                        .orElse("");
-                if (!deptName.isEmpty()) {
-                    rootDept = deptName;
-                }
-                if (rootAssign.getOfficerId() != null && !rootAssign.getOfficerId().isBlank()) {
-                    rootAssignee = officers.findById(rootAssign.getOfficerId())
+        // 1. Add the department hierarchy chain of the root task as tree nodes
+        List<TaskAssignment> rootAssigns = getSortedAssignmentsForTask(t.getId());
+        if (rootAssigns == null || rootAssigns.isEmpty()) {
+            // Fallback to task category if no assignments are found
+            mappedSubTasks.add(new gov.prajadisha.backend.task.dto.TaskDtos.SubTask(
+                    t.getId(),
+                    null,
+                    t.getTitle(),
+                    "Root Task",
+                    t.getCategory(),
+                    "account_tree",
+                    "ACTIVE",
+                    "bg-primary-container text-on-primary-container",
+                    "",
+                    ""
+            ));
+        } else {
+            for (int i = 0; i < rootAssigns.size(); i++) {
+                TaskAssignment assign = rootAssigns.get(i);
+                Department dept = departments.findById(assign.getDepartmentId()).orElse(null);
+                if (dept == null) continue;
+                
+                String deptName = dept.getName();
+                String assignee = "";
+                if (assign.getOfficerId() != null && !assign.getOfficerId().isBlank()) {
+                    assignee = officers.findById(assign.getOfficerId())
                             .map(gov.prajadisha.backend.org.model.Officer::getName)
                             .orElse("");
                 }
+                
+                String role = "Division";
+                if (i == 0) {
+                    role = "Root Division";
+                } else if (i == rootAssigns.size() - 1) {
+                    role = "Root Task"; // Matches frontend filter to identify the leaf task node
+                } else {
+                    role = "Sub-Division";
+                }
+                
+                String nodeId;
+                String parentNodeId;
+                if (i == 0) {
+                    nodeId = t.getId() + "-root";
+                    parentNodeId = null;
+                } else if (i == rootAssigns.size() - 1) {
+                    nodeId = t.getId(); // Leaf ID matches t.getId() so actual subtasks nest under it
+                    parentNodeId = t.getId() + (i - 1 == 0 ? "-root" : "-level-" + (i - 1));
+                } else {
+                    nodeId = t.getId() + "-level-" + i;
+                    parentNodeId = t.getId() + (i - 1 == 0 ? "-root" : "-level-" + (i - 1));
+                }
+                
+                mappedSubTasks.add(new gov.prajadisha.backend.task.dto.TaskDtos.SubTask(
+                        nodeId,
+                        parentNodeId,
+                        t.getTitle(),
+                        role,
+                        deptName,
+                        "account_tree",
+                        "ACTIVE",
+                        "bg-primary-container text-on-primary-container",
+                        assignee,
+                        ""
+                ));
             }
-        } catch (Exception ex) {
-            log.error("Failed to fetch assignments for root task: {}", t.getId(), ex);
         }
-
-        mappedSubTasks.add(new gov.prajadisha.backend.task.dto.TaskDtos.SubTask(
-                t.getId(),
-                null,
-                t.getTitle(),
-                rootRole,
-                rootDept,
-                "account_tree",
-                "ACTIVE",
-                "bg-primary-container text-on-primary-container",
-                rootAssignee,
-                ""
-        ));
 
         // 2. Add each actual subtask
         for (Task subT : sub) {
@@ -539,9 +569,10 @@ public class TaskService {
             String roleStr = "Unassigned";
 
             try {
-                List<TaskAssignment> assigns = taskAssignments.findByTaskId(subT.getId());
+                // Fetch assignments sorted from root to leaf and pick the leaf assignment details
+                List<TaskAssignment> assigns = getSortedAssignmentsForTask(subT.getId());
                 if (assigns != null && !assigns.isEmpty()) {
-                    TaskAssignment assign = assigns.get(0);
+                    TaskAssignment assign = assigns.get(assigns.size() - 1);
                     gov.prajadisha.backend.org.model.Department dept = departments.findById(assign.getDepartmentId()).orElse(null);
                     if (dept != null) {
                         deptName = dept.getName();
@@ -679,18 +710,8 @@ public class TaskService {
     }
 
     public TaskDetailPayload updateAssignee(String id, gov.prajadisha.backend.task.dto.TaskDtos.UpdateAssigneeRequest req) {
-        taskAssignments.deleteByTaskId(id);
-        
-        if (req.departmentId() != null && !req.departmentId().isBlank()) {
-            TaskAssignment assignment = TaskAssignment.builder()
-                    .taskId(id)
-                    .departmentId(req.departmentId())
-                    .officerId(req.officerId())
-                    .status("PENDING")
-                    .assignedAt(System.currentTimeMillis())
-                    .build();
-            taskAssignments.save(assignment);
-        }
+        // Save the complete hierarchy of departments for this reassignment
+        saveHierarchyAssignments(id, req.departmentId(), req.officerId(), System.currentTimeMillis());
         
         Task task = get(id);
         
@@ -845,14 +866,8 @@ public class TaskService {
         Task saved = tasks.save(subTask);
 
         if (req.departmentId() != null && !req.departmentId().isBlank()) {
-            TaskAssignment assignment = TaskAssignment.builder()
-                    .taskId(saved.getId())
-                    .departmentId(req.departmentId())
-                    .officerId(req.officerId())
-                    .status("PENDING")
-                    .assignedAt(now)
-                    .build();
-            taskAssignments.save(assignment);
+            // Save the complete hierarchy of departments for the subtask
+            saveHierarchyAssignments(saved.getId(), req.departmentId(), req.officerId(), now);
         }
 
         parent.getActivities().add(DetailedActivity.builder()
@@ -1322,6 +1337,76 @@ public class TaskService {
             }
         }
         return candidates.isEmpty() ? null : candidates.get(0);
+    }
+
+    /**
+     * Resolves the full department hierarchy from a given target department ID
+     * up to the root, creating TaskAssignment records for each tier.
+     */
+    private void saveHierarchyAssignments(String taskId, String targetDeptId, String targetOfficerId, long now) {
+        taskAssignments.deleteByTaskId(taskId);
+        if (targetDeptId == null || targetDeptId.isBlank()) {
+            return;
+        }
+
+        List<Department> hierarchy = new ArrayList<>();
+        String currentDeptId = targetDeptId;
+        while (currentDeptId != null && !currentDeptId.isBlank()) {
+            Optional<Department> optDept = departments.findById(currentDeptId);
+            if (optDept.isPresent()) {
+                Department dept = optDept.get();
+                // Add at start of list so root/parent departments come first, leaf last
+                hierarchy.add(0, dept);
+                currentDeptId = dept.getParentDepartmentId();
+            } else {
+                break;
+            }
+        }
+
+        for (Department dept : hierarchy) {
+            String officerId = null;
+            if (dept.getId().equals(targetDeptId)) {
+                // Leaf department gets the specifically assigned officer
+                officerId = targetOfficerId;
+            } else {
+                // Parent departments default to their respective head officers
+                officerId = dept.getHeadOfficerId();
+            }
+            TaskAssignment assignment = TaskAssignment.builder()
+                    .taskId(taskId)
+                    .departmentId(dept.getId())
+                    .officerId(officerId)
+                    .status("PENDING")
+                    .assignedAt(now)
+                    .build();
+            taskAssignments.save(assignment);
+        }
+    }
+
+    /**
+     * Retrieves all TaskAssignment records for a given task, sorted from
+     * root to leaf based on their department hierarchy depth.
+     */
+    private List<TaskAssignment> getSortedAssignmentsForTask(String taskId) {
+        List<TaskAssignment> list = taskAssignments.findByTaskId(taskId);
+        if (list == null || list.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        java.util.Map<String, Integer> deptDepths = new java.util.HashMap<>();
+        for (TaskAssignment a : list) {
+            departments.findById(a.getDepartmentId()).ifPresent(d -> {
+                deptDepths.put(d.getId(), d.getDepth() != null ? d.getDepth() : 0);
+            });
+        }
+        
+        // Sort ascending so root department (depth 0) is first, leaf is last
+        list.sort((a1, a2) -> {
+            int d1 = deptDepths.getOrDefault(a1.getDepartmentId(), 0);
+            int d2 = deptDepths.getOrDefault(a2.getDepartmentId(), 0);
+            return Integer.compare(d1, d2);
+        });
+        return list;
     }
 }
 

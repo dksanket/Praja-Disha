@@ -211,6 +211,7 @@ class TaskServiceTest {
         when(organizations.findById("ORG-101")).thenReturn(Optional.of(org));
         when(organizations.findAll()).thenReturn(List.of(org));
         when(departments.findByOrgId("ORG-101")).thenReturn(List.of(dept));
+        when(departments.findById("DPT-001")).thenReturn(Optional.of(dept));
         when(officers.findByDepartmentIdsContaining("DPT-001")).thenReturn(List.of(officer));
         when(taskAssignments.countByOfficerIdAndStatusIn(eq("OFF-101"), any())).thenReturn(0L);
         when(ollama.isEnabled()).thenReturn(false); // test fallback flow

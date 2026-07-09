@@ -156,14 +156,69 @@
                 </select>
               </th>
               <th class="triage-table__filter-th">
-                <input
-                  type="text"
-                  class="triage-table__filter-input"
-                  [placeholder]="strings.triageTable.filterPlaceholders.assignment"
-                  [(ngModel)]="filterAssignment"
-                  (ngModelChange)="onFilterChange()"
-                  aria-label="Filter by Assignment"
-                  id="filter-assignment" />
+                <div class="dept-dropdown-container">
+                  <button
+                    type="button"
+                    class="dept-dropdown-trigger"
+                    (click)="toggleDropdown()"
+                    aria-label="Filter by Assignment"
+                    id="filter-assignment">
+                    <span class="dept-dropdown-label">{{ selectedDeptNamesSummary }}</span>
+                    <span class="material-symbols-outlined dropdown-chevron" [class.dropdown-chevron--open]="dropdownOpen">expand_more</span>
+                  </button>
+
+                  <div *ngIf="dropdownOpen" class="dept-dropdown-menu" (click)="$event.stopPropagation()">
+                    <!-- Search Input -->
+                    <div class="dept-dropdown-search">
+                      <span class="material-symbols-outlined search-icon">search</span>
+                      <input
+                        type="text"
+                        [placeholder]="strings.triageTable.filterPlaceholders.assignmentSearch"
+                        [(ngModel)]="deptSearchQuery"
+                        (ngModelChange)="onDeptSearchChange()"
+                        class="dept-dropdown-search-input" />
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="dept-dropdown-actions">
+                      <button type="button" class="action-link" (click)="selectAllDepts()">
+                        {{ strings.triageTable.filterPlaceholders.assignmentSelectAll }}
+                      </button>
+                      <span class="action-divider">|</span>
+                      <button type="button" class="action-link" (click)="clearAllDepts()">
+                        {{ strings.triageTable.filterPlaceholders.assignmentClearAll }}
+                      </button>
+                    </div>
+
+                    <!-- Options List -->
+                    <div class="dept-dropdown-options">
+                      <div
+                        *ngFor="let dept of filteredDropdownDepts"
+                        class="dept-dropdown-option"
+                        [class.dept-dropdown-option--child]="dept.depth && dept.depth > 0"
+                        (click)="toggleDeptSelection(dept.name)">
+                        
+                        <!-- Tree Connector Line -->
+                        <span *ngIf="dept.depth && dept.depth > 0" class="dept-tree-line" aria-hidden="true"></span>
+
+                        <!-- Custom Checkbox -->
+                        <div class="custom-checkbox" [class.custom-checkbox--checked]="dept.selected">
+                          <span class="material-symbols-outlined check-icon">check</span>
+                        </div>
+
+                        <!-- Label -->
+                        <span class="dept-option-label" [class.dept-option-label--bold]="!dept.depth || dept.depth === 0">
+                          {{ dept.name }}
+                        </span>
+                      </div>
+
+                      <!-- Empty State -->
+                      <div *ngIf="filteredDropdownDepts.length === 0" class="dept-dropdown-empty">
+                        {{ strings.triageTable.emptyState }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </th>
               <th class="triage-table__filter-th">
                 <input
@@ -243,15 +298,21 @@
               <td class="triage-table__td">
                 <!-- Assignment List -->
                 <div class="triage-table__assignments">
-                  <ng-container *ngFor="let assign of task.assignments">
-                    
-                    <span
-                      *ngIf="assign.type === 'icon' || assign.type === 'dept'"
-                      class="triage-table__assignment-dept-tag">
-                      {{ assign.label }}
-                    </span>
-                    
+                  <ng-container *ngIf="task.assignments && task.assignments.length > 0; else unassignedTpl">
+                    <ng-container *ngFor="let assign of task.assignments; let last = last">
+                      <span
+                        *ngIf="assign.type === 'icon' || assign.type === 'dept'"
+                        class="triage-table__assignment-dept-tag">
+                        {{ assign.label }}
+                      </span>
+                      <span *ngIf="!last && (assign.type === 'icon' || assign.type === 'dept')" class="assignment-separator"> &gt; </span>
+                    </ng-container>
                   </ng-container>
+                  <ng-template #unassignedTpl>
+                    <span class="triage-table__assignment-unassigned">
+                      {{ strings.triageTable.unassigned }}
+                    </span>
+                  </ng-template>
                 </div>
               </td>
               

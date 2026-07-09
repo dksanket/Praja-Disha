@@ -18,7 +18,8 @@ const en = {
   successNotification: 'Ticket submitted successfully!',
   voiceMessageLabel: 'Voice Message',
   speechLanguageLabel: 'Speech Language',
-  removeMedia: 'Remove'
+  removeMedia: 'Remove',
+  locationNote: 'Note: For demo purposes, please select a location within the New Delhi constituency, as the admin dashboard is configured to manage issues only for this region.'
 };
 
 export const REPORT_STRINGS: Record<string, typeof en> = {
@@ -43,7 +44,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'टिकट सफलतापूर्वक जमा किया गया!',
     voiceMessageLabel: 'आवाज़ संदेश',
     speechLanguageLabel: 'बोलने की भाषा',
-    removeMedia: 'हटाएं'
+    removeMedia: 'हटाएं',
+    locationNote: 'नोट: कृपया डेमो के लिए नई दिल्ली निर्वाचन क्षेत्र (जैसे, कनॉट प्लेस, इंडिया गेट, चाणक्यपुरी) के भीतर का स्थान चुनें, क्योंकि एडमिन डैशबोर्ड केवल इसी निर्वाचन क्षेत्र के लिए बनाया गया है।'
   },
   kn: {
     title: 'ಸಮಸ್ಯೆ ವರದಿ ಮಾಡಿ',
@@ -65,7 +67,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'ಟಿಕೆಟ್ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಕೆಯಾಗಿದೆ!',
     voiceMessageLabel: 'ಧ್ವನಿ ಸಂದೇಶ',
     speechLanguageLabel: 'ಮಾತನಾಡುವ ಭಾಷೆ',
-    removeMedia: 'ತೆಗೆದುಹಾಕಿ'
+    removeMedia: 'ತೆಗೆದುಹಾಕಿ',
+    locationNote: 'ಸೂಚನೆ: ಡೆಮೊ ಉದ್ದೇಶಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ನವದೆಹಲಿ ಕ್ಷೇತ್ರ ವ್ಯಾಪ್ತಿಯೊಳಗಿನ ಸ್ಥಳವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ, ಏಕೆಂದರೆ ನಿರ್ವಾಹಕ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಈ ಕ್ಷೇತ್ರಕ್ಕೆ ಮಾತ್ರ ಹೊಂದಿಸಲಾಗಿದೆ.'
   },
   bn: {
     title: 'সমস্যা রিপোর্ট করুন',
@@ -87,7 +90,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'টিকিট সফলভাবে জমা হয়েছে!',
     voiceMessageLabel: 'ভয়েস মেসেজ',
     speechLanguageLabel: 'বলার ভাষা',
-    removeMedia: 'মুছে ফেলুন'
+    removeMedia: 'মুছে ফেলুন',
+    locationNote: 'দ্রষ্টব্য: ডেমো উদ্দেশ্যে দয়া করে নয়াদিল্লি নির্বাচনী এলাকার মধ্যে একটি স্থান নির্বাচন করুন, কারণ অ্যাডমিন ড্যাশবোর্ডটি শুধুমাত্র এই নির্বাচনী এলাকার জন্য তৈরি করা হয়েছে।'
   },
   ta: {
     title: 'பிரச்சினையைப் புகாரளி',
@@ -109,7 +113,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!',
     voiceMessageLabel: 'குரல் செய்தி',
     speechLanguageLabel: 'பேசும் மொழி',
-    removeMedia: 'நீக்கு'
+    removeMedia: 'நீக்கு',
+    locationNote: 'குறிப்பு: டெமோ நோக்கங்களுக்காக புது தில்லி தொகுதிக்குட்பட்ட இடத்தை தேர்ந்தெடுக்கவும், ஏனெனில் நிர்வாக டாஷ்போர்டு இந்த தொகுதிக்கு மட்டுமே உருவாக்கப்பட்டுள்ளது.'
   },
   te: {
     title: 'సమస్యను నివేదించండి',
@@ -131,7 +136,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'టికెట్ విజయవంతంగా సమర్పించబడింది!',
     voiceMessageLabel: 'வాయిస్ సందేశం',
     speechLanguageLabel: 'మాట్లాడే భాష',
-    removeMedia: 'తొలగించు'
+    removeMedia: 'తొలగించు',
+    locationNote: 'గమనిక: డెమో ప్రయోజనాల కోసం దయచేసి న్యూ ఢిల్లీ నియోజకవర్గ పరిధిలోని ప్రాంతాన్ని ఎంచుకోండి, ఎందుకంటే అడ్మిన్ డ్యాష్‌బోర్డ్ ఈ నియోజకవర్గానికి మాత్రమే కాన్ఫిగర్ చేయబడింది.'
   },
   mr: {
     title: 'समस्येची तक्रार करा',
@@ -153,7 +159,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'तिकीट यशस्वीरित्या सबमिट झाले!',
     voiceMessageLabel: 'ध्वनी संदेश',
     speechLanguageLabel: 'बोलण्याची भाषा',
-    removeMedia: 'काढून टाका'
+    removeMedia: 'काढून टाका',
+    locationNote: 'टीप: डेमोसाठी कृपया नवी दिल्ली मतदारसंघातील ठिकाण निवडा, कारण ॲडमिन डॅशबोर्ड केवळ याच मतदारसंघासाठी तयार करण्यात आला आहे।'
   },
   ur: {
     title: 'مسئلہ رپورٹ کریں',
@@ -175,7 +182,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'ٹکٹ کامیابی سے جمع ہو گیا!',
     voiceMessageLabel: 'وائس میسج',
     speechLanguageLabel: 'بولنے کی زبان',
-    removeMedia: 'ہٹائیں'
+    removeMedia: 'ہٹائیں',
+    locationNote: 'نوٹ: ڈیمو کے مقاصد کے لیے براہ کرم نئی دہلی حلقے کے اندر کا مقام منتخب کریں، کیونکہ ایڈمن ڈیش بورڈ صرف اسی حلقے کے لیے بنایا گیا ہے۔'
   },
   gu: {
     title: 'સમસ્યા રિપોર્ટ કરો',
@@ -197,7 +205,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'ટિકિટ સફળતાપૂર્વક સબમિટ થઈ ગઈ!',
     voiceMessageLabel: 'વોઇસ મેસેજ',
     speechLanguageLabel: 'બોલવાની ભાષા',
-    removeMedia: 'દૂર કરો'
+    removeMedia: 'દૂર કરો',
+    locationNote: 'નોંધ: ડેમો હેતુ માટે કૃપા કરીને નવી દિલ્હી મતવિસ્તારની અંદરનું સ્થળ પસંદ કરો, કારણ કે એડમિન ડેશબોર્ડ ફક્ત આ જ મતવિસ્તાર માટે સુયોજિત છે.'
   },
   ml: {
     title: 'പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക',
@@ -219,7 +228,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'ടിക്കറ്റ് വിജയകരമായി സമർപ്പിച്ചു!',
     voiceMessageLabel: 'ശബ്ദ സന്ദേശം',
     speechLanguageLabel: 'സംസാരിക്കുന്ന ഭാഷ',
-    removeMedia: 'നീക്കം ചെയ്യുക'
+    removeMedia: 'നീക്കം ചെയ്യുക',
+    locationNote: 'കുറിപ്പ്: ഡെമോ ആവശ്യങ്ങൾക്കായി ദയവായി ന്യൂഡൽഹി മണ്ഡലത്തിനകത്തുള്ള ഒരു സ്ഥലം തിരഞ്ഞെടുക്കുക, കാരണം അഡ്മിൻ ഡാഷ്‌ബോർഡ് ഈ മണ്ഡലത്തിനായി മാത്രമാണ് സജ്ജീകരിച്ചിരിക്കുന്നത്.'
   },
   pa: {
     title: 'ਸਮੱਸਿਆ ਦੀ ਰਿਪੋਰਟ ਕਰੋ',
@@ -241,7 +251,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'ਟਿਕਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਜਮ੍ਹਾਂ ਹੋ ਗਈ ਹੈ!',
     voiceMessageLabel: 'ਵੌਇਸ ਸੰਦੇਸ਼',
     speechLanguageLabel: 'ਬੋਲਣ ਵਾਲੀ ਭਾਸ਼ਾ',
-    removeMedia: 'ਹਟਾਓ'
+    removeMedia: 'ਹਟਾਓ',
+    locationNote: 'ਨੋਟ: ਡੈਮੋ ਦੇ ਉਦੇਸ਼ਾਂ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਨਵੀਂ ਦਿੱਲੀ ਹਲਕੇ ਦੇ ਅੰਦਰ ਦਾ ਸਥਾਨ ਚੁਣੋ, ਕਿਉਂਕਿ ਐਡਮਿਨ ਡੈਸ਼ਬੋਰਡ ਸਿਰਫ ਇਸ ਹਲਕੇ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ।'
   },
   or: {
     title: 'ସମସ୍ୟା ରିପୋର୍ଟ କରନ୍ତୁ',
@@ -263,7 +274,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'ଟିକେଟ୍ ସଫଳତାର ସହ ଦାଖଲ ହେଲା!',
     voiceMessageLabel: 'ସ୍ୱର ସନ୍ଦେଶ',
     speechLanguageLabel: 'କହିବା ଭାଷା',
-    removeMedia: 'ହଟାନ୍ତୁ'
+    removeMedia: 'ହଟାନ୍ତୁ',
+    locationNote: 'ସୂଚନା: ଡେମୋ ପାଇଁ ଦୟାକରି ନୂଆଦିଲ୍ଲୀ ନିର୍ବାଚନ ମଣ୍ଡଳୀ ମଧ୍ୟରେ ଏକ ସ୍ଥାନ ବାଛନ୍ତୁ, କାରଣ ଆଡମିନ୍ ଡ୍ୟାସବୋର୍ଡ କେବଳ ଏହି ନିର୍ବାଚନ ମଣ୍ଡଳୀ ପାଇଁ ପ୍ରସ୍ତୁତ କରାଯାଇଛି।'
   },
   as: {
     title: 'অভিযোগ দাখিল কৰক',
@@ -285,7 +297,8 @@ export const REPORT_STRINGS: Record<string, typeof en> = {
     successNotification: 'টিকট সফলতাৰে দাখিল কৰা হৈছে!',
     voiceMessageLabel: 'মাতৰ বাৰ্তা',
     speechLanguageLabel: 'কোৱা ভাষা',
-    removeMedia: 'আঁতৰাওক'
+    removeMedia: 'আঁতৰাওক',
+    locationNote: 'টোকা: ডেমোৰ বাবে অনুগ্ৰহ কৰি নতুন দিল্লী সমষ্টিৰ ভিতৰত এটা স্থান বাছনি কৰক, কাৰণ এডমিন ড্যাশবৰ্ড কেৱল এই সমষ্টিৰ বাবেহে প্ৰস্তুত কৰা হৈছে।'
   }
 };
 
