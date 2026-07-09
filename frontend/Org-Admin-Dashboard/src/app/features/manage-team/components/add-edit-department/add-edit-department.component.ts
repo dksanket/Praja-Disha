@@ -691,7 +691,7 @@ export class AddEditDepartmentComponent implements OnInit {
 
     const departmentPayload: Department = {
       id: this.id.trim(),
-      orgId: this.activeOrgId || 'org-1',
+      orgId: this.activeOrgId,
       name: this.name.trim(),
       parentDepartmentId: this.parentDepartmentId,
       parentDepartmentName: parentName,
@@ -707,11 +707,11 @@ export class AddEditDepartmentComponent implements OnInit {
           type: 'Polygon',
           coordinates: [
             [
-              [77.5946, 12.9716],
-              [77.6046, 12.9716],
-              [77.6046, 12.9816],
-              [77.5946, 12.9816],
-              [77.5946, 12.9716],
+              [77.2090, 28.6139],
+              [77.2190, 28.6139],
+              [77.2190, 28.6239],
+              [77.2090, 28.6239],
+              [77.2090, 28.6139],
             ]
           ]
         }

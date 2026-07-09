@@ -4,6 +4,8 @@ import gov.prajadisha.backend.common.ApiException;
 import gov.prajadisha.backend.org.model.Organization;
 import gov.prajadisha.backend.org.repository.OrganizationRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Resolves the "active" organization for the current dashboard session.
@@ -21,10 +23,18 @@ public class OrganizationService {
         this.organizations = organizations;
     }
 
+    public List<Organization> findAll() {
+        return organizations.findAll();
+    }
+
     public Organization getActive() {
         return organizations.findAll().stream()
                 .findFirst()
                 .orElseThrow(() -> ApiException.notFound("No active organization configured"));
+    }
+
+    public Optional<Organization> findById(String id) {
+        return organizations.findById(id);
     }
 
     public String getActiveOrgId() {

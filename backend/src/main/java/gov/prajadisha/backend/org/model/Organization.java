@@ -22,6 +22,7 @@ public class Organization {
     private String id;
 
     private String name;
+    private String description;
     private long createdAt; // unix ms
     private OrgConstituency constituency;
 

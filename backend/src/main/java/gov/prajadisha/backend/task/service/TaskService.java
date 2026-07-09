@@ -6,6 +6,7 @@ import gov.prajadisha.backend.ai.service.OllamaClient;
 import gov.prajadisha.backend.common.ApiException;
 import gov.prajadisha.backend.common.Formats;
 import gov.prajadisha.backend.common.GeoPoint;
+import gov.prajadisha.backend.common.GeoPolygon;
 import gov.prajadisha.backend.common.Ids;
 import gov.prajadisha.backend.org.service.OrganizationService;
 import gov.prajadisha.backend.storage.StorageService;
@@ -23,6 +24,7 @@ import gov.prajadisha.backend.task.model.TaskAssignment;
 import gov.prajadisha.backend.task.repository.TaskAssignmentRepository;
 import gov.prajadisha.backend.org.model.Department;
 import gov.prajadisha.backend.org.model.Officer;
+import gov.prajadisha.backend.org.model.Organization;
 import gov.prajadisha.backend.org.repository.DepartmentRepository;
 import gov.prajadisha.backend.org.repository.OfficerRepository;
 import gov.prajadisha.backend.task.event.TicketCreatedEvent;
@@ -165,6 +167,40 @@ public class TaskService {
                 }
             }
 
+            // Resolve Organization based on geocoordinates and/or description
+            Organization resolvedOrg = resolveOrganization(task);
+            if (resolvedOrg == null) {
+                log.warn("Auto-assignment failed: No matching organization found for task {}", task.getId());
+                task.getActivities().add(DetailedActivity.builder()
+                        .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                        .action("ASSIGNMENT_FAILED")
+                        .performedBy("system_ai")
+                        .remarks("Auto-assignment failed: No suitable organization found matching location or description.")
+                        .build());
+                tasks.save(task);
+                return;
+            }
+
+            task.setOrgId(resolvedOrg.getId());
+
+            // Log organization routing activity
+            boolean matchedByGeo = false;
+            if (task.getLocation() != null && task.getLocation().getGeo() != null && task.getLocation().getGeo().getCoordinates() != null && task.getLocation().getGeo().getCoordinates().size() >= 2) {
+                double lng = task.getLocation().getGeo().getCoordinates().get(0);
+                double lat = task.getLocation().getGeo().getCoordinates().get(1);
+                if (resolvedOrg.getConstituency() != null && resolvedOrg.getConstituency().getCoordinates() != null) {
+                    matchedByGeo = isPointInPolygon(lng, lat, resolvedOrg.getConstituency().getCoordinates());
+                }
+            }
+
+            task.getActivities().add(DetailedActivity.builder()
+                    .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                    .action("ORG_ROUTED")
+                    .performedBy("system_ai")
+                    .remarks("Task automatically routed to organization '" + resolvedOrg.getName() + "'"
+                            + (matchedByGeo ? " based on constituency geographic coordinates." : " based on content description match."))
+                    .build());
+
             AiTriageService.Classification c = triage.classify(task);
             task.setCategory(c.category());
             task.setPriority(c.priority());
@@ -176,65 +212,157 @@ public class TaskService {
                 task.setLanguage(c.language());
             }
 
-            // Best-effort vector embedding of the ticket text for duplicate detection.
-            List<Double> embedding = ollama.embed(
-                    (task.getTitle() == null ? "" : task.getTitle()) + ". "
-                            + (task.getDescription() == null ? "" : task.getDescription()));
-            if (!embedding.isEmpty()) {
-                task.setDescriptionEmbedding(embedding);
-            }
-
-            // Run duplicate check and update groupId/activities if duplicates exist.
-            try {
-                checkForDuplicates(task);
-            } catch (Exception e) {
-                log.error("Error during duplicate checking for task: {}", task.getId(), e);
-            }
-
-            task.getActivities().add(DetailedActivity.builder()
-                    .timestamp(Formats.dateTime(System.currentTimeMillis()))
-                    .action("AI_ASSIGNED")
-                    .performedBy("system_ai")
-                    .remarks("Auto-classified as " + c.category() + " / " + c.priority()
-                            + " and routed to " + c.suggestedDepartment())
-                    .build());
-
-            // Create a TaskAssignment in task_assignments collection
-            try {
-                String deptName = c.suggestedDepartment();
-                List<Department> allDepts = departments.findByOrgId(task.getOrgId());
-                Department targetDept = allDepts.stream()
-                        .filter(d -> deptName.equalsIgnoreCase(d.getName()))
-                        .findFirst()
-                        .orElseGet(() -> {
-                            String text = ((task.getTitle() == null ? "" : task.getTitle()) + " " +
-                                           (task.getDescription() == null ? "" : task.getDescription())).toLowerCase();
-                            if (text.contains("streetlight") || text.contains("light") || text.contains("electrical")) {
-                                return allDepts.stream().filter(d -> "Streetlights & Grid".equalsIgnoreCase(d.getName())).findFirst().orElse(null);
-                            }
-                            if (text.contains("road") || text.contains("pothole")) {
-                                return allDepts.stream().filter(d -> "Road Maintenance".equalsIgnoreCase(d.getName())).findFirst().orElse(null);
-                            }
-                            return allDepts.isEmpty() ? null : allDepts.get(0);
-                        });
-
-                if (targetDept != null) {
-                    taskAssignments.deleteByTaskId(task.getId());
-                    TaskAssignment assignment = TaskAssignment.builder()
-                            .taskId(task.getId())
-                            .departmentId(targetDept.getId())
-                            .officerId(targetDept.getHeadOfficerId())
-                            .status("PENDING")
-                            .assignedAt(System.currentTimeMillis())
-                            .build();
-                    taskAssignments.save(assignment);
+            // Verify resolved organization boundary
+            boolean isInBoundary = true;
+            if (resolvedOrg.getConstituency() != null && resolvedOrg.getConstituency().getCoordinates() != null) {
+                if (task.getLocation() != null && task.getLocation().getGeo() != null && task.getLocation().getGeo().getCoordinates() != null && task.getLocation().getGeo().getCoordinates().size() >= 2) {
+                    double lng = task.getLocation().getGeo().getCoordinates().get(0);
+                    double lat = task.getLocation().getGeo().getCoordinates().get(1);
+                    if (!isPointInPolygon(lng, lat, resolvedOrg.getConstituency().getCoordinates())) {
+                        isInBoundary = false;
+                        log.warn("Auto-assignment failed: Task coordinates [{}, {}] are outside the resolved constituency '{}' boundary.", lng, lat, resolvedOrg.getConstituency().getName());
+                        task.getActivities().add(DetailedActivity.builder()
+                                .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                                .action("ASSIGNMENT_FAILED")
+                                .performedBy("system_ai")
+                                .remarks("Auto-assignment failed: Task coordinates [" + lng + ", " + lat + "] are outside the constituency '" + resolvedOrg.getConstituency().getName() + "' boundary.")
+                                .build());
+                    }
                 }
-            } catch (Exception e) {
-                log.error("Failed to auto-assign task {} to department", task.getId(), e);
             }
+
+            Department targetDept = null;
+            Officer assignedOfficer = null;
+
+            if (isInBoundary) {
+                // Route to Department based on coordinates and description
+                try {
+                    List<Department> allDepts = departments.findByOrgId(task.getOrgId());
+                    
+                    // Filter departments by coordinates
+                    List<Department> geoCandidates = new ArrayList<>();
+                    for (Department dept : allDepts) {
+                        if (dept.getConstituency() != null && dept.getConstituency().getCoordinates() != null) {
+                            if (task.getLocation() != null && task.getLocation().getGeo() != null && task.getLocation().getGeo().getCoordinates() != null && task.getLocation().getGeo().getCoordinates().size() >= 2) {
+                                double lng = task.getLocation().getGeo().getCoordinates().get(0);
+                                double lat = task.getLocation().getGeo().getCoordinates().get(1);
+                                if (isPointInPolygon(lng, lat, dept.getConstituency().getCoordinates())) {
+                                    geoCandidates.add(dept);
+                                }
+                            }
+                        } else {
+                            geoCandidates.add(dept); // Global department
+                        }
+                    }
+
+                    if (!geoCandidates.isEmpty()) {
+                        if (ollama.isEnabled()) {
+                            targetDept = selectBestDepartmentWithAi(task, geoCandidates);
+                        }
+                        if (targetDept == null) {
+                            targetDept = selectBestDepartmentFallback(task, geoCandidates, c.suggestedDepartment());
+                        }
+                    }
+
+                    if (targetDept != null) {
+                        // Find the least loaded active officer in the department
+                        List<Officer> deptOfficers = officers.findByDepartmentIdsContaining(targetDept.getId());
+                        List<Officer> activeOfficers = deptOfficers.stream()
+                                .filter(Officer::isActive)
+                                .toList();
+                        
+                        if (!activeOfficers.isEmpty()) {
+                            Officer leastLoaded = null;
+                            long minLoad = Long.MAX_VALUE;
+                            for (Officer off : activeOfficers) {
+                                long load = getOfficerWorkload(off.getId());
+                                if (load < minLoad) {
+                                    minLoad = load;
+                                    leastLoaded = off;
+                                }
+                            }
+                            assignedOfficer = leastLoaded;
+                        }
+
+                        // Fallback to department's head officer if no active officers or load-balancing failed
+                        if (assignedOfficer == null && targetDept.getHeadOfficerId() != null) {
+                            assignedOfficer = officers.findById(targetDept.getHeadOfficerId()).orElse(null);
+                        }
+
+                        taskAssignments.deleteByTaskId(task.getId());
+                        TaskAssignment assignment = TaskAssignment.builder()
+                                .taskId(task.getId())
+                                .departmentId(targetDept.getId())
+                                .officerId(assignedOfficer != null ? assignedOfficer.getId() : null)
+                                .status("PENDING")
+                                .assignedAt(System.currentTimeMillis())
+                                .build();
+                        taskAssignments.save(assignment);
+
+                        task.getActivities().add(DetailedActivity.builder()
+                                .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                                .action("AI_ASSIGNED")
+                                .performedBy("system_ai")
+                                .remarks("Auto-classified and assigned to department '" + targetDept.getName() + "'"
+                                        + (assignedOfficer != null ? " and officer '" + assignedOfficer.getName() + "'" : ""))
+                                .build());
+                    } else {
+                        task.getActivities().add(DetailedActivity.builder()
+                                .timestamp(Formats.dateTime(System.currentTimeMillis()))
+                                .action("ASSIGNMENT_FAILED")
+                                .performedBy("system_ai")
+                                .remarks("Auto-assignment failed: No suitable department found based on location/description.")
+                                .build());
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to auto-assign task {} to department/officer", task.getId(), e);
+                }
+            }
+
+            // Generate rich vector embedding using all task details and verify duplicates
+            generateEmbeddingAndCheckDuplicates(task, targetDept, assignedOfficer);
 
             tasks.save(task);
         });
+    }
+
+    /**
+     * Constructs a detailed rich text block representing the task, gets its embedding from Ollama,
+     * and triggers semantic duplicate checking.
+     */
+    private void generateEmbeddingAndCheckDuplicates(Task task, Department targetDept, Officer assignedOfficer) {
+        StringBuilder embedText = new StringBuilder();
+        embedText.append("Title: ").append(task.getTitle() != null ? task.getTitle() : "").append("\n");
+        embedText.append("Description: ").append(task.getDescription() != null ? task.getDescription() : "").append("\n");
+        embedText.append("Category: ").append(task.getCategory() != null ? task.getCategory() : "").append("\n");
+        embedText.append("Priority: ").append(task.getPriority() != null ? task.getPriority() : "").append("\n");
+        embedText.append("Reporter: ").append(task.getReporterType() != null ? task.getReporterType() : "").append("\n");
+        if (task.getLocation() != null && task.getLocation().getAddress() != null && !task.getLocation().getAddress().isBlank()) {
+            embedText.append("Location: ").append(task.getLocation().getAddress()).append("\n");
+        }
+        if (task.getLanguage() != null && !task.getLanguage().isBlank()) {
+            embedText.append("Language: ").append(task.getLanguage()).append("\n");
+        }
+        if (targetDept != null) {
+            embedText.append("Department: ").append(targetDept.getName()).append("\n");
+        }
+        if (assignedOfficer != null) {
+            embedText.append("Officer: ").append(assignedOfficer.getName()).append("\n");
+        }
+
+        String content = embedText.toString().trim();
+        log.info("Generating rich details embedding for task {} with content:\n{}", task.getId(), content);
+
+        List<Double> embedding = ollama.embed(content);
+        if (!embedding.isEmpty()) {
+            task.setDescriptionEmbedding(embedding);
+        }
+
+        try {
+            checkForDuplicates(task);
+        } catch (Exception e) {
+            log.error("Error during duplicate checking for task: {}", task.getId(), e);
+        }
     }
 
     private String getSpeechLanguageCode(String languageName) {
@@ -657,7 +785,11 @@ public class TaskService {
         try {
             return organizations.getActiveOrgId();
         } catch (ApiException e) {
-            return "ORG-101";
+            // Retrieve first organization from db dynamically
+            return organizations.findAll().stream()
+                    .findFirst()
+                    .map(gov.prajadisha.backend.org.model.Organization::getId)
+                    .orElseThrow(() -> e);
         }
     }
 
@@ -672,27 +804,7 @@ public class TaskService {
                 .toList();
     }
 
-    private Department findAssignedDepartment(Task t, List<Department> depts) {
-        String text = ((t.getTitle() == null ? "" : t.getTitle()) + " " +
-                       (t.getDescription() == null ? "" : t.getDescription()) + " " +
-                       (t.getCategory() == null ? "" : t.getCategory())).toLowerCase();
-        
-        // Match specific department names
-        for (Department d : depts) {
-            if (d.getName() != null && text.contains(d.getName().toLowerCase())) {
-                return d;
-            }
-        }
-        // Fallback matching by keyword
-        if (text.contains("streetlight") || text.contains("light") || text.contains("electrical")) {
-            return depts.stream().filter(d -> "Streetlights & Grid".equalsIgnoreCase(d.getName())).findFirst().orElse(null);
-        }
-        if (text.contains("road") || text.contains("pothole")) {
-            return depts.stream().filter(d -> "Road Maintenance".equalsIgnoreCase(d.getName())).findFirst().orElse(null);
-        }
-        // General fallback
-        return depts.isEmpty() ? null : depts.get(0);
-    }
+
 
     public Task createSubTask(String parentId, gov.prajadisha.backend.task.dto.TaskDtos.CreateSubTaskRequest req) {
         Task parent = get(parentId);
@@ -907,6 +1019,309 @@ public class TaskService {
         }
         int unionSize = set1.size() + set2.size() - intersectionSize;
         return (double) intersectionSize / unionSize;
+    }
+
+    /**
+     * Checks if coordinates fall inside the GeoPolygon using the standard ray-casting algorithm.
+     */
+    private static boolean isPointInPolygon(double longitude, double latitude, GeoPolygon polygon) {
+        if (polygon == null || polygon.getCoordinates() == null || polygon.getCoordinates().isEmpty()) {
+            return false;
+        }
+        List<List<Double>> exteriorRing = polygon.getCoordinates().get(0);
+        if (exteriorRing == null || exteriorRing.size() < 3) {
+            return false;
+        }
+
+        boolean inside = false;
+        int n = exteriorRing.size();
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            List<Double> pi = exteriorRing.get(i);
+            List<Double> pj = exteriorRing.get(j);
+            if (pi == null || pi.size() < 2 || pj == null || pj.size() < 2) {
+                continue;
+            }
+            double xi = pi.get(0);
+            double yi = pi.get(1);
+            double xj = pj.get(0);
+            double yj = pj.get(1);
+
+            boolean intersect = ((yi > latitude) != (yj > latitude))
+                    && (longitude < (xj - xi) * (latitude - yi) / (yj - yi) + xi);
+            if (intersect) {
+                inside = !inside;
+            }
+        }
+
+        if (inside && polygon.getCoordinates().size() > 1) {
+            for (int h = 1; h < polygon.getCoordinates().size(); h++) {
+                List<List<Double>> hole = polygon.getCoordinates().get(h);
+                if (hole == null || hole.size() < 3) {
+                    continue;
+                }
+                boolean inHole = false;
+                int hn = hole.size();
+                for (int i = 0, j = hn - 1; i < hn; j = i++) {
+                    List<Double> pi = hole.get(i);
+                    List<Double> pj = hole.get(j);
+                    if (pi == null || pi.size() < 2 || pj == null || pj.size() < 2) {
+                        continue;
+                    }
+                    double xi = pi.get(0);
+                    double yi = pi.get(1);
+                    double xj = pj.get(0);
+                    double yj = pj.get(1);
+
+                    boolean intersect = ((yi > latitude) != (yj > latitude))
+                            && (longitude < (xj - xi) * (latitude - yi) / (yj - yi) + xi);
+                    if (intersect) {
+                        inHole = !inHole;
+                    }
+                }
+                if (inHole) {
+                    return false;
+                }
+            }
+        }
+
+        return inside;
+    }
+
+    /**
+     * Uses Ollama to check if a task matches the organization's jurisdiction description.
+     */
+    private boolean checkTaskMatchesDescriptionWithAiOrFallback(Task task, String description) {
+        if (ollama.isEnabled()) {
+            try {
+                String systemPrompt = "You are a municipal triage validator. You must determine if a civic task/complaint falls under the jurisdiction of a specific organization based on its description.\n" +
+                        "Organization Description: " + description + "\n" +
+                        "Respond with ONLY 'yes' or 'no'. Do not include any other text, explanation, or punctuation.";
+                String userPrompt = "Task Title: " + (task.getTitle() == null ? "" : task.getTitle()) + "\n" +
+                        "Task Description: " + (task.getDescription() == null ? "" : task.getDescription());
+                String response = ollama.chat(systemPrompt, userPrompt);
+                if (response != null) {
+                    String trimmed = response.trim().toLowerCase();
+                    if (trimmed.contains("yes")) {
+                        return true;
+                    } else if (trimmed.contains("no")) {
+                        return false;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("AI check for organization description match failed: {}", e.getMessage());
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Uses Ollama to select the best matching candidate department based on role description.
+     */
+    private Department selectBestDepartmentWithAi(Task task, List<Department> candidates) {
+        try {
+            StringBuilder deptBlock = new StringBuilder();
+            for (Department dept : candidates) {
+                deptBlock.append("- ID: ").append(dept.getId())
+                         .append(", Name: ").append(dept.getName())
+                         .append(", Role: ").append(dept.getRoleDescription() == null ? "" : dept.getRoleDescription())
+                         .append("\n");
+            }
+
+            String systemPrompt = "You are a municipal routing assistant. Based on the civic ticket below and the list of candidate departments, select the best matching department based on their role description.\n" +
+                    "Candidate Departments:\n" +
+                    deptBlock + "\n" +
+                    "Respond with ONLY the ID of the chosen department. If none of the departments are appropriate, respond with 'NONE'. Do not include any other text, explanation, or punctuation.";
+            String userPrompt = "Task Title: " + (task.getTitle() == null ? "" : task.getTitle()) + "\n" +
+                    "Task Description: " + (task.getDescription() == null ? "" : task.getDescription());
+            String response = ollama.chat(systemPrompt, userPrompt);
+            if (response != null) {
+                String chosenId = response.trim();
+                if (chosenId.contains("\n")) {
+                    chosenId = chosenId.split("\n")[0];
+                }
+                chosenId = chosenId.replaceAll("[^a-zA-Z0-9-]", "");
+                if ("NONE".equalsIgnoreCase(chosenId)) {
+                    return null;
+                }
+                String finalId = chosenId;
+                return candidates.stream()
+                        .filter(d -> finalId.equalsIgnoreCase(d.getId()))
+                        .findFirst()
+                        .orElse(null);
+            }
+        } catch (Exception e) {
+            log.warn("AI department selection failed: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Fallback department matching based on name and role description keywords.
+     */
+    private Department selectBestDepartmentFallback(Task task, List<Department> candidates, String suggestedDepartmentName) {
+        if (suggestedDepartmentName != null && !suggestedDepartmentName.isBlank()) {
+            Optional<Department> match = candidates.stream()
+                    .filter(d -> suggestedDepartmentName.equalsIgnoreCase(d.getName()))
+                    .findFirst();
+            if (match.isPresent()) {
+                return match.get();
+            }
+        }
+        String text = ((task.getTitle() == null ? "" : task.getTitle()) + " " +
+                       (task.getDescription() == null ? "" : task.getDescription())).toLowerCase();
+        for (Department d : candidates) {
+            String dName = d.getName().toLowerCase();
+            if (text.contains(dName)) {
+                return d;
+            }
+            if (d.getRoleDescription() != null) {
+                String dRole = d.getRoleDescription().toLowerCase();
+                if (text.contains(dRole) || containsKeywords(text, dName)) {
+                    return d;
+                }
+            }
+        }
+        return candidates.isEmpty() ? null : candidates.get(0);
+    }
+
+    private boolean containsKeywords(String text, String name) {
+        String[] words = name.split("\\s+");
+        for (String w : words) {
+            if (w.length() > 3 && text.contains(w)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Counts the workload (pending or in-progress assignments) for an officer.
+     */
+    private long getOfficerWorkload(String officerId) {
+        try {
+            return taskAssignments.countByOfficerIdAndStatusIn(officerId, List.of("PENDING", "IN_PROGRESS"));
+        } catch (Exception e) {
+            log.warn("Failed to count workload for officer {}: {}", officerId, e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Resolves the correct organization for a task based on geocoordinates and description.
+     */
+    private Organization resolveOrganization(Task task) {
+        List<Organization> allOrgs;
+        try {
+            allOrgs = organizations.findAll();
+        } catch (Exception e) {
+            log.error("Failed to fetch all organizations from repository", e);
+            return null;
+        }
+        if (allOrgs == null || allOrgs.isEmpty()) {
+            log.warn("No organizations found in database to route task {}", task.getId());
+            return null;
+        }
+
+        // 1. Try matching by coordinates first
+        if (task.getLocation() != null && task.getLocation().getGeo() != null && task.getLocation().getGeo().getCoordinates() != null && task.getLocation().getGeo().getCoordinates().size() >= 2) {
+            double lng = task.getLocation().getGeo().getCoordinates().get(0);
+            double lat = task.getLocation().getGeo().getCoordinates().get(1);
+            List<Organization> geoCandidates = new ArrayList<>();
+            for (Organization org : allOrgs) {
+                if (org.getConstituency() != null && org.getConstituency().getCoordinates() != null) {
+                    if (isPointInPolygon(lng, lat, org.getConstituency().getCoordinates())) {
+                        geoCandidates.add(org);
+                    }
+                }
+            }
+            if (geoCandidates.size() == 1) {
+                log.info("Resolved organization {} by geocoordinates for task {}", geoCandidates.get(0).getId(), task.getId());
+                return geoCandidates.get(0);
+            } else if (geoCandidates.size() > 1) {
+                log.info("Multiple geographic organization matches ({} found) for task {}. Selecting via AI.", geoCandidates.size(), task.getId());
+                Organization best = selectBestOrganizationWithAi(task, geoCandidates);
+                if (best != null) {
+                    return best;
+                }
+                return geoCandidates.get(0);
+            }
+        }
+
+        // 2. If no coordinates match (or missing coordinates), match using AI based on description
+        log.info("No geocoordinate match found for task {}. Attempting description-based AI matching.", task.getId());
+        Organization best = selectBestOrganizationWithAi(task, allOrgs);
+        if (best != null) {
+            return best;
+        }
+
+        // 3. Fallback keyword matching
+        log.info("AI organization matching failed or disabled. Falling back to keyword matching for task {}", task.getId());
+        return selectBestOrganizationFallback(task, allOrgs);
+    }
+
+    /**
+     * Uses Ollama to select the best matching candidate organization based on its description.
+     */
+    private Organization selectBestOrganizationWithAi(Task task, List<Organization> candidates) {
+        if (!ollama.isEnabled()) {
+            return null;
+        }
+        try {
+            StringBuilder orgBlock = new StringBuilder();
+            for (Organization org : candidates) {
+                orgBlock.append("- ID: ").append(org.getId())
+                         .append(", Name: ").append(org.getName())
+                         .append(", Description: ").append(org.getDescription() == null ? "" : org.getDescription())
+                         .append("\n");
+            }
+
+            String systemPrompt = "You are a municipal organization routing assistant. Based on the civic ticket below and the list of candidate organizations, select the best matching organization whose jurisdiction or description aligns with the ticket.\n" +
+                    "Candidate Organizations:\n" +
+                    orgBlock + "\n" +
+                    "Respond with ONLY the ID of the chosen organization. If none of the organizations are appropriate, respond with 'NONE'. Do not include any other text, explanation, or punctuation.";
+            String userPrompt = "Task Title: " + (task.getTitle() == null ? "" : task.getTitle()) + "\n" +
+                    "Task Description: " + (task.getDescription() == null ? "" : task.getDescription());
+            String response = ollama.chat(systemPrompt, userPrompt);
+            if (response != null) {
+                String chosenId = response.trim();
+                if (chosenId.contains("\n")) {
+                    chosenId = chosenId.split("\n")[0];
+                }
+                chosenId = chosenId.replaceAll("[^a-zA-Z0-9-]", "");
+                if ("NONE".equalsIgnoreCase(chosenId)) {
+                    return null;
+                }
+                String finalId = chosenId;
+                return candidates.stream()
+                        .filter(org -> finalId.equalsIgnoreCase(org.getId()))
+                        .findFirst()
+                        .orElse(null);
+            }
+        } catch (Exception e) {
+            log.warn("AI organization selection failed: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Fallback organization matching based on name and description keywords.
+     */
+    private Organization selectBestOrganizationFallback(Task task, List<Organization> candidates) {
+        String text = ((task.getTitle() == null ? "" : task.getTitle()) + " " +
+                       (task.getDescription() == null ? "" : task.getDescription())).toLowerCase();
+        for (Organization org : candidates) {
+            String orgName = org.getName().toLowerCase();
+            if (text.contains(orgName)) {
+                return org;
+            }
+            if (org.getDescription() != null) {
+                String orgDesc = org.getDescription().toLowerCase();
+                if (text.contains(orgDesc) || containsKeywords(text, orgName)) {
+                    return org;
+                }
+            }
+        }
+        return candidates.isEmpty() ? null : candidates.get(0);
     }
 }
 
