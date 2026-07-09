@@ -30,7 +30,7 @@ public class OfficerController {
         java.util.Optional<gov.prajadisha.backend.org.model.Officer> optionalOfficer;
         if ("9999988888".equals(req.identifier())) {
             optionalOfficer = officerService.findByIdentifier("9999988888")
-                    .or(() -> officerService.findByIdentifier("rajesh_kumar"));
+                    .or(() -> officerService.findByIdentifier("aarav_sharma"));
         } else {
             optionalOfficer = officerService.findByIdentifier(req.identifier());
         }

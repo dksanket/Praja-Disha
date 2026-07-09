@@ -14,6 +14,7 @@ export interface OrgConstituency {
 export interface Organization {
   id: string;                  // MongoDB ObjectId as string
   name: string;
+  description?: string;
   createdAt: number;           // Unix timestamp (milliseconds)
   constituency: OrgConstituency;
 }

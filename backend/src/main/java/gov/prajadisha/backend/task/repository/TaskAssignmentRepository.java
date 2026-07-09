@@ -7,4 +7,5 @@ import java.util.List;
 public interface TaskAssignmentRepository extends MongoRepository<TaskAssignment, String> {
     List<TaskAssignment> findByTaskId(String taskId);
     void deleteByTaskId(String taskId);
+    long countByOfficerIdAndStatusIn(String officerId, List<String> statuses);
 }

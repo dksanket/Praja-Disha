@@ -58,7 +58,7 @@ public class AiChatService {
     }
 
     public ChatResponse reply(String userText) {
-        return reply(userText, "rajesh_kumar");
+        return reply(userText, "aarav_sharma");
     }
 
     public ChatResponse reply(String userText, String officerUserName) {
@@ -67,7 +67,10 @@ public class AiChatService {
         try {
             orgId = organizations.getActiveOrgId();
         } catch (Exception e) {
-            orgId = "ORG-BBMP";
+            orgId = organizations.findAll().stream()
+                    .findFirst()
+                    .map(gov.prajadisha.backend.org.model.Organization::getId)
+                    .orElse("unknown-org");
         }
 
         // 1. Save user message to database
@@ -101,7 +104,10 @@ public class AiChatService {
         try {
             orgId = organizations.getActiveOrgId();
         } catch (Exception e) {
-            orgId = "ORG-BBMP";
+            orgId = organizations.findAll().stream()
+                    .findFirst()
+                    .map(gov.prajadisha.backend.org.model.Organization::getId)
+                    .orElse("unknown-org");
         }
         List<AiChatMessage> messages = aiChatMessages.findByOfficerUserNameAndOrgIdOrderByTimestampAsc(officerUserName, orgId);
         return messages.stream()

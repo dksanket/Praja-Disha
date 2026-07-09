@@ -174,55 +174,68 @@ public class AiTriageService {
         String text = (nullToEmpty(task.getTitle()) + " " + nullToEmpty(task.getDescription()))
                 .toLowerCase(Locale.ROOT);
 
+        // 1. Resolve Category dynamically based on OrganizationConfig categories
         String category = "Grievance";
+        List<OrganizationConfig.OrgCategory> categories = categoriesFor(task.getOrgId());
+        if (!categories.isEmpty()) {
+            category = categories.get(0).getName(); // default to first category
+            for (OrganizationConfig.OrgCategory cat : categories) {
+                String catName = cat.getName().toLowerCase();
+                String catDesc = nullToEmpty(cat.getDescription()).toLowerCase();
+                if (text.contains(catName) || (!catDesc.isEmpty() && containsAnyWord(text, catDesc))) {
+                    category = cat.getName();
+                    break;
+                }
+            }
+        }
+
+        // 2. Resolve Department dynamically based on Organization's departments
         String department = "General Administration";
-        String title = "Civic Concern";
-        if (containsAny(text, "streetlight", "light", "road", "pothole", "signal", "footpath", "bridge")) {
-            category = "Infrastructure";
-            department = "Roads & Streetlights";
-            if (text.contains("light") || text.contains("lamp")) {
-                title = "Streetlight Issue";
-            } else if (text.contains("pothole")) {
-                title = "Road Pothole";
-            } else {
-                title = "Infrastructure Concern";
+        List<Department> orgDepts = departments.findByOrgId(task.getOrgId());
+        if (!orgDepts.isEmpty()) {
+            Department matchedDept = null;
+            for (Department d : orgDepts) {
+                String deptName = d.getName().toLowerCase();
+                String deptRole = nullToEmpty(d.getRoleDescription()).toLowerCase();
+                if (text.contains(deptName) || (!deptRole.isEmpty() && containsAnyWord(text, deptRole))) {
+                    matchedDept = d;
+                    break;
+                }
             }
-        } else if (containsAny(text, "garbage", "waste", "sewage", "drain", "sanitation", "toilet")) {
-            category = "Sanitation";
-            department = "Sanitation";
-            if (text.contains("garbage") || text.contains("waste")) {
-                title = "Garbage Dumping";
-            } else if (text.contains("sewage") || text.contains("drain")) {
-                title = "Drainage/Sewage Issue";
+            if (matchedDept != null) {
+                department = matchedDept.getName();
             } else {
-                title = "Sanitation Concern";
+                department = orgDepts.get(0).getName();
             }
-        } else if (containsAny(text, "water", "supply", "leak", "pipe")) {
-            category = "Water Supply";
-            department = "Water Board";
-            if (text.contains("leak") || text.contains("pipe")) {
-                title = "Water Pipe Leak";
-            } else {
-                title = "Water Supply Concern";
-            }
-        } else if (containsAny(text, "tree", "park", "garden", "horticulture")) {
-            category = "Horticulture";
-            department = "Horticulture";
-            title = "Horticulture Issue";
         }
 
-        if ("Civic Concern".equals(title)) {
-            title = generateFallbackTitle(task.getDescription());
-        }
+        // 3. Generate fallback title dynamically
+        String title = generateFallbackTitle(task.getDescription());
 
+        // 4. Resolve Priority dynamically based on keywords
         String priority = "P2";
-        if (containsAny(text, "danger", "urgent", "accident", "fire", "collapse", "electric", "shock")) {
-            priority = "P0";
-        } else if (containsAny(text, "broken", "not working", "flicker", "overflow", "block")) {
-            priority = "P1";
+        List<String> priorities = prioritiesFor(task.getOrgId());
+        if (!priorities.isEmpty()) {
+            priority = priorities.size() > 2 ? priorities.get(2) : priorities.get(0);
+        }
+        
+        if (containsAny(text, "danger", "urgent", "accident", "fire", "collapse", "electric", "shock", "safety")) {
+            priority = priorities.isEmpty() ? "P0" : priorities.get(0);
+        } else if (containsAny(text, "broken", "not working", "flicker", "overflow", "block", "leak")) {
+            priority = priorities.isEmpty() ? "P1" : (priorities.size() > 1 ? priorities.get(1) : priorities.get(0));
         }
 
         return new Classification(category, priority, department, title, "English");
+    }
+
+    private boolean containsAnyWord(String text, String sentence) {
+        String[] words = sentence.replaceAll("[^a-zA-Z0-9\\s]", "").split("\\s+");
+        for (String w : words) {
+            if (w.length() > 3 && text.contains(w)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String generateFallbackTitle(String description) {

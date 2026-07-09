@@ -7,6 +7,7 @@ import { Department } from '../../../../core/models/manage-team/manage-team.doma
 import { Officer } from '../../../../core/models/officer.model';
 import { DepartmentService } from '../../../../core/services/department.service';
 import { OfficerService } from '../../../../core/services/officer.service';
+import { OrganizationService } from '../../../../core/services/organization.service';
 
 /** UI definition for officer details sidebar representation */
 interface ProfileNode {
@@ -61,16 +62,29 @@ export class AddEditOfficerComponent implements OnInit {
   isFormSubmitted = false;
   errorMessage = '';
 
+  activeOrgId = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private departmentService: DepartmentService,
-    private officerService: OfficerService
+    private officerService: OfficerService,
+    private organizationService: OrganizationService
   ) {}
 
   ngOnInit(): void {
     this.officerId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.officerId;
+
+    // Load active organization
+    this.organizationService.getActiveOrganization().subscribe({
+      next: (org) => {
+        if (org) {
+          this.activeOrgId = org.id;
+        }
+      },
+      error: (err) => console.error('Error fetching active organization:', err),
+    });
 
     // Load static lists
     this.departmentService.getDepartments().subscribe({
@@ -316,7 +330,7 @@ export class AddEditOfficerComponent implements OnInit {
 
     const officerPayload: Officer = {
       id: this.isEditMode && this.officerId ? this.officerId : this.generateNextId(this.allOfficers),
-      orgIds: ['ORG-001'],
+      orgIds: this.activeOrgId ? [this.activeOrgId] : [],
       officerUserName: this.officerUserName.trim(),
       name: this.name.trim(),
       email: this.email.trim(),

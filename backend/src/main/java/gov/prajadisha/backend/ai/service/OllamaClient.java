@@ -38,18 +38,21 @@ public class OllamaClient {
 
     private static final Logger log = LoggerFactory.getLogger(OllamaClient.class);
 
-    private final RestClient http;
+    private final RestClient chatHttp;
+    private final RestClient embedHttp;
     private final ObjectMapper mapper;
 
     private final boolean enabled;
     private final String apiKey;
     private final String chatModel;
     private final String embedModel;
+    private final boolean hasCustomEmbedUrl;
 
     public OllamaClient(
             ObjectMapper mapper,
             @Value("${ollama.enabled:true}") boolean enabled,
             @Value("${ollama.base-url:https://ollama.com}") String baseUrl,
+            @Value("${ollama.embed-base-url:}") String embedBaseUrl,
             @Value("${ollama.api-key:}") String apiKey,
             @Value("${ollama.chat-model:gpt-oss:120b}") String chatModel,
             @Value("${ollama.embed-model:embeddinggemma}") String embedModel,
@@ -59,23 +62,45 @@ public class OllamaClient {
         this.apiKey = apiKey == null ? "" : apiKey.trim();
         this.chatModel = chatModel;
         this.embedModel = embedModel;
+        this.hasCustomEmbedUrl = embedBaseUrl != null && !embedBaseUrl.isBlank();
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout((int) Duration.ofSeconds(15).toMillis());
         factory.setReadTimeout((int) Duration.ofSeconds(Math.max(timeoutSeconds, 5)).toMillis());
 
-        RestClient.Builder builder = RestClient.builder()
+        // Chat REST Client configuration
+        RestClient.Builder chatBuilder = RestClient.builder()
                 .requestFactory(factory)
                 .baseUrl(baseUrl == null ? "https://ollama.com" : baseUrl.replaceAll("/+$", ""));
         if (!this.apiKey.isEmpty()) {
-            builder.defaultHeader("Authorization", "Bearer " + this.apiKey);
+            chatBuilder.defaultHeader("Authorization", "Bearer " + this.apiKey);
         }
-        this.http = builder.build();
+        this.chatHttp = chatBuilder.build();
+
+        // Embed REST Client configuration
+        String finalEmbedUrl = this.hasCustomEmbedUrl ? embedBaseUrl : (baseUrl == null ? "https://ollama.com" : baseUrl);
+        RestClient.Builder embedBuilder = RestClient.builder()
+                .requestFactory(factory)
+                .baseUrl(finalEmbedUrl.replaceAll("/+$", ""));
+        if (!this.apiKey.isEmpty() && !this.hasCustomEmbedUrl) {
+            embedBuilder.defaultHeader("Authorization", "Bearer " + this.apiKey);
+        }
+        this.embedHttp = embedBuilder.build();
     }
 
-    /** True when AI calls should be attempted (feature on and an API key is present). */
-    public boolean isEnabled() {
+    /** True when chat/triage AI calls should be attempted. */
+    public boolean isChatEnabled() {
         return enabled && !apiKey.isEmpty();
+    }
+
+    /** True when embedding vector generation is enabled. */
+    public boolean isEmbedEnabled() {
+        return enabled && (!apiKey.isEmpty() || hasCustomEmbedUrl);
+    }
+
+    /** True when AI calls should be attempted (for backward compatibility). */
+    public boolean isEnabled() {
+        return isChatEnabled();
     }
 
     public String chat(String system, String user) {
@@ -102,8 +127,8 @@ public class OllamaClient {
     }
 
     private JsonNode chatInternal(String system, List<Map<String, String>> history, String user, Object format) {
-        if (!isEnabled()) {
-            throw new OllamaException("Ollama is disabled or no API key configured");
+        if (!isChatEnabled()) {
+            throw new OllamaException("Ollama chat is disabled or no API key configured");
         }
         List<Map<String, String>> messages = new ArrayList<>();
         if (system != null && !system.isBlank()) {
@@ -123,7 +148,7 @@ public class OllamaClient {
         }
 
         try {
-            String raw = http.post()
+            String raw = chatHttp.post()
                     .uri("/api/chat")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(body)
@@ -142,12 +167,12 @@ public class OllamaClient {
      * if the embedding model is unavailable, so it never blocks ticket processing.
      */
     public List<Double> embed(String text) {
-        if (!isEnabled() || text == null || text.isBlank()) {
+        if (!isEmbedEnabled() || text == null || text.isBlank()) {
             return List.of();
         }
         Map<String, Object> body = Map.of("model", embedModel, "input", text);
         try {
-            String raw = http.post()
+            String raw = embedHttp.post()
                     .uri("/api/embed")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(body)

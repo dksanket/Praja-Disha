@@ -47,6 +47,6 @@ public class AiChatController {
         if (headerUsername != null && !headerUsername.isBlank()) {
             return headerUsername;
         }
-        return "rajesh_kumar"; // BBMP admin officer fallback
+        return "aarav_sharma"; // New Delhi MP office admin officer fallback
     }
 }
